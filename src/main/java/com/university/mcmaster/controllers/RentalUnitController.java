@@ -18,7 +18,7 @@ public class RentalUnitController {
 
     @GetMapping("/rental-units")
     public ResponseEntity<ApiResponse<?>> getRentalUnits(
-            @RequestParam("requestId") String requestId,
+            @RequestHeader("requestId") String requestId,
             @RequestParam(name = "limit",required = false,defaultValue = "10") int limit,
             @RequestParam(name = "lastSeen",required = false) String lastSeen,
             HttpServletRequest request
@@ -29,7 +29,7 @@ public class RentalUnitController {
     @PostMapping("/rental-units")
     public ResponseEntity<ApiResponse<?>> addRentalUnit(
             @RequestBody AddUpdateRentalUnitRequestDto requestDto,
-            @RequestParam("requestId") String requestId,
+            @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
         return rentalUnitService.addRentalUnit(requestDto,requestId,request);
@@ -39,7 +39,7 @@ public class RentalUnitController {
     public ResponseEntity<ApiResponse<?>> updateRentalUnits(
             @PathVariable("rentalUnitId") String rentalUnitId,
             @RequestBody AddUpdateRentalUnitRequestDto requestDto,
-            @RequestParam("requestId") String requestId,
+            @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
         return rentalUnitService.updateRentalUnits(requestId,request);
@@ -48,7 +48,7 @@ public class RentalUnitController {
     @DeleteMapping("/rental-units/{rentalUnitId}")
     public ResponseEntity<ApiResponse<?>> deleteRentalUnits(
             @PathVariable("rentalUnitId") String rentalUnitId,
-            @RequestParam("requestId") String requestId,
+            @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
         return rentalUnitService.deleteRentalUnits(rentalUnitId,requestId,request);

@@ -17,7 +17,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody RegisterRequestDto requestDto,
-            @RequestParam("requestId") String requestId
+            @RequestHeader("requestId") String requestId
     ){
         return authService.registerUser(requestDto,requestId);
     }
@@ -25,7 +25,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @RequestBody LogInRequestDto requestDto,
-            @RequestParam("requestId") String requestId
+            @RequestHeader("requestId") String requestId
     ){
         return authService.login(requestDto,requestId);
     }

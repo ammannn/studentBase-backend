@@ -7,5 +7,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface FileService {
     ResponseEntity<ApiResponse<?>> getUploadUrlForFile(GetUploadUrlForFileRequestDto requestDro, String requestId, HttpServletRequest request);
-    ResponseEntity<ApiResponse<?>> confirmFileUpload(String fileId, HttpServletRequest request);
+    ResponseEntity<ApiResponse<?>> confirmFileUpload(String fileId,String requestId, HttpServletRequest request);
 }

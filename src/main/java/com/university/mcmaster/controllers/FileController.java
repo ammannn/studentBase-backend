@@ -18,7 +18,7 @@ public class FileController {
     @PostMapping("/files")
     public ResponseEntity<ApiResponse<?>> getUploadUrlForFile(
             @RequestBody GetUploadUrlForFileRequestDto requestDro,
-            @RequestParam("requestId") String requestId,
+            @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
         return fileService.getUploadUrlForFile(requestDro,requestId,request);
@@ -27,8 +27,9 @@ public class FileController {
     @PostMapping("/files/{fileId}/cnfm")
     public ResponseEntity<ApiResponse<?>> confirmFileUpload(
             @PathVariable("fileId") String fileId,
+            @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
-        return fileService.confirmFileUpload(fileId,request);
+        return fileService.confirmFileUpload(fileId,requestId,request);
     }
 }

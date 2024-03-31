@@ -51,7 +51,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<?>> confirmFileUpload(String fileId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<?>> confirmFileUpload(String fileId,String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
         if(null == fileId || fileId.isEmpty()) throw new MissingRequiredParamException("fileId");

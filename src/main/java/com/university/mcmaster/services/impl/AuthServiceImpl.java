@@ -1,5 +1,6 @@
 package com.university.mcmaster.services.impl;
 
+import com.university.mcmaster.controllers.LogInResponseDto;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
@@ -19,10 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,19 +104,21 @@ public class AuthServiceImpl implements AuthService {
         CustomUserDetails userDetails = FirebaseAuthenticationService.verifyToken(requestDto.getAuthToken());
         if(null == userDetails) throw new InvalidParamValueException("auth_token");
         User user = userService.findUserById(userDetails.getId());
-        if(null == user) throw new ActionNotAllowedException("login","user is not registered");
+        LogInResponseDto responseDto = new LogInResponseDto();
+        if(null == user) {
+            return ResponseEntity.ok(ApiResponse.builder().build());
+        }
+        responseDto.setRegistered(true);
         if(user.getRole().contains(UserRole.student)){
-            return ResponseEntity.ok(ApiResponse.builder()
-                            .data(StudentLogInResponse.builder()
-                                    .email(user.getEmail())
-                                    .phoneNumber(user.getPhoneNumber())
-                                    .verified(user.isVerified())
-                                    .name(user.getName())
-                                    .userRole(UserRole.student)
-                                    .build())
+            responseDto.setStudent(StudentLogInResponse.builder()
+                    .email(user.getEmail())
+                    .phoneNumber(user.getPhoneNumber())
+                    .verified(user.isVerified())
+                    .name(user.getName())
+                    .userRole(UserRole.student)
                     .build());
         }else if(user.getRole().contains(UserRole.rental_unit_owner)){
-            return ResponseEntity.ok(RentalUnitOwnerLogInResponse.builder()
+            responseDto.setRentalUnitOwner(RentalUnitOwnerLogInResponse.builder()
                     .email(user.getEmail())
                     .phoneNumber(user.getPhoneNumber())
                     .verified(user.isVerified())
@@ -125,6 +126,9 @@ public class AuthServiceImpl implements AuthService {
                     .userRole(UserRole.rental_unit_owner)
                     .build());
         }
-        throw new ActionNotAllowedException("log_in","in valid user role");
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(responseDto)
+                        .status(200)
+                .build());
     }
 }
