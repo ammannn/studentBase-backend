@@ -42,7 +42,7 @@ public class RentalUnitController {
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
-        return rentalUnitService.updateRentalUnits(requestId,request);
+        return rentalUnitService.updateRentalUnits(rentalUnitId,requestDto,requestId,request);
     }
 
     @DeleteMapping("/rental-units/{rentalUnitId}")

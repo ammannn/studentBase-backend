@@ -7,6 +7,7 @@ import com.university.mcmaster.repositories.utils.FirebaseUtils;
 import com.university.mcmaster.utils.FirestoreConstants;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Repository
@@ -29,5 +30,10 @@ public class UserRepoImpl extends FirebaseUtils<User> implements UserRepo {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void update(String userId,Map<String, Object> updateMap) {
+        update(userId,FirestoreConstants.FS_USERS,updateMap);
     }
 }

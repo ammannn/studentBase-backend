@@ -3,6 +3,7 @@ package com.university.mcmaster.repositories;
 import com.university.mcmaster.models.entities.File;
 
 import java.util.HashMap;
+import java.util.List;
 
 public interface FileRepo {
 //    void save(File file);
@@ -12,4 +13,6 @@ public interface FileRepo {
     void update(String fileId, HashMap<String, Object> uploadedOnGcp);
 
     boolean save(File file);
+
+    List<File> getFilesByRentalUnitIdAndDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId);
 }

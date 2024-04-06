@@ -1,11 +1,13 @@
 package com.university.mcmaster.models.entities;
 
 import com.university.mcmaster.enums.UserRole;
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.FirebaseCommonProps;
 import com.university.mcmaster.utils.FirestoreConstants;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -15,14 +17,21 @@ import java.util.List;
 public class User implements FirebaseCommonProps {
         private static String collection = FirestoreConstants.FS_USERS;
         private String id;
-        private String email;
-        private String phoneNumber;
-        private String name;
-        private boolean verified;
+        private VerificationStatus verificationStatus;
         private boolean deleted;
         private long verifiedOn;
         private long createdOn;
         private List<UserRole> role;
+
+        private String email;
+        private String phoneNumber;
+        private String name;
+        private String dob;
+        private String nationality;
+        private String emergencyContact;
+        private String additionalEmail;
+        private List<Address> addresses;
+        private Map<String,String> documentPaths;
 
         @Override
         public String getCollection() {

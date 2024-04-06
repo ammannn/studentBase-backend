@@ -32,4 +32,13 @@ public class FileController {
     ){
         return fileService.confirmFileUpload(fileId,requestId,request);
     }
+
+    @DeleteMapping("/files/{fileId}")
+    public ResponseEntity<?> deleteFile(
+            @PathVariable("fileId") String fileId,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return fileService.deleteFile(fileId,requestId,request);
+    }
 }

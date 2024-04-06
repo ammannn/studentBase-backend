@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -26,5 +27,15 @@ public class FileRepoImpl extends FirebaseUtils<File> implements FileRepo {
     @Override
     public void update(String fileId, HashMap<String, Object> updateMap) {
         update(fileId,FirestoreConstants.FS_FILES,updateMap);
+    }
+
+    @Override
+    public List<File> getFilesByRentalUnitIdAndDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId) {
+        return processQueryForEntityList(
+                FirestoreClient.getFirestore().collection(FirestoreConstants.FS_FILES)
+                        .whereEqualTo("rentalUnitId",rentalUnitId)
+                        .whereEqualTo("deleted",false)
+                        .whereEqualTo("uploadedOnGcp",true)
+                ,File.class);
     }
 }

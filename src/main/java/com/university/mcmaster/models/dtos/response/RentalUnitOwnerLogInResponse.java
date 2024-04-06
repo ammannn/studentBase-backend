@@ -11,8 +11,6 @@ import lombok.*;
 public class RentalUnitOwnerLogInResponse{
     private String email;
     private String phoneNumber;
-    private boolean verified;
-    private long verifiedOn;
     private UserRole userRole;
     private String name;
 }
