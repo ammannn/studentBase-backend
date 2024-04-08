@@ -110,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
         if(false == StringUtils.hasText(requestDto.getAuthToken())) throw new MissingRequiredParamException("authToken");
 //        if(false == StringUtils.hasText(requestDto.getAddress())) throw new MissingRequiredParamException("address");
 //        if(false == StringUtils.hasText(requestDto.getEmergencyContact())) throw new MissingRequiredParamException("emergencyContact");
-        if(false == StringUtils.hasText(requestDto.getName())) throw new MissingRequiredParamException("name");
+//        if(false == StringUtils.hasText(requestDto.getName())) throw new MissingRequiredParamException("name");
     }
 
     @Override
