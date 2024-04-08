@@ -1,6 +1,5 @@
 package com.university.mcmaster.services.impl;
 
-import com.university.mcmaster.enums.FileType;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
@@ -11,6 +10,7 @@ import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.response.RentalUnitForOwner;
+import com.university.mcmaster.models.dtos.response.RentalUnitForStudent;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.File;
 import com.university.mcmaster.models.entities.RentalUnit;
@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,10 +43,10 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     public ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
-        if(userDetails.getRoles().contains(UserRole.student.name())){
+        if(userDetails.getRoles().contains(UserRole.student.name())) {
             return getRentalUnitsForStudent(userDetails,limit,lastSeen,requestId);
         }
-        if(userDetails.getRoles().contains(UserRole.rental_unit_owner.name())){
+        if(userDetails.getRoles().contains(UserRole.rental_unit_owner.name())) {
             return getRentalUnitsForRentalUnitOwner(userDetails,limit,lastSeen,requestId);
         }
         throw new ActionNotAllowedException("get_rental_units","user is not registered either as student or rental unit owner");
@@ -79,7 +78,21 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     }
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
-        return null;
+        List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusVerifiedAndDeletedFalse(limit,lastSeen);
+        List<RentalUnitForStudent> res = rentalUnits.stream().map(r -> {
+            return RentalUnitForStudent.builder()
+                    .rent(r.getRent())
+                    .deposit(r.getDeposit())
+                    .address(r.getAddress())
+                    .features(r.getFeatures())
+                    .rentalUnitStatus(r.getRentalUnitStatus())
+                    .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
+                    .build();
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .status(200)
+                        .data(res)
+                .build());
     }
 
     @Override

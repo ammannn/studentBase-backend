@@ -52,4 +52,14 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
         query = addLastSeen(query,FirestoreConstants.FS_RENTAL_UNITS,lastSeen);
         return processQueryForEntityList(query,RentalUnit.class);
     }
+
+    @Override
+    public List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusVerifiedAndDeletedFalse(int limit, String lastSeen) {
+        Query query = FirestoreClient.getFirestore().collection(FirestoreConstants.FS_RENTAL_UNITS)
+                .whereEqualTo("verificationStatus",VerificationStatus.verified)
+                .whereEqualTo("deleted",false)
+                .limit(limit);
+        query = addLastSeen(query,FirestoreConstants.FS_RENTAL_UNITS,lastSeen);
+        return processQueryForEntityList(query,RentalUnit.class);
+    }
 }
