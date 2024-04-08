@@ -9,6 +9,7 @@ public class EnvironmentVariables {
     public static final String PUBSUB_EMULATOR_HOST = getEnvString("PUBSUB_EMULATOR_HOST",false);
     public static final String BUCKET_NAME = getEnvString("BUCKET_NAME",false);
     public static final String GOOGLE_APPLICATION_CREDENTIALS = getGoogleCreds();
+    public static final String ADMIN_EMAIL = getEnvString("ADMIN_EMAIL",false);
 
     public static boolean isProd() {
         return ENVIRONMENT != null && ENVIRONMENT.contains("prod");

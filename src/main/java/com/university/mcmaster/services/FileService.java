@@ -6,9 +6,12 @@ import com.university.mcmaster.models.entities.File;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 public interface FileService {
     ResponseEntity<ApiResponse<?>> getUploadUrlForFile(GetUploadUrlForFileRequestDto requestDro, String requestId, HttpServletRequest request);
     ResponseEntity<ApiResponse<?>> confirmFileUpload(String fileId,String requestId, HttpServletRequest request);
     ResponseEntity<?> deleteFile(String fileId, String requestId, HttpServletRequest request);
     File getFileById(String posterImageId);
+    List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
 }

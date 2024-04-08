@@ -2,6 +2,7 @@ package com.university.mcmaster.repositories.impl;
 
 import com.google.cloud.firestore.Query;
 import com.google.firebase.cloud.FirestoreClient;
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.repositories.utils.FirebaseUtils;
@@ -39,5 +40,16 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen) {
+        Query query = FirestoreClient.getFirestore()
+                .collection(FirestoreConstants.FS_RENTAL_UNITS)
+                .whereEqualTo("verificationStatus",verificationStatus)
+                .whereEqualTo("deleted",false);
+        if(limit > 0 ) query = query.limit(limit);
+        query = addLastSeen(query,FirestoreConstants.FS_RENTAL_UNITS,lastSeen);
+        return processQueryForEntityList(query,RentalUnit.class);
     }
 }

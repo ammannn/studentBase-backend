@@ -1,5 +1,6 @@
 package com.university.mcmaster.repositories;
 
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.RentalUnit;
 
 import java.util.HashMap;
@@ -14,4 +15,6 @@ public interface RentalUnitRepo {
     void update(String rentalUnitId, Map<String, Object> posterImageId);
 
     RentalUnit findById(String rentalUnitId);
+
+    List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen);
 }

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -192,5 +193,30 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             put("posterImageId",posterImageId);
             put("posterImagePath",imagePath);
         }});
+    }
+
+    @Override
+    public List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen) {
+       List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(verificationStatus,limit,lastSeen);
+        for (RentalUnit rentalUnit : rentalUnits) {
+            rentalUnit.setCustomFields(new HashMap<>());
+            if(null != rentalUnit.getPosterImagePath()) rentalUnit.getCustomFields().put("posterImagePath",GcpStorageUtil.createGetUrl(rentalUnit.getPosterImagePath()));
+            List<File> files = fileService.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(rentalUnit.getId());
+            rentalUnit.getCustomFields().put("images",files.stream().map(f->new HashMap<String,Object>(){{
+                put("imageId",f.getId());
+                put("url",GcpStorageUtil.createGetUrl(f.getFilePath()));
+            }}).collect(Collectors.toList()));
+        }
+       return rentalUnits;
+    }
+
+    @Override
+    public RentalUnit findRentalUnitById(String rentalUnitId) {
+        return rentalUnitRepo.findById(rentalUnitId);
+    }
+
+    @Override
+    public void updateRentalUnit(String rentalUnitId, HashMap<String, Object> updateMap) {
+        rentalUnitRepo.update(rentalUnitId,updateMap);
     }
 }

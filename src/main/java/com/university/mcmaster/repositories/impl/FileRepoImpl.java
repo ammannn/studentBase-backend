@@ -4,6 +4,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.university.mcmaster.models.entities.File;
 import com.university.mcmaster.repositories.FileRepo;
 import com.university.mcmaster.repositories.utils.FirebaseUtils;
+import com.university.mcmaster.utils.Constants;
 import com.university.mcmaster.utils.FirestoreConstants;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +38,17 @@ public class FileRepoImpl extends FirebaseUtils<File> implements FileRepo {
                         .whereEqualTo("deleted",false)
                         .whereEqualTo("uploadedOnGcp",true)
                 ,File.class);
+    }
+
+    @Override
+    public List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String rentalUnitId) {
+        return processQueryForEntityList(
+                FirestoreClient.getFirestore().collection(FirestoreConstants.FS_FILES)
+                        .whereEqualTo("rentalUnitId",rentalUnitId)
+                        .whereEqualTo("deleted",false)
+                        .whereEqualTo("uploadedOnGcp",true)
+                        .limit(Constants.RENTAL_UNIT_IMAGES_LIMIT)
+                ,File.class
+        );
     }
 }

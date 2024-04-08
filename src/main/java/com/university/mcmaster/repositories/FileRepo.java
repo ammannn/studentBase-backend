@@ -15,4 +15,6 @@ public interface FileRepo {
     boolean save(File file);
 
     List<File> getFilesByRentalUnitIdAndDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId);
+
+    List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
 }

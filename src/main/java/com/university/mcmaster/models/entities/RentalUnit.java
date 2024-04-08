@@ -7,6 +7,8 @@ import com.university.mcmaster.models.FirebaseCommonProps;
 import com.university.mcmaster.utils.FirestoreConstants;
 import lombok.*;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,6 +29,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private String userId;
     private String posterImageId;
     private String posterImagePath;
+    private Map<String,Object> customFields;
 
     @Override
     public String getCollection() {

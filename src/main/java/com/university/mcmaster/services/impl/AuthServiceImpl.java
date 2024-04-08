@@ -12,10 +12,12 @@ import com.university.mcmaster.models.dtos.request.LogInRequestDto;
 import com.university.mcmaster.models.dtos.request.RegisterRequestDto;
 import com.university.mcmaster.services.AuthService;
 import com.university.mcmaster.services.UserService;
+import com.university.mcmaster.utils.EnvironmentVariables;
 import com.university.mcmaster.utils.FirebaseAuthenticationService;
 import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -54,11 +56,18 @@ public class AuthServiceImpl implements AuthService {
         if(null == userDetails) throw new InvalidParamValueException("authToken");
         User rentalUnitOwner = userService.findUserById(userDetails.getId());
         if(null != rentalUnitOwner) throw new ActionNotAllowedException("register_user","user already exists");
+        List<UserRole> roles = new ArrayList<>(){{
+            add(UserRole.rental_unit_owner);
+            add(UserRole.user);
+        }};
+        if(userDetails.getEmail().equals(EnvironmentVariables.ADMIN_EMAIL)){
+            roles.add(UserRole.admin);
+        }
         rentalUnitOwner = User.builder()
                 .id(userDetails.getId())
                 .email(requestDto.getEmail())
                 .phoneNumber(requestDto.getPhoneNumber())
-                .role(Arrays.asList(UserRole.rental_unit_owner,UserRole.user))
+                .role(roles)
                 .createdOn(Instant.now().toEpochMilli())
                 .build();
         boolean isSaved = userService.saveUser(rentalUnitOwner);
@@ -73,12 +82,19 @@ public class AuthServiceImpl implements AuthService {
         if(null == userDetails) throw new InvalidParamValueException("authToken");
         User student = userService.findUserById(userDetails.getId());
         if(null != student) throw new ActionNotAllowedException("register_user","user already exists");
+        List<UserRole> roles = new ArrayList<>(){{
+            add(UserRole.student);
+            add(UserRole.user);
+        }};
+        if(userDetails.getEmail().equals(EnvironmentVariables.ADMIN_EMAIL)){
+            roles.add(UserRole.admin);
+        }
         student = User.builder()
                 .id(userDetails.getId())
                 .email(requestDto.getEmail())
                 .name(requestDto.getName())
                 .phoneNumber(requestDto.getPhoneNumber())
-                .role(Arrays.asList(UserRole.student,UserRole.user))
+                .role(roles)
                 .createdOn(Instant.now().toEpochMilli())
                 .build();
         boolean isSaved = userService.saveUser(student);

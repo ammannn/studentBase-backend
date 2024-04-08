@@ -119,4 +119,9 @@ public class FileServiceImpl implements FileService {
     public File getFileById(String imageId) {
         return fileRepo.findById(imageId);
     }
+
+    @Override
+    public List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id) {
+        return fileRepo.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(id);
+    }
 }

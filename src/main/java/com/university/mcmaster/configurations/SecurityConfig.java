@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(registry ->
                     registry
                             .requestMatchers(getPublicRouts()).permitAll()
-                            .requestMatchers(getAdminRouts()).hasRole("admin")
+                            .requestMatchers(getAdminRouts()).hasAnyRole("admin","platform_admin")
                             .anyRequest().authenticated()
                 )
                 .sessionManagement(config->config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

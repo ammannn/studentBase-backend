@@ -10,9 +10,11 @@ import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.UpdateUserRequestDto;
 import com.university.mcmaster.models.entities.Address;
 import com.university.mcmaster.models.entities.CustomUserDetails;
+import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.repositories.UserRepo;
 import com.university.mcmaster.services.UserService;
+import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +53,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(String userId, Map<String, Object> updateMap) {
         userRepo.update(userId,updateMap);
+    }
+
+    @Override
+    public List<User> getPaginatedUsersByVerificationStatusForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen) {
+        List<User> users = userRepo.getPaginatedUsersByVerificationStatusForAdmin(verificationStatus,limit,lastSeen);
+        for (User user : users) {
+            List<Map<String,String>> urls = user.getDocumentPaths().entrySet().stream().map(e->{
+                return new HashMap<String,String>(){{
+                   put(e.getKey(), GcpStorageUtil.createGetUrl(e.getValue()).toString());
+                }};
+            }).collect(Collectors.toList());
+            user.setCustomFields(new HashMap<String, Object>(){{
+                put("documents",urls);
+            }});
+        }
+        return users;
     }
 
     private ResponseEntity<?> updateRentalUnitOwnerUserUnAuth(String userId, UpdateUserRequestDto requestDto, boolean isAdmin, String requestId) {

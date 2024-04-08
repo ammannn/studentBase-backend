@@ -1,9 +1,14 @@
 package com.university.mcmaster.services;
 
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
+import com.university.mcmaster.models.entities.RentalUnit;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+
+import java.util.HashMap;
+import java.util.List;
 
 public interface RentalUnitService {
     ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request);
@@ -11,4 +16,9 @@ public interface RentalUnitService {
     ResponseEntity<ApiResponse<?>> updateRentalUnits(String rentalUnitId,AddUpdateRentalUnitRequestDto requestDto,String requestId, HttpServletRequest request);
     ResponseEntity<ApiResponse<?>> deleteRentalUnits(String rentalUnitId, String requestId, HttpServletRequest request);
     void updateRentalUnitPosterImage(String rentalUnitId, String imageId,String imagePath);
+    List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen);
+
+    RentalUnit findRentalUnitById(String rentalUnitId);
+
+    void updateRentalUnit(String rentalUnitId, HashMap<String, Object> hashMap);
 }

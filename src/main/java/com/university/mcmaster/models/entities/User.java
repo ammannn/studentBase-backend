@@ -30,8 +30,12 @@ public class User implements FirebaseCommonProps {
         private String nationality;
         private String emergencyContact;
         private String additionalEmail;
+
+        private String reason;
+
         private List<Address> addresses;
         private Map<String,String> documentPaths;
+        private Map<String,Object> customFields;
 
         @Override
         public String getCollection() {
