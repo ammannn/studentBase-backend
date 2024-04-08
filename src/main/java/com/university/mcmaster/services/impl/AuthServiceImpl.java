@@ -47,6 +47,10 @@ public class AuthServiceImpl implements AuthService {
                 put("roles", finalUser.getRole().stream().map(UserRole::toString).collect(Collectors.joining(",")));
                 put("verified",false);
             }});
+            return ResponseEntity.ok(ApiResponse.builder()
+                            .status(200)
+                            .msg("user registered")
+                    .build());
         }
         throw new ActionNotAllowedException("register_user","invalid user role request");
     }
