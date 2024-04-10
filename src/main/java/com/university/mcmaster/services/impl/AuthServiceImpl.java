@@ -52,14 +52,14 @@ public class AuthServiceImpl implements AuthService {
                             .msg("user registered")
                     .build());
         }
-        throw new ActionNotAllowedException("register_user","invalid user role request");
+        throw new ActionNotAllowedException("register_user","invalid user role request",400);
     }
 
     private User registerRentalUnitOwner(RegisterRequestDto requestDto, String requestId) {
         CustomUserDetails userDetails = FirebaseAuthenticationService.verifyToken(requestDto.getAuthToken());
         if(null == userDetails) throw new InvalidParamValueException("authToken");
         User rentalUnitOwner = userService.findUserById(userDetails.getId());
-        if(null != rentalUnitOwner) throw new ActionNotAllowedException("register_user","user already exists");
+        if(null != rentalUnitOwner) throw new ActionNotAllowedException("register_user","user already exists",400);
         List<UserRole> roles = new ArrayList<>(){{
             add(UserRole.rental_unit_owner);
             add(UserRole.user);
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
         CustomUserDetails userDetails = FirebaseAuthenticationService.verifyToken(requestDto.getAuthToken());
         if(null == userDetails) throw new InvalidParamValueException("authToken");
         User student = userService.findUserById(userDetails.getId());
-        if(null != student) throw new ActionNotAllowedException("register_user","user already exists");
+        if(null != student) throw new ActionNotAllowedException("register_user","user already exists",400);
         List<UserRole> roles = new ArrayList<>(){{
             add(UserRole.student);
             add(UserRole.user);

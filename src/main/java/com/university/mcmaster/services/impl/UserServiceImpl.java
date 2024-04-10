@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         if(null == userDetails) throw new UnAuthenticatedUserException();
         if(userDetails.getRoles().contains(UserRole.student)) return updateStudentUnAuth(userDetails.getId(),requestDto,false,requestId);
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)) return updateRentalUnitOwnerUserUnAuth(userDetails.getId(),requestDto,false,requestId);
-        throw new ActionNotAllowedException("update_user","invalid user role");
+        throw new ActionNotAllowedException("update_user","invalid user role",400);
     }
 
     @Override

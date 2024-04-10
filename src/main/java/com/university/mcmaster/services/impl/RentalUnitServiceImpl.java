@@ -49,7 +49,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner.name())) {
             return getRentalUnitsForRentalUnitOwner(userDetails,limit,lastSeen,requestId);
         }
-        throw new ActionNotAllowedException("get_rental_units","user is not registered either as student or rental unit owner");
+        throw new ActionNotAllowedException("get_rental_units","user is not registered either as student or rental unit owner",401);
     }
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForRentalUnitOwner(CustomUserDetails userDetails, int limit, String lastSeen, String requestId) {
@@ -184,7 +184,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(null != requestDto.getPosterImageId() && false == requestDto.getPosterImageId().trim().isEmpty() && false == requestDto.getPosterImageId().trim().equals(rentalUnit.getPosterImageId())){
             File file = fileService.getFileById(requestDto.getPosterImageId());
             if(null == file) throw new EntityNotFoundException();
-            if(false ==  userId.equals(file.getUserId())) throw new ActionNotAllowedException("update_rental_unit","user tried to use image uploaded by other users");
+            if(false ==  userId.equals(file.getUserId())) throw new ActionNotAllowedException("update_rental_unit","user tried to use image uploaded by other users",401);
             updateMap.put("posterImageId",requestDto.getPosterImageId());
             updateMap.put("posterImagePath",file.getFilePath());
         }

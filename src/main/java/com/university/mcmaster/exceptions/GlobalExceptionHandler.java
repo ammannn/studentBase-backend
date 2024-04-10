@@ -11,9 +11,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ActionNotAllowedException.class)
     public ResponseEntity<?> handleActionNotAllowedException(ActionNotAllowedException ex){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(ex.getCode())
                 .body(ApiResponse.builder()
-                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .status(ex.getCode())
                         .msg(ex.getMessage())
                         .build());
     }
@@ -29,9 +29,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException ex){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST.value())
+                        .status(HttpStatus.NOT_FOUND.value())
                         .msg(ex.getMessage())
                         .build());
     }

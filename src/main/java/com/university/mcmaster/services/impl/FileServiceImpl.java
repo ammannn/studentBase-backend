@@ -45,15 +45,15 @@ public class FileServiceImpl implements FileService {
         if(null == requestDto.getContentType() || requestDto.getContentType().trim().isEmpty()) throw new MissingRequiredParamException("content_type");
         String rentalUnitId = null;
         if(userDetails.getRoles().contains(UserRole.student)){
-            if(FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new ActionNotAllowedException("upload_file","invalid file purpose");
+            if(FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new ActionNotAllowedException("upload_file","invalid file purpose",400);
         }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
-            if(FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new ActionNotAllowedException("upload_file","invalid file purpose");
+            if(FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new ActionNotAllowedException("upload_file","invalid file purpose",400);
             if(null == requestDto.getRentalUnitId() || requestDto.getRentalUnitId().isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
             rentalUnitId = requestDto.getRentalUnitId().trim();
             if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()){
                 List<File> files = fileRepo.getFilesByRentalUnitIdAndDeletedFalseAndUploadedOnGcpTrue(rentalUnitId);
-                if(files.size() >= Constants.RENTAL_UNIT_IMAGES_LIMIT) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit : " + Constants.RENTAL_UNIT_IMAGES_LIMIT);
+                if(files.size() >= Constants.RENTAL_UNIT_IMAGES_LIMIT) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit : " + Constants.RENTAL_UNIT_IMAGES_LIMIT,400);
             }
         }
         String fileId = UUID.randomUUID().toString();
@@ -104,7 +104,7 @@ public class FileServiceImpl implements FileService {
         if(null == fileId || fileId.isEmpty()) throw new MissingRequiredParamException("fileId");
         File file = fileRepo.findById(fileId);
         if(null != file){
-            if(false == userDetails.getId().equals(file.getUserId())) throw new ActionNotAllowedException("delete_file","user can delete file uploaded by himself");
+            if(false == userDetails.getId().equals(file.getUserId())) throw new ActionNotAllowedException("delete_file","user can delete file uploaded by himself",400);
             fileRepo.update(fileId,new HashMap<String, Object>(){{
                 put("deleted",true);
             }});
