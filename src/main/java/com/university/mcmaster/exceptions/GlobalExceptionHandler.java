@@ -1,6 +1,7 @@
 package com.university.mcmaster.exceptions;
 
 import com.university.mcmaster.models.dtos.request.ApiResponse;
+import jakarta.validation.constraints.Null;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -56,6 +57,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FailedToPerformOperation.class)
     public ResponseEntity<?> handleFailedToPerformOperation(FailedToPerformOperation ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .msg(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> handleNullPointerException(NullPointerException ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.builder()
                         .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

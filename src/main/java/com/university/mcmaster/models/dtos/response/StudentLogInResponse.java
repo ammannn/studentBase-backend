@@ -20,4 +20,5 @@ public class StudentLogInResponse {
     private UserRole userRole;
     private String name;
     private List<Map<String,String>> documents;
+    private boolean admin;
 }

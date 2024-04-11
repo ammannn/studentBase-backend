@@ -140,6 +140,7 @@ public class AuthServiceImpl implements AuthService {
                     .verificationStatus(user.getVerificationStatus())
                     .name(user.getName())
                     .userRole(UserRole.student)
+                    .admin(user.getRole().contains(UserRole.admin))
                     .documents(docs)
                     .build());
         }else if(user.getRole().contains(UserRole.rental_unit_owner)){
@@ -147,6 +148,7 @@ public class AuthServiceImpl implements AuthService {
                     .email(user.getEmail())
                     .phoneNumber(user.getPhoneNumber())
                     .name(user.getName())
+                    .admin(user.getRole().contains(UserRole.admin))
                     .userRole(UserRole.rental_unit_owner)
                     .build());
         }

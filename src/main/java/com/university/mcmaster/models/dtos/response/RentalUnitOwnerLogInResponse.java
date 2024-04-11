@@ -13,4 +13,5 @@ public class RentalUnitOwnerLogInResponse{
     private String phoneNumber;
     private UserRole userRole;
     private String name;
+    private boolean admin;
 }
