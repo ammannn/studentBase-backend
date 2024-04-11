@@ -70,7 +70,10 @@ public class FileServiceImpl implements FileService {
         URL url = GcpStorageUtil.createPostUrl(path,requestDto.getContentType());
         return ResponseEntity.status(200).body(ApiResponse.builder()
                         .status(200)
-                        .data(url).build());
+                        .data(new HashMap<String,Object>(){{
+                            put("fileId",fileId);
+                            put("url",url.toString());
+                        }}).build());
     }
 
     @Override
