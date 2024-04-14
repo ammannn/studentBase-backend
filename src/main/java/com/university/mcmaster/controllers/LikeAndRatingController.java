@@ -34,4 +34,12 @@ public class LikeAndRatingController {
         return likeAndRatingService.rateRentalUnit(rentalUnitId,star,requestId,request);
     }
 
+    @GetMapping("/like/rental-unit")
+    public ResponseEntity<?> getLikedRentalUnits(
+            @RequestHeader("requestId")String requestId,
+            HttpServletRequest request
+    ){
+        return likeAndRatingService.getLikedRentalUnits(requestId,request);
+    }
+
 }

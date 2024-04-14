@@ -90,26 +90,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusVerifiedAndDeletedFalse(limit,lastSeen);
         List<RentalUnitForStudent> res = rentalUnits.stream().map(r -> {
             LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),r.getId());
-            boolean liked = false;
-            double avgRating = Utility.getAverageRating(r.getRating());
-            int likes = r.getLikes();
-            int givenRating = 0;
-            if(null != likeAndRating){
-                liked = likeAndRating.isLiked();
-                givenRating = likeAndRating.getRating();
-            }
-            return RentalUnitForStudent.builder()
-                    .rent(r.getRent())
-                    .deposit(r.getDeposit())
-                    .address(r.getAddress())
-                    .liked(liked)
-                    .avgRating(avgRating)
-                    .likes(likes)
-                    .givenRating(givenRating)
-                    .features(r.getFeatures())
-                    .rentalUnitStatus(r.getRentalUnitStatus())
-                    .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
-                    .build();
+            return RentalUnitService.mapRentalUnitToResponseDtoForStudent(r,likeAndRating);
         }).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
@@ -279,6 +260,11 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     @Override
     public void decreamentRatingCountForRentalUnit(String rentalUnitId, int rating) {
         decrementOrIncrementRatingCountForRentalUnit(rentalUnitId,rating,"dec");
+    }
+
+    @Override
+    public RentalUnit getRentalUnitById(String rentalUnitId) {
+        return rentalUnitRepo.findById(rentalUnitId);
     }
 
     private void decrementOrIncrementRatingCountForRentalUnit(String rentalUnitId,int rating,String op) {
