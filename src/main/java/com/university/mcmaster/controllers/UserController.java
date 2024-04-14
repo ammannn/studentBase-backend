@@ -22,4 +22,12 @@ public class UserController {
     ){
         return userService.updateUser(requestDto,requestId,request);
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getUserDetails(
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return userService.getUserDetails(requestId,request);
+    }
 }

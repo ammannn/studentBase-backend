@@ -1,5 +1,7 @@
 package com.university.mcmaster.services.impl;
 
+import com.google.firebase.auth.UserRecord;
+import com.university.mcmaster.controllers.LogInResponseDto;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.exceptions.ActionNotAllowedException;
@@ -8,20 +10,29 @@ import com.university.mcmaster.exceptions.MissingRequiredParamException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.UpdateUserRequestDto;
+import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
+import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
 import com.university.mcmaster.models.entities.Address;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.repositories.UserRepo;
 import com.university.mcmaster.services.UserService;
+import com.university.mcmaster.utils.EnvironmentVariables;
+import com.university.mcmaster.utils.FirebaseAuthenticationService;
 import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +40,47 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepo userRepo;
+
+    @EventListener
+    public void createAdminUser(ApplicationStartedEvent event){
+        String email = EnvironmentVariables.ADMIN_EMAIL;
+        if(null != email && false == email.isEmpty()){
+            log.trace("checking for admin account for email : " + email);
+            User user = userRepo.findUserByEmail(email);
+            if(null == user){
+                log.trace("user admin account found, creating new admin account for : " + email);
+                UserRecord record = FirebaseAuthenticationService.createAdminAccount(email);
+                if(null != record){
+                    user = User.builder()
+                            .createdOn(Instant.now().toEpochMilli())
+                            .id(record.getUid())
+                            .email(email.trim().toLowerCase())
+                            .name("mcmaster admin")
+                            .verificationStatus(VerificationStatus.verified)
+                            .role(Arrays.asList(UserRole.user,UserRole.admin))
+                            .build();
+                    userRepo.save(user);
+                }else{
+                    log.trace("failed to create admin account");
+                }
+            }else if(false == user.getRole().contains(UserRole.admin)){
+                log.trace("found an existing admin account with missing admin role, updating user");
+                User finalUser = user;
+                user.getRole().add(UserRole.admin);
+                userRepo.update(user.getId(),new HashMap<String, Object>(){{
+                    put("role",finalUser.getRole());
+                }});
+                FirebaseAuthenticationService.updateClaims(user.getId(),new HashMap<String, Object>(){{
+                    put("roles", finalUser.getRole().stream().map(UserRole::toString).collect(Collectors.joining(",")));
+                    put("verified", true);
+                }});
+            }
+        }else{
+            log.trace("no admin email set");
+        }
+    }
 
     @Override
     public User findUserById(String id) {
@@ -69,6 +120,43 @@ public class UserServiceImpl implements UserService {
             }});
         }
         return users;
+    }
+
+    @Override
+    public ResponseEntity<?> getUserDetails(String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
+        User user = userRepo.findById(userDetails.getId());
+        LogInResponseDto responseDto = new LogInResponseDto();
+        if(null == user) {
+            return ResponseEntity.ok(ApiResponse.builder().build());
+        }
+        responseDto.setRegistered(true);
+        if(user.getRole().contains(UserRole.student)) {
+            List<Map<String,String>> docs = Optional.ofNullable(user.getDocumentPaths()).map(Map::entrySet)
+                    .stream().flatMap(Collection::stream)
+                    .map(e->new HashMap<String,String>(){{
+                        put(e.getKey(), GcpStorageUtil.createGetUrl(e.getValue()).toString());
+                    }}).collect(Collectors.toList());
+            responseDto.setStudent(StudentLogInResponse.builder()
+                    .email(user.getEmail())
+                    .phoneNumber(user.getPhoneNumber())
+                    .verificationStatus(user.getVerificationStatus())
+                    .name(user.getName())
+                    .userRole(UserRole.student)
+                    .admin(user.getRole().contains(UserRole.admin))
+                    .documents(docs)
+                    .build());
+        } else if(user.getRole().contains(UserRole.rental_unit_owner)) {
+            responseDto.setRentalUnitOwner(RentalUnitOwnerLogInResponse.builder()
+                    .email(user.getEmail())
+                    .phoneNumber(user.getPhoneNumber())
+                    .name(user.getName())
+                    .admin(user.getRole().contains(UserRole.admin))
+                    .userRole(UserRole.rental_unit_owner)
+                    .build());
+        }
+        return ResponseEntity.ok(responseDto);
     }
 
     private ResponseEntity<?> updateRentalUnitOwnerUserUnAuth(String userId, UpdateUserRequestDto requestDto, boolean isAdmin, String requestId) {

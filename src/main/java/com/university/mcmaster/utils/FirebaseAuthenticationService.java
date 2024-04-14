@@ -43,4 +43,17 @@ public class FirebaseAuthenticationService {
         }
         return false;
     }
+
+    public static UserRecord createAdminAccount(String email) {
+        UserRecord.CreateRequest request = new UserRecord.CreateRequest();
+        request.setEmailVerified(true);
+        request.setEmail(email.trim().toLowerCase());
+        request.setPassword("mcmaster@admin");
+        try {
+            return FirebaseAuth.getInstance().createUser(request);
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

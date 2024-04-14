@@ -18,4 +18,6 @@ public interface UserService {
     void updateUser(String userId, Map<String, Object> updateMap);
 
     List<User> getPaginatedUsersByVerificationStatusForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen);
+
+    ResponseEntity<?> getUserDetails(String requestId, HttpServletRequest request);
 }

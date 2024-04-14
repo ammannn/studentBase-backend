@@ -16,8 +16,11 @@ import com.university.mcmaster.utils.EnvironmentVariables;
 import com.university.mcmaster.utils.FirebaseAuthenticationService;
 import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -155,6 +158,21 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(responseDto)
                         .status(200)
+                .build());
+    }
+
+    @Override
+    public ResponseEntity<?> adminLogin(LogInRequestDto requestDto, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.admin)){
+            throw new UnAuthenticatedUserException();
+        }
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(new HashMap<String,Object>(){{
+                            put("email",userDetails.getEmail());
+                            put("name","user_name");
+                            put("admin",true);
+                        }})
                 .build());
     }
 }
