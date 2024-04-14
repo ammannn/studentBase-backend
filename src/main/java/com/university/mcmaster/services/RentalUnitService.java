@@ -21,4 +21,12 @@ public interface RentalUnitService {
     RentalUnit findRentalUnitById(String rentalUnitId);
 
     void updateRentalUnit(String rentalUnitId, HashMap<String, Object> hashMap);
+
+    void increamentLikeCountForRentalUnit(String rentalUnitId);
+
+    void decreamentLikeCountForRentalUnit(String rentalUnitId);
+
+    void increamentRatingCountForRentalUnit(String rentalUnitId, int star);
+
+    void decreamentRatingCountForRentalUnit(String rentalUnitId, int rating);
 }

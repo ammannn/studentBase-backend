@@ -1,6 +1,7 @@
 package com.university.mcmaster.models.entities;
 
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Internal;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.FirebaseCommonProps;
@@ -30,6 +31,8 @@ public class RentalUnit implements FirebaseCommonProps {
     private String posterImageId;
     private String posterImagePath;
     private Map<String,Object> customFields;
+    private Map<String, Integer> rating;
+    private int likes;
 
     @Override
     public String getCollection() {

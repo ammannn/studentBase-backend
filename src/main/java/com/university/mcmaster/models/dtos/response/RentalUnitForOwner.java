@@ -19,4 +19,6 @@ public class RentalUnitForOwner {
     private RentalUnitStatus rentalUnitStatus;
     private long createdOn;
     private String posterImageUrl;
+    private double avgRating;
+    private int likes;
 }

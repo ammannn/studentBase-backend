@@ -4,6 +4,7 @@ import com.university.mcmaster.models.entities.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,5 +44,20 @@ public class Utility {
             }
         }
         return true;
+    }
+
+    public static double getAverageRating(Map<String, Integer> ratings) {
+        int sum = 0;
+        int totalCount = 0;
+        if(null != ratings && false == ratings.isEmpty()){
+            for (Map.Entry<String, Integer> entry : ratings.entrySet()) {
+                int rating = Integer.parseInt(entry.getKey());
+                int count = entry.getValue();
+                sum += rating * count;
+                totalCount += count;
+            }
+            return (double) sum / totalCount;
+        }
+        return 0.0;
     }
 }

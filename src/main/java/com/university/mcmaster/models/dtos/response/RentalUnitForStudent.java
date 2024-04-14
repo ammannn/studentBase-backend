@@ -17,4 +17,8 @@ public class RentalUnitForStudent {
     private RentalUnitFeatures features;
     private RentalUnitStatus rentalUnitStatus;
     private String posterImageUrl;
+    private boolean liked;
+    private double avgRating;
+    private int likes;
+    private int givenRating;
 }

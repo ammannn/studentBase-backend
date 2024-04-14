@@ -1,5 +1,6 @@
 package com.university.mcmaster.services.impl;
 
+import com.google.cloud.firestore.FieldValue;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
@@ -13,9 +14,11 @@ import com.university.mcmaster.models.dtos.response.RentalUnitForOwner;
 import com.university.mcmaster.models.dtos.response.RentalUnitForStudent;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.File;
+import com.university.mcmaster.models.entities.LikeAndRating;
 import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.services.FileService;
+import com.university.mcmaster.services.LikeAndRatingService;
 import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
@@ -26,6 +29,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.FieldView;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +42,9 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     @Autowired
     @Lazy
     private FileService fileService;
+    @Autowired
+    @Lazy
+    private LikeAndRatingService likeAndRatingService;
 
     @Override
     public ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request) {
@@ -59,6 +66,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             String url = null;
             if(null != rentalUnit.getPosterImagePath())url = GcpStorageUtil.createGetUrl(rentalUnit.getPosterImagePath()).toString();
             res.add(RentalUnitForOwner.builder()
+                            .avgRating(Utility.getAverageRating(rentalUnit.getRating()))
+                            .likes(rentalUnit.getLikes())
                             .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
                             .rentalUnitId(rentalUnit.getId())
                             .rent(rentalUnit.getRent())
@@ -80,10 +89,23 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
         List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusVerifiedAndDeletedFalse(limit,lastSeen);
         List<RentalUnitForStudent> res = rentalUnits.stream().map(r -> {
+            LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),r.getId());
+            boolean liked = false;
+            double avgRating = Utility.getAverageRating(r.getRating());
+            int likes = r.getLikes();
+            int givenRating = 0;
+            if(null != likeAndRating){
+                liked = likeAndRating.isLiked();
+                givenRating = likeAndRating.getRating();
+            }
             return RentalUnitForStudent.builder()
                     .rent(r.getRent())
                     .deposit(r.getDeposit())
                     .address(r.getAddress())
+                    .liked(liked)
+                    .avgRating(avgRating)
+                    .likes(likes)
+                    .givenRating(givenRating)
                     .features(r.getFeatures())
                     .rentalUnitStatus(r.getRentalUnitStatus())
                     .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
@@ -231,5 +253,37 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     @Override
     public void updateRentalUnit(String rentalUnitId, HashMap<String, Object> updateMap) {
         rentalUnitRepo.update(rentalUnitId,updateMap);
+    }
+
+    @Override
+    public void increamentLikeCountForRentalUnit(String rentalUnitId) {
+        decrementOrIncrementLikeCountForRentalUnit(rentalUnitId,"inc");
+    }
+
+    @Override
+    public void decreamentLikeCountForRentalUnit(String rentalUnitId) {
+        decrementOrIncrementLikeCountForRentalUnit(rentalUnitId,"dec");
+    }
+
+    private void decrementOrIncrementLikeCountForRentalUnit(String rentalUnitId,String op) {
+        rentalUnitRepo.update(rentalUnitId,new HashMap<String,Object>(){{
+            put("likes", FieldValue.increment("inc".equals(op) ? 1 : -1));
+        }});
+    }
+
+    @Override
+    public void increamentRatingCountForRentalUnit(String rentalUnitId, int star) {
+        decrementOrIncrementRatingCountForRentalUnit(rentalUnitId,star,"inc");
+    }
+
+    @Override
+    public void decreamentRatingCountForRentalUnit(String rentalUnitId, int rating) {
+        decrementOrIncrementRatingCountForRentalUnit(rentalUnitId,rating,"dec");
+    }
+
+    private void decrementOrIncrementRatingCountForRentalUnit(String rentalUnitId,int rating,String op) {
+        rentalUnitRepo.update(rentalUnitId,new HashMap<String,Object>(){{
+            put("rating."+rating, FieldValue.increment("inc".equals(op) ? 1 : -1));
+        }});
     }
 }

@@ -13,6 +13,7 @@ student
 [X][X] student can search properties
 [X][X] student can filter properties
 [X][X] student can get list of applied applications with status
+[X][X] student can request visit for a property
 
 landlord
 
@@ -24,9 +25,23 @@ landlord
 [X][X]ll can get all payments done
 [X][X]ll can get all applications
 [X][X]ll can get all students from application
+[X][X] ll get listing of visit requests
 
 admin
 
 [x][X]admin can get list of all users
 [x][X]admin can get list of all properties
 [x][X]admin can verify user and properties
+
+
+issues
+how to specify slots [date/time]
+accept/reject/reschedule slot
+university specific login
+can students of different university create application togather
+application stage
+    after student requests visit, does landlord need to accepts it
+    what will happen after visit
+    what will happen after ll approves application
+    how student will add others to same application
+    what happens after ll rejects visit request
