@@ -163,10 +163,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> adminLogin(LogInRequestDto requestDto, String requestId, HttpServletRequest request) {
-        CustomUserDetails userDetails = Utility.customUserDetails(request);
-        if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.admin)){
-            throw new UnAuthenticatedUserException();
-        }
+        if(null == requestDto.getAuthToken() || requestDto.getAuthToken().trim().isEmpty()) throw new UnAuthenticatedUserException() ;
+        CustomUserDetails userDetails = FirebaseAuthenticationService.verifyToken(requestDto.getAuthToken());
+        if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.admin)) throw new InvalidParamValueException("auth_token");
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(new HashMap<String,Object>(){{
                             put("email",userDetails.getEmail());

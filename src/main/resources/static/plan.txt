@@ -1,0 +1,18 @@
+student
+
+student log in
+student can update profile
+student can upload documents
+student can get list of properties
+student can create application
+student can add other students to application
+student can get available slots
+student can schedule visit with landlord
+student can bookmark properties
+student can see list of bookmarked properties
+
+landlord
+
+ll can log in
+ll can create property listing
+ll
