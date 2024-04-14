@@ -10,9 +10,12 @@ student can get available slots
 student can schedule visit with landlord
 student can bookmark properties
 student can see list of bookmarked properties
+student can search properties
+student can filter properties
 
 landlord
 
 ll can log in
 ll can create property listing
-ll
+ll can get all property listing
+ll can filter property listing

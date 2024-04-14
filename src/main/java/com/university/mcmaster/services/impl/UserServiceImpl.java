@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
             log.trace("checking for admin account for email : " + email);
             User user = userRepo.findUserByEmail(email);
             if(null == user){
-                log.trace("user admin account found, creating new admin account for : " + email);
+                log.trace("user admin not account found, creating new admin account for : " + email);
                 UserRecord record = FirebaseAuthenticationService.createAdminAccount(email);
                 if(null != record){
                     user = User.builder()
@@ -62,10 +62,15 @@ public class UserServiceImpl implements UserService {
                             .role(Arrays.asList(UserRole.user,UserRole.admin))
                             .build();
                     userRepo.save(user);
+                    User finalUser1 = user;
+                    FirebaseAuthenticationService.updateClaims(user.getId(),new HashMap<String, Object>(){{
+                        put("roles", finalUser1.getRole().stream().map(UserRole::toString).collect(Collectors.joining(",")));
+                        put("verified", true);
+                    }});
                 }else{
                     log.trace("failed to create admin account");
                 }
-            }else if(false == user.getRole().contains(UserRole.admin)){
+            }else if(false == user.getRole().contains(UserRole.admin)) {
                 log.trace("found an existing admin account with missing admin role, updating user");
                 User finalUser = user;
                 user.getRole().add(UserRole.admin);
