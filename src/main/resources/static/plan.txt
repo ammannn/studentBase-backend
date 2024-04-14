@@ -1,21 +1,32 @@
 student
 
-student log in
-student can update profile
-student can upload documents
-student can get list of properties
-student can create application
-student can add other students to application
-student can get available slots
-student can schedule visit with landlord
-student can bookmark properties
-student can see list of bookmarked properties
-student can search properties
-student can filter properties
+[X] student log in
+[X] student can update profile
+[X] student can upload documents
+[X] student can get list of properties
+[X] student can create application
+[X] student can add other students to application
+[X] student can get available slots
+[X] student can schedule visit with landlord
+[X] student can bookmark properties
+[X] student can see list of bookmarked properties
+[X] student can search properties
+[X] student can filter properties
+[X] student can get list of applied applications with status
 
 landlord
 
-ll can log in
-ll can create property listing
-ll can get all property listing
-ll can filter property listing
+[X]ll can log in
+[X]ll can create property listing
+[X]CRUD on properties
+[X]ll can get all property listing
+[X]ll can filter property listing
+[X]ll can get all payments done
+[X]ll can get all applications
+[X]ll can get all students from application
+
+admin
+
+[x]admin can get list of all users
+[x]admin can get list of all properties
+[x]admin can verify user and properties
