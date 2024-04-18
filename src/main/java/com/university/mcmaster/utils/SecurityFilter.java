@@ -26,7 +26,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(token);
                 request.setAttribute("user",userDetails);
             }
-            System.out.println(tokenStr);
+            
         }else{
             logger.trace("no auth token provided");
         }
