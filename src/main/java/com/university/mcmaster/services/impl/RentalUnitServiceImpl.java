@@ -48,12 +48,13 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 
     @Override
     public ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request) {
+        
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
-        if(userDetails.getRoles().contains(UserRole.student.name())) {
+        if(userDetails.getRoles().contains(UserRole.student)) {
             return getRentalUnitsForStudent(userDetails,limit,lastSeen,requestId);
         }
-        if(userDetails.getRoles().contains(UserRole.rental_unit_owner.name())) {
+        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)) {
             return getRentalUnitsForRentalUnitOwner(userDetails,limit,lastSeen,requestId);
         }
         throw new ActionNotAllowedException("get_rental_units","user is not registered either as student or rental unit owner",401);
