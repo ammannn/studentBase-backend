@@ -134,9 +134,9 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     }
 
     private void validateFeatures(AddUpdateRentalUnitRequestDto requestDto, List<String> missingProps) {
-        if(0 == requestDto.getFeatures().getRooms()) missingProps.add("rooms");
-        if(0 == requestDto.getFeatures().getAreaInSqFt()) missingProps.add("areaInSqFt");
-        if(null == requestDto.getFeatures().getAmenities() || requestDto.getFeatures().getAmenities().isEmpty()) missingProps.add("amenities");
+//        if(0 == requestDto.getFeatures().getRooms()) missingProps.add("rooms");
+//        if(0 == requestDto.getFeatures().getAreaInSqFt()) missingProps.add("areaInSqFt");
+//        if(null == requestDto.getFeatures().getAmenities() || requestDto.getFeatures().getAmenities().isEmpty()) missingProps.add("amenities");
     }
 
     private void validateAddress(AddUpdateRentalUnitRequestDto requestDto, List<String> missingProps) {
@@ -174,7 +174,6 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
             updateMap.put("address",requestDto.getAddress());
         }
-
         if(0 != requestDto.getRent() && requestDto.getRent() != rentalUnit.getRent()){
             updateMap.put("rent",requestDto.getRent());
         }

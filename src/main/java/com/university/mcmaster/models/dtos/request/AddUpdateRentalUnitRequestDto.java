@@ -11,6 +11,7 @@ import lombok.*;
 @Setter
 @Builder
 public class AddUpdateRentalUnitRequestDto {
+    private String title;
     private Address address;
     private long deposit;
     private long rent;
@@ -18,3 +19,6 @@ public class AddUpdateRentalUnitRequestDto {
     private String posterImageId;
     private Contact contact;
 }
+/*
+
+ */

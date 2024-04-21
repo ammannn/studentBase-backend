@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,4 +61,30 @@ public class Utility {
         }
         return 0.0;
     }
+
+    public static <K, V> boolean areMapsEqual(Map<K, V> m1, Map<K, V> m2) {
+        // Check if both maps are null
+        if (m1 == null && m2 == null) {
+            return true;
+        }
+        // Check if one of the maps is null while the other is not
+        if (m1 == null || m2 == null) {
+            return false;
+        }
+        // Check if the size of the maps is equal
+        if (m1.size() != m2.size()) {
+            return false;
+        }
+        // Check if each key-value pair in m1 exists in m2
+        for (Map.Entry<K, V> entry : m1.entrySet()) {
+            K key = entry.getKey();
+            V value = entry.getValue();
+
+            if (!m2.containsKey(key) || !Objects.equals(value, m2.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

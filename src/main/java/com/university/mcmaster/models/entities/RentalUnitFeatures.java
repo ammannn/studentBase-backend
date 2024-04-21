@@ -5,6 +5,7 @@ import com.university.mcmaster.utils.Utility;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @AllArgsConstructor
@@ -13,26 +14,19 @@ import java.util.Objects;
 @Setter
 @Builder
 public class RentalUnitFeatures {
-    private int rooms;
-    private int bathrooms;
-    private boolean furnished;
-    private double areaInSqFt;
-    private boolean parking;
-    private boolean garden;
-    private boolean petsAllowed;
-    private boolean airConditioning;
-    private List<Amenity> amenities;
+    private Map<String,Boolean> featuresFlags;
+    private Map<String,Double> featuresNumbers;
+    private List<String> extraFeatures;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RentalUnitFeatures that = (RentalUnitFeatures) o;
-        return rooms == that.rooms && bathrooms == that.bathrooms && furnished == that.furnished && Double.compare(areaInSqFt, that.areaInSqFt) == 0 && parking == that.parking && garden == that.garden && petsAllowed == that.petsAllowed && airConditioning == that.airConditioning && Utility.areListsEqual(amenities, that.amenities);
+        return Utility.areMapsEqual(getFeaturesFlags(), that.getFeaturesFlags()) && Utility.areMapsEqual(getFeaturesNumbers(), that.getFeaturesNumbers()) && Utility.areListsEqual(getExtraFeatures(), that.getExtraFeatures());
     }
-
     @Override
     public int hashCode() {
-        return Objects.hash(rooms, bathrooms, furnished, areaInSqFt, parking, garden, petsAllowed, airConditioning, amenities);
+        return Objects.hash(getFeaturesFlags(), getFeaturesNumbers(), getExtraFeatures());
     }
 }
