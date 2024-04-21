@@ -112,6 +112,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .verificationStatus(VerificationStatus.pending)
                 .address(requestDto.getAddress())
                 .features(requestDto.getFeatures())
+                .contact(requestDto.getContact())
                 .createdOn(Instant.now().toEpochMilli())
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .rentalUnitStatus(RentalUnitStatus.available)

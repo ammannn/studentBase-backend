@@ -33,6 +33,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private Map<String,Object> customFields;
     private Map<String, Integer> rating;
     private int likes;
+    private Contact contact;
 
     @Override
     public String getCollection() {
