@@ -1,26 +1,27 @@
 student
 [BE][FE]
-[X][X] student log in
-[X][X] student can update profile
-[X][X] student can upload documents
-[X][X] student can get list of properties
-[X][X] student can create application
-[X][X] student can add other students to application
-[X][X] student can get available slots
-[X][X] student can schedule visit with landlord
-[X][X] student can bookmark properties
-[X][X] student can see list of bookmarked properties
+[Y][X] student log in
+[Y][X] student can update profile
+[Y][X] student can upload documents
+[Y][X] student can get list of properties
+[Y][X] student can bookmark properties
+[Y][X] student can see list of bookmarked properties
+
 [X][X] student can search properties
 [X][X] student can filter properties
 [X][X] student can get list of applied applications with status
 [X][X] student can request visit for a property
+[X][X] student can create application
+[X][X] student can add other students to application
+[X][X] student can get available slots
+[X][X] student can schedule visit with landlord
 
 landlord
 
-[X][X]ll can log in
-[X][X]ll can create property listing
+[Y][X]ll can log in
+[Y][X]ll can create property listing
 [X][X]CRUD on properties
-[X][X]ll can get all property listing
+[Y][X]ll can get all property listing
 [X][X]ll can filter property listing
 [X][X]ll can get all payments done
 [X][X]ll can get all applications
@@ -29,13 +30,14 @@ landlord
 
 admin
 
-[x][X]admin can get list of all users
-[x][X]admin can get list of all properties
-[x][X]admin can verify user and properties
+[Y][X]admin can get list of all users
+[Y][X]admin can get list of all properties
+[Y][X]admin can verify user and properties
 
 
 issues
 how to specify slots [date/time]
+    do we need to make custom design or can we integrate calendly
 accept/reject/reschedule slot
 university specific login
 can students of different university create application togather

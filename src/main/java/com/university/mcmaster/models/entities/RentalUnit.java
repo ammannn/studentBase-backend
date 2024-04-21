@@ -20,7 +20,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private String id;
     private long rent;
     private long deposit;
-    private boolean delete;
+    private boolean deleted;
     private VerificationStatus verificationStatus;
     private Address address;
     private RentalUnitFeatures features;
