@@ -32,6 +32,7 @@ public interface RentalUnitService {
                 .liked(liked)
                 .avgRating(avgRating)
                 .likes(likes)
+                .contact(r.getContact())
                 .givenRating(givenRating)
                 .features(r.getFeatures())
                 .rentalUnitStatus(r.getRentalUnitStatus())
@@ -59,4 +60,6 @@ public interface RentalUnitService {
     void decreamentRatingCountForRentalUnit(String rentalUnitId, int rating);
 
     RentalUnit getRentalUnitById(String rentalUnitId);
+
+    ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request);
 }

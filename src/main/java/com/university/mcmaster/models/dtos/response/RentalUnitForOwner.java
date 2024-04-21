@@ -3,6 +3,7 @@ package com.university.mcmaster.models.dtos.response;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.Address;
+import com.university.mcmaster.models.entities.Contact;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import lombok.*;
 
@@ -21,4 +22,5 @@ public class RentalUnitForOwner {
     private String posterImageUrl;
     private double avgRating;
     private int likes;
+    private Contact contact;
 }

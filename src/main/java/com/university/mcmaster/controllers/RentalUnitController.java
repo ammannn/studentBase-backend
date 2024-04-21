@@ -53,4 +53,12 @@ public class RentalUnitController {
     ){
         return rentalUnitService.deleteRentalUnits(rentalUnitId,requestId,request);
     }
+
+    @GetMapping("/rental-units/static")
+    public ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return rentalUnitService.getRentalUnitFeaturesStaticData(requestId,request);
+    }
 }

@@ -12,10 +12,7 @@ import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.response.RentalUnitForOwner;
 import com.university.mcmaster.models.dtos.response.RentalUnitForStudent;
-import com.university.mcmaster.models.entities.CustomUserDetails;
-import com.university.mcmaster.models.entities.File;
-import com.university.mcmaster.models.entities.LikeAndRating;
-import com.university.mcmaster.models.entities.RentalUnit;
+import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.LikeAndRatingService;
@@ -29,7 +26,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.FieldView;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,6 +71,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                             .deposit(rentalUnit.getDeposit())
                             .verificationStatus(rentalUnit.getVerificationStatus())
                             .address(rentalUnit.getAddress())
+                            .contact(rentalUnit.getContact())
                             .features(rentalUnit.getFeatures())
                             .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
                             .createdOn(rentalUnit.getCreatedOn())
@@ -273,4 +270,41 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             put("rating."+rating, FieldValue.increment("inc".equals(op) ? 1 : -1));
         }});
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
+//       featuresFlags , featuresNumbers , extraFeatures
+        Map<String,Boolean> featuresFlags = new HashMap<>();
+        Map<String,Double> featuresNumbers = new HashMap<>();
+        List<String> extraFeatures = new ArrayList<>();
+        featuresFlags.put("petsAllowed", true);
+        featuresFlags.put("parkingAvailable", true);
+        featuresFlags.put("laundryInUnit", false);
+        featuresFlags.put("furnished", false);
+        featuresFlags.put("gymAccess", true);
+
+        // Populate featuresNumbers with real values
+        featuresNumbers.put("squareFootage", 1200.0);
+        featuresNumbers.put("numberOfBedrooms", 2.0);
+        featuresNumbers.put("numberOfBathrooms", 1.5);
+        featuresNumbers.put("distanceToPublicTransit", 0.3);
+        featuresNumbers.put("monthlyRent", 2000.0);
+
+        // Populate amenities with real values
+        extraFeatures.add("swimmingPool");
+        extraFeatures.add("balcony");
+        extraFeatures.add("airConditioning");
+        extraFeatures.add("securitySystem");
+        extraFeatures.add("closeToShopping");
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(RentalUnitFeatures.builder()
+                                .extraFeatures(extraFeatures)
+                                .featuresFlags(featuresFlags)
+                                .featuresNumbers(featuresNumbers)
+                                .build())
+                .build());
+    }
+
 }
