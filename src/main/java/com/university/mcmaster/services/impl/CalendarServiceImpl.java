@@ -137,11 +137,12 @@ public class CalendarServiceImpl implements CalendarService {
             boolean finalTemplate = template;
             day.setTimeSlots(new ArrayList<>(){{
                 for (int i = 10; i < 19; i++) {
+                    int end = i+1;
                     TimeSlotResponse timeSlot = TimeSlotResponse.builder()
                             .start(Time.builder()
                                     .hour(i > 12 ? i-12 : i).build())
                             .end(Time.builder()
-                                    .hour(i > 12 ? i-12+1 : i).build())
+                                    .hour(end > 12 ? end-12 : end).build())
                             .build();
                     timeSlot.getEnd().setDayPeriod(timeSlot.getEnd().getHour() >= 12 ? DayPeriod.PM : DayPeriod.AM);
                     timeSlot.getStart().setDayPeriod(timeSlot.getStart().getHour() >= 12 ? DayPeriod.PM : DayPeriod.AM);
