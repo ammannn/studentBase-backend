@@ -1,6 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.university.mcmaster.controllers.LogInResponseDto;
+import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
@@ -12,10 +13,7 @@ import com.university.mcmaster.models.dtos.request.LogInRequestDto;
 import com.university.mcmaster.models.dtos.request.RegisterRequestDto;
 import com.university.mcmaster.services.AuthService;
 import com.university.mcmaster.services.UserService;
-import com.university.mcmaster.utils.EnvironmentVariables;
-import com.university.mcmaster.utils.FirebaseAuthenticationService;
-import com.university.mcmaster.utils.GcpStorageUtil;
-import com.university.mcmaster.utils.Utility;
+import com.university.mcmaster.utils.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
@@ -34,6 +32,7 @@ import java.util.stream.Collectors;
 public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
+    private final ResponseMapper responseMapper;
 
     @Override
     public ResponseEntity<?> registerUser(RegisterRequestDto requestDto, String requestId) {
@@ -103,6 +102,14 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber(requestDto.getPhoneNumber())
                 .role(roles)
                 .createdOn(Instant.now().toEpochMilli())
+                .documentPaths(new HashMap<String,String>(){{
+                    put(FilePurpose.bank_statement.toString(),"");
+                    put(FilePurpose.credit_score_report.toString(),"");
+                    put(FilePurpose.gic_certificate.toString(),"");
+                    put(FilePurpose.parents_bank_statement.toString(),"");
+                    put(FilePurpose.student_id.toString(),"");
+                    put(FilePurpose.national_id.toString(),"");
+                }})
                 .build();
         boolean isSaved = userService.saveUser(student);
         if(isSaved){
@@ -132,11 +139,7 @@ public class AuthServiceImpl implements AuthService {
         }
         responseDto.setRegistered(true);
         if(user.getRole().contains(UserRole.student)){
-            List<Map<String,String>> docs = Optional.ofNullable(user.getDocumentPaths()).map(Map::entrySet)
-                            .stream().flatMap(Collection::stream)
-                            .map(e->new HashMap<String,String>(){{
-                                put(e.getKey(), GcpStorageUtil.createGetUrl(e.getValue()).toString());
-                            }}).collect(Collectors.toList());
+            List<Map<String,String>> docs = responseMapper.getStudentDocs(user);
             responseDto.setStudent(StudentLogInResponse.builder()
                     .email(user.getEmail())
                     .phoneNumber(user.getPhoneNumber())

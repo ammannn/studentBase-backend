@@ -13,4 +13,9 @@ public class ActionNotAllowedException extends RuntimeException {
         super("user is not allowed to perform action : " +action + ", reason: " +reason);
         this.code = code;
     }
+
+    public ActionNotAllowedException(String action,String reason){
+        super("user is not allowed to perform action : " +action + ", reason: " +reason);
+        this.code = code;
+    }
 }

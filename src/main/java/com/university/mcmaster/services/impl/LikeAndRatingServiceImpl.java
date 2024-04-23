@@ -4,14 +4,14 @@ import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.InvalidParamValueException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
-import com.university.mcmaster.models.dtos.response.RentalUnitForStudent;
+import com.university.mcmaster.models.dtos.response.RentalUnitForStudentForListing;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.LikeAndRating;
-import com.university.mcmaster.models.entities.Rating;
 import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.repositories.LikeAndRatingRepo;
 import com.university.mcmaster.services.LikeAndRatingService;
 import com.university.mcmaster.services.RentalUnitService;
+import com.university.mcmaster.utils.ResponseMapper;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,7 @@ public class LikeAndRatingServiceImpl implements LikeAndRatingService {
 
     private final LikeAndRatingRepo likeAndRatingRepo;
     private final RentalUnitService rentalUnitService;
+    private final ResponseMapper responseMapper;
 
     @Override
     public ResponseEntity<?> likeRentalUnit(String rentalUnitId, boolean status, String requestId, HttpServletRequest request){
@@ -108,9 +109,9 @@ public class LikeAndRatingServiceImpl implements LikeAndRatingService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.student)) throw new UnAuthenticatedUserException();
         List<LikeAndRating> likeAndRatings = likeAndRatingRepo.getLikeAndRatingDocsByUserIdAndDeletedFalse(userDetails.getId());
-        List<RentalUnitForStudent> res = likeAndRatings.stream().map(lar->{
+        List<RentalUnitForStudentForListing> res = likeAndRatings.stream().map(lar->{
             RentalUnit rentalUnit = rentalUnitService.getRentalUnitById(lar.getRentalUnitId());
-            return RentalUnitService.mapRentalUnitToResponseDtoForStudent(rentalUnit,lar);
+            return responseMapper.mapRentalUnitToResponseDtoForStudent(rentalUnit,lar);
         }).toList();
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(res)

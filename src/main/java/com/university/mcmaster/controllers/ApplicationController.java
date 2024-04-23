@@ -1,5 +1,6 @@
 package com.university.mcmaster.controllers;
 
+import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
 import com.university.mcmaster.services.ApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,10 +18,14 @@ public class ApplicationController {
 
     @GetMapping("/applications")
     public ResponseEntity<?> getApplications(
+            @RequestParam(name = "status") ApplicationStatus status,
+            @RequestParam(name = "rentalUnitId",required = false) String rentalUnitId,
+            @RequestParam(name = "lastSeen",required = false) String lastSeen,
+            @RequestParam(name = "limit",required = false) int limit,
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
-        return applicationService.getApplications(requestId,request);
+        return applicationService.getApplications(status,rentalUnitId,lastSeen,limit,requestId,request);
     }
 
     @PostMapping("/applications")
@@ -39,6 +44,16 @@ public class ApplicationController {
             HttpServletRequest request
     ){
         return applicationService.updateApplication(applicationId,requestId,request);
+    }
+
+    @PutMapping("/applications/{applicationId}/status")
+    public ResponseEntity<?> updateApplicationStatus(
+            @PathVariable("applicationId") String applicationId,
+            @RequestParam("status") ApplicationStatus status,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return applicationService.updateApplicationStatus(applicationId,status,requestId,request);
     }
 
     @DeleteMapping("/applications/{applicationId}")

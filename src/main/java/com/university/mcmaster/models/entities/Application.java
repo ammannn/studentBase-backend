@@ -21,6 +21,8 @@ public class Application implements FirebaseCommonProps {
     private ApplicationStatus applicationStatus;
     private long createdOn;
     private long lastUpdatedOn;
+    private RequestedVisitingSchedule visitingSchedule;
+    private boolean deleted;
 
     @Override
     public String getCollection() {

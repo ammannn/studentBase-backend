@@ -6,12 +6,15 @@ import com.university.mcmaster.models.entities.Contact;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import lombok.*;
 
+import java.util.List;
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RentalUnitForStudent {
+public class RentalUnitForStudentForListing {
     private long rent;
     private long deposit;
     private Address address;
@@ -23,4 +26,5 @@ public class RentalUnitForStudent {
     private int likes;
     private int givenRating;
     private Contact contact;
+    private List<Map<String,String>> images;
 }

@@ -19,20 +19,21 @@ import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
+    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
     private final FileRepo fileRepo;
     private final UserService userService;
     private final RentalUnitService rentalUnitService;
@@ -126,5 +127,18 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id) {
         return fileRepo.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(id);
+    }
+
+    @Override
+    public List<Map<String,String>> getImagesByRentalUnitI(String id) {
+        try {
+            return fileRepo.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(id).stream().map(f->new HashMap<String,String>(){{
+                put("imageId",f.getId());
+                put("url",GcpStorageUtil.createGetUrl(f.getFilePath()).toString());
+            }}).collect(Collectors.toList());
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+     return Collections.emptyList();
     }
 }

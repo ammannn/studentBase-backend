@@ -1,8 +1,16 @@
 package com.university.mcmaster.utils;
 
 import com.university.mcmaster.models.entities.CustomUserDetails;
+import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.zone.ZoneRulesException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,4 +95,32 @@ public class Utility {
         return true;
     }
 
+    public static long getTimeStamp(String date, Time time, String timeZone) {
+        try {
+            String dateTimeStr = date + " " + time.getHour() + ":" + time.getMinute();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime localDateTime = LocalDateTime.parse(dateTimeStr, formatter);
+
+            ZoneId zoneId = ZoneId.of(timeZone);
+            ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
+
+            return zonedDateTime.toInstant().toEpochMilli();
+        } catch (DateTimeParseException e) {
+            System.err.println("Invalid date format: " + date);
+            return -1;
+        } catch (ZoneRulesException e) {
+            System.err.println("Invalid time zone: " + timeZone);
+            return -1;
+        }
+    }
+
+    public static boolean verifyDateFormat(String date) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate parsedDate = LocalDate.parse(date, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
 }

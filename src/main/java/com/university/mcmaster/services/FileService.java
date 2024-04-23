@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FileService {
     ResponseEntity<ApiResponse<?>> getUploadUrlForFile(GetUploadUrlForFileRequestDto requestDro, String requestId, HttpServletRequest request);
@@ -14,4 +15,6 @@ public interface FileService {
     ResponseEntity<?> deleteFile(String fileId, String requestId, HttpServletRequest request);
     File getFileById(String posterImageId);
     List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
+
+    List<Map<String,String>> getImagesByRentalUnitI(String id);
 }

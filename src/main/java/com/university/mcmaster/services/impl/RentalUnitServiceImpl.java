@@ -11,13 +11,14 @@ import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.response.RentalUnitForOwner;
-import com.university.mcmaster.models.dtos.response.RentalUnitForStudent;
+import com.university.mcmaster.models.dtos.response.RentalUnitForStudentForListing;
 import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.LikeAndRatingService;
 import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.utils.GcpStorageUtil;
+import com.university.mcmaster.utils.ResponseMapper;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     @Autowired
     @Lazy
     private LikeAndRatingService likeAndRatingService;
+    @Autowired
+    private ResponseMapper responseMapper;
 
     @Override
     public ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request) {
@@ -58,26 +61,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForRentalUnitOwner(CustomUserDetails userDetails, int limit, String lastSeen, String requestId) {
         List<RentalUnit> rentalUnits = rentalUnitRepo.getRentalUnitByUserIdAndDeletedFalse(userDetails.getId(),limit,lastSeen);
-        List<RentalUnitForOwner> res = new ArrayList<>();
-        for (RentalUnit rentalUnit : rentalUnits) {
-            String url = null;
-            if(null != rentalUnit.getPosterImagePath())url = GcpStorageUtil.createGetUrl(rentalUnit.getPosterImagePath()).toString();
-            res.add(RentalUnitForOwner.builder()
-                            .avgRating(Utility.getAverageRating(rentalUnit.getRating()))
-                            .likes(rentalUnit.getLikes())
-                            .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
-                            .rentalUnitId(rentalUnit.getId())
-                            .rent(rentalUnit.getRent())
-                            .deposit(rentalUnit.getDeposit())
-                            .verificationStatus(rentalUnit.getVerificationStatus())
-                            .address(rentalUnit.getAddress())
-                            .contact(rentalUnit.getContact())
-                            .features(rentalUnit.getFeatures())
-                            .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
-                            .createdOn(rentalUnit.getCreatedOn())
-                            .posterImageUrl(url)
-                    .build());
-        }
+        List<RentalUnitForOwner> res = responseMapper.getRentalUnitsForOwner(rentalUnits);
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
                         .data(res)
@@ -86,9 +70,9 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
         List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusVerifiedAndDeletedFalse(limit,lastSeen);
-        List<RentalUnitForStudent> res = rentalUnits.stream().map(r -> {
+        List<RentalUnitForStudentForListing> res = rentalUnits.stream().map(r -> {
             LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),r.getId());
-            return RentalUnitService.mapRentalUnitToResponseDtoForStudent(r,likeAndRating);
+            return responseMapper.mapRentalUnitToResponseDtoForStudent(r,likeAndRating);
         }).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
