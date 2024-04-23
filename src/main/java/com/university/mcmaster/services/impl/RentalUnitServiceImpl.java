@@ -279,7 +279,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 //       featuresFlags , featuresNumbers , extraFeatures
         Map<String,Boolean> utilities = Arrays.stream("Heat, Water , Wifi , Cable , Electricity".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
-        Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished/partially furnished , Yard".split(","))
+        Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished/partially furnished".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
         Map<String,Double> featuresNumbers = Arrays.stream("Beds, Baths, Kitchen,Yard".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->0.0));
