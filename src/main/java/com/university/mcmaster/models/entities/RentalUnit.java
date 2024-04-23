@@ -34,6 +34,10 @@ public class RentalUnit implements FirebaseCommonProps {
     private Map<String, Integer> rating;
     private int likes;
     private Contact contact;
+    private String title;
+    private String description;
+    private int leaseTerm;
+    private long leaseStartDate;
 
     @Override
     public String getCollection() {

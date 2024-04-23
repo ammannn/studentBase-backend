@@ -21,4 +21,6 @@ public class UpdateUserRequestDto {
     private String emergencyContact;
     private String additionalEmail;
     private List<Address> addresses;
+    private String occupation;
+    private String preferredModOfContact;
 }

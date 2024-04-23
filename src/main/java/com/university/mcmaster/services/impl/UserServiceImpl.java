@@ -171,12 +171,20 @@ public class UserServiceImpl implements UserService {
 //        phoneNumber , name , dob , nationality , emergencyContact , additionalEmail , address
         String phoneNumber = Optional.ofNullable(requestDto.getPhoneNumber()).map(s->s.trim()).orElse("");
         String name = Optional.ofNullable(requestDto.getName()).map(s->s.trim()).orElse("");
+        String occupation = Optional.ofNullable(requestDto.getOccupation()).map(s->s.trim()).orElse("");
+        String preferredModOfContact = Optional.ofNullable(requestDto.getPreferredModOfContact()).map(s->s.trim()).orElse("phone");
 
         if(false == phoneNumber.isEmpty() && false == phoneNumber.equals(user.getPhoneNumber())){
             updateMap.put("phoneNumber",phoneNumber);
         }
         if(false == name.isEmpty() && false == name.equals(user.getName())){
             updateMap.put("name",name);
+        }
+        if(false == occupation.isEmpty() && false == occupation.equals(user.getOccupation())){
+            updateMap.put("occupation",occupation);
+        }
+        if(false == preferredModOfContact.isEmpty() && false == preferredModOfContact.equals(user.getPreferredModOfContact())){
+            updateMap.put("preferredModOfContact",preferredModOfContact);
         }
         if(false == updateMap.isEmpty()) userRepo.update(user.getId(),updateMap);
         return ResponseEntity.status(200).body(ApiResponse.builder()

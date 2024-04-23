@@ -97,6 +97,10 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .createdOn(Instant.now().toEpochMilli())
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .rentalUnitStatus(RentalUnitStatus.available)
+                .title(Optional.ofNullable(requestDto.getTitle()).map(s->s.trim()).orElse(""))
+                .description(Optional.ofNullable(requestDto.getDescription()).map(s->s.trim()).orElse(""))
+                .leaseTerm(requestDto.getLeaseTerm())
+                .leaseStartDate(requestDto.getLeaseStartDate())
                 .build();
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()
@@ -111,6 +115,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         else validateAddress(requestDto,missingProps);
         if(null == requestDto.getFeatures()) missingProps.add("features");
         else validateFeatures(requestDto,missingProps);
+        if(null == requestDto.getTitle() || requestDto.getTitle().trim().isEmpty()) missingProps.add("title");
         if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
     }
 
@@ -158,8 +163,20 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(0 != requestDto.getRent() && requestDto.getRent() != rentalUnit.getRent()){
             updateMap.put("rent",requestDto.getRent());
         }
+        if(0 != requestDto.getLeaseTerm() && requestDto.getLeaseTerm() != rentalUnit.getLeaseTerm()){
+            updateMap.put("leaseTerm",requestDto.getLeaseTerm());
+        }
+        if(0 != requestDto.getLeaseStartDate() && requestDto.getLeaseStartDate() != rentalUnit.getLeaseStartDate()){
+            updateMap.put("leaseStartDate",requestDto.getLeaseStartDate());
+        }
         if(0 != requestDto.getDeposit() && requestDto.getDeposit() != rentalUnit.getDeposit()){
             updateMap.put("deposit",requestDto.getDeposit());
+        }
+        if(null != requestDto.getTitle() && false == requestDto.getTitle().trim().isEmpty() && false == requestDto.getTitle().equals(rentalUnit.getTitle())){
+            updateMap.put("title",requestDto.getTitle());
+        }
+        if(null != requestDto.getDescription() && false == requestDto.getDescription().trim().isEmpty() && false == requestDto.getDescription().equals(rentalUnit.getDescription())){
+            updateMap.put("description",requestDto.getDescription());
         }
         if(null != requestDto.getFeatures() && false == requestDto.getFeatures().equals(rentalUnit.getFeatures())){
             validateFeatures(requestDto,missingProps);
@@ -260,32 +277,16 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
 //       featuresFlags , featuresNumbers , extraFeatures
-        Map<String,Boolean> featuresFlags = new HashMap<>();
-        Map<String,Double> featuresNumbers = new HashMap<>();
-        List<String> extraFeatures = new ArrayList<>();
-        featuresFlags.put("petsAllowed", true);
-        featuresFlags.put("parkingAvailable", true);
-        featuresFlags.put("laundryInUnit", false);
-        featuresFlags.put("furnished", false);
-        featuresFlags.put("gymAccess", true);
-
-        // Populate featuresNumbers with real values
-        featuresNumbers.put("squareFootage", 1200.0);
-        featuresNumbers.put("numberOfBedrooms", 2.0);
-        featuresNumbers.put("numberOfBathrooms", 1.5);
-        featuresNumbers.put("distanceToPublicTransit", 0.3);
-        featuresNumbers.put("monthlyRent", 2000.0);
-
-        // Populate amenities with real values
-        extraFeatures.add("swimmingPool");
-        extraFeatures.add("balcony");
-        extraFeatures.add("airConditioning");
-        extraFeatures.add("securitySystem");
-        extraFeatures.add("closeToShopping");
+        Map<String,Boolean> utilities = Arrays.stream("Heat, Water , Wifi , Cable , Electricity".split(","))
+                .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
+        Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished/partially furnished , Yard".split(","))
+                .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
+        Map<String,Double> featuresNumbers = Arrays.stream("Beds, Baths, Kitchen,Yard".split(","))
+                .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->0.0));
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(RentalUnitFeatures.builder()
-                                .extraFeatures(extraFeatures)
-                                .featuresFlags(featuresFlags)
+                                .featuresUtilities(utilities)
+                                .featuresAmenities(amenities)
                                 .featuresNumbers(featuresNumbers)
                                 .build())
                 .build());

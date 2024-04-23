@@ -15,6 +15,10 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 public class RentalUnitForStudentForListing {
+    private String title;
+    private String description;
+    private int leaseTerm;
+    private long leaseStartDate;
     private long rent;
     private long deposit;
     private Address address;
