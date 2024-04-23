@@ -7,12 +7,10 @@ import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
 import com.university.mcmaster.models.dtos.response.ApplicationForRentalUnitOwner;
 import com.university.mcmaster.models.dtos.response.ApplicationForStudent;
-import com.university.mcmaster.models.entities.Application;
-import com.university.mcmaster.models.entities.CustomUserDetails;
-import com.university.mcmaster.models.entities.RequestedVisitingSchedule;
-import com.university.mcmaster.models.entities.User;
+import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.ApplicationRepo;
 import com.university.mcmaster.services.ApplicationService;
+import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.services.UserService;
 import com.university.mcmaster.utils.ResponseMapper;
 import com.university.mcmaster.utils.Utility;
@@ -22,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -31,6 +30,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepo applicationRepo;
     private final ResponseMapper responseMapper;
     private final UserService userService;
+    private final RentalUnitService rentalUnitService;
 
     @Override
     public ResponseEntity<?> getApplications(ApplicationStatus status,String rentalUnitId,String lastSeen,int limit,String requestId, HttpServletRequest request) {
@@ -68,17 +68,20 @@ public class ApplicationServiceImpl implements ApplicationService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.student)) throw new UnAuthenticatedUserException();
         verifyCreateApplicationRequest(requestDto);
+        RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(requestDto.getRentalUnitId());
+        if(null == rentalUnit) throw new EntityNotFoundException();
         Application application = Application.builder()
                 .id(UUID.randomUUID().toString())
                 .rentalUnitId(requestDto.getRentalUnitId())
                 .students(Arrays.asList(userDetails.getId()))
                 .createdBy(userDetails.getId())
+                .rentalUnitOwnerId(rentalUnit.getUserId())
                 .applicationStatus(ApplicationStatus.visit_requested)
                 .createdOn(Instant.now().toEpochMilli())
                 .visitingSchedule(RequestedVisitingSchedule.builder()
                         .timeZone(requestDto.getTimeZone())
-                        .durationInMin(requestDto.getVisitDurationInMin())
-                        .time(Utility.getTimeStamp(requestDto.getDate(),requestDto.getTime(),requestDto.getTimeZone()))
+                        .startTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitStartTime(),requestDto.getTimeZone()))
+                        .endTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitEndTime(),requestDto.getTimeZone()))
                         .build())
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .build();
@@ -92,8 +95,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == requestDto.getRentalUnitId() || requestDto.getRentalUnitId().trim().isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
         if(null == requestDto.getTimeZone() || requestDto.getTimeZone().trim().isEmpty()) throw new MissingRequiredParamException("timeZone");
         if(null == requestDto.getDate() || requestDto.getDate().trim().isEmpty()) throw new MissingRequiredParamException("date");
-        if(requestDto.getVisitDurationInMin() <= 0) throw new InvalidParamValueException("visitDurationInMin");
         if(false == Utility.verifyDateFormat(requestDto.getDate())) throw new InvalidParamValueException("date","yyyy-MM-dd");
+        if(null == requestDto.getVisitStartTime() || null == requestDto.getVisitStartTime().getDayPeriod() || requestDto.getVisitStartTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
+        if(null == requestDto.getVisitEndTime() || null == requestDto.getVisitEndTime().getDayPeriod() || requestDto.getVisitEndTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
     }
 
     @Override
@@ -184,5 +188,14 @@ public class ApplicationServiceImpl implements ApplicationService {
                     throw new ActionNotAllowedException("approve_application","some of the students are missing required documents");
             }
         }
+    }
+
+    @Override
+    public boolean isVistingTimeSlotAvailble(String ownerId,LocalDate date, String timeZone, Time start, Time end) {
+        long startTimeStamp = Utility.getTimeStamp(date,timeZone,start);
+        long endTimeStamp = Utility.getTimeStamp(date,timeZone,end);
+        List<Application> temp1 = applicationRepo.getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitStartTimeInRange(ownerId,startTimeStamp,endTimeStamp);
+        List<Application> temp2 = applicationRepo.getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitEndTimeInRange(ownerId,startTimeStamp,endTimeStamp);
+        return temp1.isEmpty() && temp2.isEmpty();
     }
 }

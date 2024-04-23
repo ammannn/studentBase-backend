@@ -1,16 +1,15 @@
 package com.university.mcmaster.utils;
 
+import com.university.mcmaster.enums.DayPeriod;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.zone.ZoneRulesException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -123,4 +122,31 @@ public class Utility {
             return false;
         }
     }
+
+
+    public static long getTimeStamp(LocalDate date, String timeZone, Time time) {
+        Map<String, Long> timestamps = new HashMap<>();
+
+        // Define the time zone
+        ZoneId zoneId = ZoneId.of(timeZone);
+
+        // Convert start and end hours to 24-hour format
+        int startHour24 = (time.getDayPeriod() == DayPeriod.PM && time.getHour() != 12) ? time.getHour() + 12 : time.getHour();
+
+        // Construct start and end LocalDateTime objects
+        LocalDateTime startDateTime = LocalDateTime.of(date, LocalTime.of(startHour24, time.getMinute()));
+
+        // Convert LocalDateTime objects to ZonedDateTime with the specified time zone
+        ZonedDateTime startZonedDateTime = ZonedDateTime.of(startDateTime, zoneId);
+
+        // Convert ZonedDateTime objects to epoch timestamps
+        return startZonedDateTime.toEpochSecond();
+    }
+    public static Month getCurrentMonth(String timeZone) {
+        // Get the current date and time in the specified time zone
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of(timeZone));
+        // Extract and return the month
+        return zonedDateTime.getMonth();
+    }
 }
+

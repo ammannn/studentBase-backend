@@ -62,4 +62,20 @@ public class ApplicationRepoImpl extends FirebaseUtils<Application> implements A
     public boolean update(String id, Map<String, Object> updateMap) {
         return update(id,FirestoreConstants.FS_APPLICATIONS,updateMap);
     }
+
+    @Override
+    public List<Application> getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitStartTimeInRange(String ownerId, long startTimeStamp, long endTimeStamp) {
+        return processQueryForEntityList(FirestoreClient.getFirestore().collection(FirestoreConstants.FS_APPLICATIONS)
+                        .whereGreaterThanOrEqualTo("visitingSchedule.startTime",startTimeStamp)
+                        .whereLessThan("visitingSchedule.startTime",endTimeStamp)
+                        .limit(1), Application.class);
+    }
+
+    @Override
+    public List<Application> getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitEndTimeInRange(String ownerId, long startTimeStamp, long endTimeStamp) {
+        return processQueryForEntityList(FirestoreClient.getFirestore().collection(FirestoreConstants.FS_APPLICATIONS)
+                .whereGreaterThanOrEqualTo("visitingSchedule.endTime",startTimeStamp)
+                .whereLessThan("visitingSchedule.endTime",endTimeStamp)
+                .limit(1), Application.class);
+    }
 }

@@ -3,9 +3,11 @@ package com.university.mcmaster.services;
 import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
+import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,4 +58,6 @@ public interface ApplicationService {
     ResponseEntity<?> deleteApplication(String applicationId, String requestId, HttpServletRequest request);
 
     ResponseEntity<?> updateApplicationStatus(String applicationId, ApplicationStatus status, String requestId, HttpServletRequest request);
+
+    boolean isVistingTimeSlotAvailble(String ownerId,LocalDate date, String timeZone, Time start, Time end);
 }

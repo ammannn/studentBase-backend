@@ -1,7 +1,6 @@
 package com.university.mcmaster.models.dtos.request;
 
 import com.university.mcmaster.models.entities.Time;
-import com.university.mcmaster.models.entities.VisitingSchedule;
 import lombok.*;
 
 @Getter
@@ -12,7 +11,7 @@ import lombok.*;
 public class CreateApplicationRequestDto {
     private String rentalUnitId;
     private String date;
-    private int visitDurationInMin;
-    private Time time;
+    private Time visitStartTime;
+    private Time visitEndTime;
     private String timeZone;
 }

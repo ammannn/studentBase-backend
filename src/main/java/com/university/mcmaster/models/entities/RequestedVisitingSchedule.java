@@ -8,7 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class RequestedVisitingSchedule {
-    private long time;
+    private long startTime;
+    private long endTime;
     private String timeZone;
     private int durationInMin;
 }

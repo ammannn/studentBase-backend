@@ -11,8 +11,9 @@ public interface ApplicationRepo {
     Application findById(String applicationId);
     List<Application> getApplicationByNullableRentalUnitIdAndStatusAndDeletedFalse(String rentalUnitId, ApplicationStatus status);
     List<Application> getPaginatedApplicationsByNullableRentalUnitIdAndStatusAndDeletedFalse(String rentalUnitId, ApplicationStatus status, int limit, String lastSeen);
-
     List<Application> getPaginatedApplicationsByStudentIdAndNullableRentalUnitIdAndStatusAndDeletedFalse(String userId, String rentalUnitId, ApplicationStatus status, int limit, String lastSeen);
-
     boolean update(String id, Map<String, Object> updateMap);
+
+    List<Application> getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitStartTimeInRange(String ownerId, long startTimeStamp, long endTimeStamp);
+    List<Application> getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitEndTimeInRange(String ownerId, long startTimeStamp, long endTimeStamp);
 }

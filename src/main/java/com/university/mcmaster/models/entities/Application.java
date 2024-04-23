@@ -16,6 +16,7 @@ public class Application implements FirebaseCommonProps {
     private static String collection = FirestoreConstants.FS_APPLICATIONS;
     private String id;
     private String rentalUnitId;
+    private String rentalUnitOwnerId;
     private List<String> students;
     private String createdBy;
     private ApplicationStatus applicationStatus;
