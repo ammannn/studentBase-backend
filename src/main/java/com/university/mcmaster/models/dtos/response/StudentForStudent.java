@@ -21,5 +21,5 @@ public class StudentForStudent {
 
     private VerificationStatus verificationStatus;
     private long verifiedOn;
-    private List<Map<String, HashMap<String,Object>>> docs;
+    private Map<String,HashMap<String,Object>> docs;
 }

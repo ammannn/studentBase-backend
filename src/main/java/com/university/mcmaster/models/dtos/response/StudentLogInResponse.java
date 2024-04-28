@@ -21,7 +21,7 @@ public class StudentLogInResponse {
     private long verifiedOn;
     private UserRole userRole;
     private String name;
-    private List<Map<String, HashMap<String,Object>>> documents;
+    private Map<String,HashMap<String,Object>> documents;
     private boolean admin;
     private String dob;
     private String nationality;

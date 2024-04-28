@@ -157,14 +157,16 @@ public class ResponseMapper {
                 .build();
     }
 
-    public List<Map<String,HashMap<String,Object>>> getStudentDocs(User user){
-        return Optional.ofNullable(user.getDocumentPaths()).map(Map::entrySet)
-                .stream().flatMap(Collection::stream)
-                .map(e->new HashMap<String,HashMap<String,Object>>(){{
-                    put(e.getKey(), new HashMap<String,Object>(){{
-                        put("url",(null != e.getValue() && false == e.getValue().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(e.getValue()).toString() : "");
-                    }});
-                }}).collect(Collectors.toList());
+    public Map<String,HashMap<String,Object>> getStudentDocs(User user){
+        Map<String,HashMap<String,Object>> res = new HashMap<>();
+        if(null != user && null != user.getDocumentPaths()){
+            for (Map.Entry<String, String> docEntry : user.getDocumentPaths().entrySet()) {
+                res.put(docEntry.getKey(),new HashMap<String,Object>(){{
+                    put("url",(null != docEntry.getValue() && false == docEntry.getValue().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(docEntry.getValue()).toString() : "");
+                }});
+            }
+        }
+        return res;
     }
 
     public List<ApplicationForStudent> getApplicationsForStudent(String userId,List<Application> applications, String requestId) {
