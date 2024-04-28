@@ -218,25 +218,32 @@ public class UserServiceImpl implements UserService {
         List<Address> validatedAddresses = velidateAndSanitizeAddresses(requestDto.getAddresses());
 
         if(false == phoneNumber.isEmpty() && false == phoneNumber.equals(user.getPhoneNumber())){
+            log.trace("[update_student] updating 'phoneNumber'");
             updateMap.put("phoneNumber",phoneNumber);
         }
         if(false == name.isEmpty() && false == name.equals(user.getName())){
+            log.trace("[update_student] updating 'name'");
             updateMap.put("name",name);
         }
         if(false == dob.isEmpty() && false == dob.equals(user.getDob())){
+            log.trace("[update_student] updating 'dob'");
             updateMap.put("dob",dob);
         }
         if(false == emergencyContact.isEmpty() && false == emergencyContact.equals(user.getEmergencyContact())){
+            log.trace("[update_student] updating 'emergencyContact'");
             updateMap.put("emergencyContact",emergencyContact);
         }
         if(false == additionalEmail.isEmpty() && false == additionalEmail.equals(user.getAdditionalEmail())){
+            log.trace("[update_student] updating 'additionalEmail'");
             updateMap.put("additionalEmail",additionalEmail);
         }
         if(false == validatedAddresses.isEmpty() && false == Utility.areListsEqual(validatedAddresses,user.getAddresses())){
+            log.trace("[update_student] updating 'validatedAddresses'");
             updateMap.put("addresses",validatedAddresses);
         }
         if(VerificationStatus.verified != user.getVerificationStatus() && isAdmin){
             if(false == nationality.isEmpty() && false == nationality.equals(user.getNationality())){
+                log.trace("[update_student] updating 'nationality'");
                 updateMap.put("nationality",nationality);
             }
         }
