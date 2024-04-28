@@ -36,7 +36,7 @@ public class User implements FirebaseCommonProps {
         private String reason;
 
         private List<Address> addresses;
-        private Map<String,String> documentPaths;
+        private Map<String,StudentDocFile> documentPaths;
         private Map<String,Object> customFields;
 
         @Override

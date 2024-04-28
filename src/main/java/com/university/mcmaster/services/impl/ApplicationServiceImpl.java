@@ -184,7 +184,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         for (String studentId : application.getStudents()) {
             User student = userService.findUserById(studentId);
             for (String docType : ApplicationService.getRequiredFilesForApplicationApproval()) {
-                if(false == student.getDocumentPaths().containsKey(docType) || null == student.getDocumentPaths().get(docType) || student.getDocumentPaths().get(docType).trim().isEmpty())
+                if(false == student.getDocumentPaths().containsKey(docType) || null == student.getDocumentPaths().get(docType) || null == student.getDocumentPaths().get(docType).getPath() || student.getDocumentPaths().get(docType).getPath().trim().isEmpty())
                     throw new ActionNotAllowedException("approve_application","some of the students are missing required documents");
             }
         }

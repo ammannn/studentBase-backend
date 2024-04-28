@@ -14,4 +14,5 @@ public class GetUploadUrlForFileRequestDto {
     private FileType type;
     private FilePurpose filePurpose;
     private String rentalUnitId;
+    private String fileName;
 }

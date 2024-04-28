@@ -17,6 +17,7 @@ public class File implements FirebaseCommonProps {
     private boolean uploadedOnGcp;
     private FilePurpose purpose;
     private String rentalUnitId;
+    private String fileName;
 
     @Override
     public String getCollection() {

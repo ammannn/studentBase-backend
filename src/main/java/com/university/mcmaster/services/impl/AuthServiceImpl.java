@@ -7,6 +7,7 @@ import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
 import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
 import com.university.mcmaster.models.entities.CustomUserDetails;
+import com.university.mcmaster.models.entities.StudentDocFile;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.LogInRequestDto;
@@ -102,13 +103,13 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber(requestDto.getPhoneNumber())
                 .role(roles)
                 .createdOn(Instant.now().toEpochMilli())
-                .documentPaths(new HashMap<String,String>(){{
-                    put(FilePurpose.bank_statement.toString(),"");
-                    put(FilePurpose.credit_score_report.toString(),"");
-                    put(FilePurpose.gic_certificate.toString(),"");
-                    put(FilePurpose.parents_bank_statement.toString(),"");
-                    put(FilePurpose.student_id.toString(),"");
-                    put(FilePurpose.national_id.toString(),"");
+                .documentPaths(new HashMap<String,StudentDocFile>(){{
+                    put(FilePurpose.bank_statement.toString(), StudentDocFile.builder().build());
+                    put(FilePurpose.credit_score_report.toString(),StudentDocFile.builder().build());
+                    put(FilePurpose.gic_certificate.toString(),StudentDocFile.builder().build());
+                    put(FilePurpose.parents_bank_statement.toString(),StudentDocFile.builder().build());
+                    put(FilePurpose.student_id.toString(),StudentDocFile.builder().build());
+                    put(FilePurpose.national_id.toString(),StudentDocFile.builder().build());
                 }})
                 .build();
         boolean isSaved = userService.saveUser(student);

@@ -1,10 +1,7 @@
 package com.university.mcmaster.utils;
 
 import com.university.mcmaster.models.dtos.response.*;
-import com.university.mcmaster.models.entities.Application;
-import com.university.mcmaster.models.entities.LikeAndRating;
-import com.university.mcmaster.models.entities.RentalUnit;
-import com.university.mcmaster.models.entities.User;
+import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.LikeAndRatingRepo;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.repositories.UserRepo;
@@ -160,9 +157,10 @@ public class ResponseMapper {
     public Map<String,HashMap<String,Object>> getStudentDocs(User user){
         Map<String,HashMap<String,Object>> res = new HashMap<>();
         if(null != user && null != user.getDocumentPaths()){
-            for (Map.Entry<String, String> docEntry : user.getDocumentPaths().entrySet()) {
+            for (Map.Entry<String, StudentDocFile> docEntry : user.getDocumentPaths().entrySet()) {
                 res.put(docEntry.getKey(),new HashMap<String,Object>(){{
-                    put("url",(null != docEntry.getValue() && false == docEntry.getValue().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(docEntry.getValue()).toString() : "");
+                    put("url",(null != docEntry.getValue() && null != docEntry.getValue().getPath() && false == docEntry.getValue().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(docEntry.getValue().getPath()).toString() : "");
+                    put("name",(null != docEntry.getValue()) ? docEntry.getValue().getName() : "");
                 }});
             }
         }

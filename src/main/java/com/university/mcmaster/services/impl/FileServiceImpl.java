@@ -7,6 +7,7 @@ import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.GetUploadUrlForFileRequestDto;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.File;
+import com.university.mcmaster.models.entities.StudentDocFile;
 import com.university.mcmaster.repositories.FileRepo;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.RentalUnitService;
@@ -58,6 +59,7 @@ public class FileServiceImpl implements FileService {
         String path = userDetails.getId() + "/" + requestDto.getFilePurpose().toString() + "/" + fileId;
         File file = File.builder()
                 .id(fileId)
+                .fileName(requestDto.getFileName())
                 .createdOn(Instant.now().toEpochMilli())
                 .userId(userDetails.getId())
                 .filePath(path)
@@ -86,10 +88,12 @@ public class FileServiceImpl implements FileService {
         }});
         if(file.getPurpose().isProfileFile()) {
             userService.updateUser(userDetails.getId(),new HashMap<String,Object>(){{
-                put("documentPaths."+file.getPurpose().toString(),file.getFilePath());
+                put("documentPaths."+file.getPurpose().toString(), StudentDocFile.builder()
+                        .path(file.getFilePath())
+                        .name(file.getFileName())
+                        .build());
             }});
-        }
-        if(null != file.getRentalUnitId() && FilePurpose.rental_unit_poster_image == file.getPurpose()){
+        }else if(null != file.getRentalUnitId() && FilePurpose.rental_unit_poster_image == file.getPurpose()){
             rentalUnitService.updateRentalUnitPosterImage(file.getRentalUnitId(),file.getId(),file.getFilePath());
         }
         return ResponseEntity.ok(ApiResponse.builder()

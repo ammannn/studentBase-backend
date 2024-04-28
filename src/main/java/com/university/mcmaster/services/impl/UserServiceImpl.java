@@ -113,13 +113,8 @@ public class UserServiceImpl implements UserService {
     public List<User> getPaginatedUsersByVerificationStatusForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen) {
         List<User> users = userRepo.getPaginatedUsersByVerificationStatusForAdmin(verificationStatus,limit,lastSeen);
         for (User user : users) {
-            List<Map<String,String>> urls = user.getDocumentPaths().entrySet().stream().map(e->{
-                return new HashMap<String,String>(){{
-                   put(e.getKey(), GcpStorageUtil.createGetUrl(e.getValue()).toString());
-                }};
-            }).collect(Collectors.toList());
             user.setCustomFields(new HashMap<String, Object>(){{
-                put("documents",urls);
+                put("documents",responseMapper.getStudentDocs(user));
             }});
         }
         return users;
