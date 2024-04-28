@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+
 @Configuration
 public class SwaggerConfig {
 
@@ -22,7 +24,7 @@ public class SwaggerConfig {
         openAPI = openAPI.components(
                 new Components()
                         .addSecuritySchemes(
-                                "jwt-auth",
+                                "bearer-jwt",
                                 new SecurityScheme()
                                         .in(SecurityScheme.In.HEADER)
                                         .type(SecurityScheme.Type.HTTP)
@@ -30,7 +32,8 @@ public class SwaggerConfig {
                                         .scheme("bearer")
                                         .name("Authorization")
                         )
-        );
+
+        ).addSecurityItem(new SecurityRequirement().addList("bearer-jwt", Arrays.asList("read", "write")));
         return openAPI;
     }
 }
