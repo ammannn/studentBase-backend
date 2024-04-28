@@ -41,4 +41,14 @@ public class FileController {
     ){
         return fileService.deleteFile(fileId,requestId,request);
     }
+
+    @PutMapping("/files/{fileId}/replace")
+    public ResponseEntity<?> replaceFile(
+            @RequestBody GetUploadUrlForFileRequestDto requestDto,
+            @PathVariable("fileId") String fileId,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return fileService.replaceFile(fileId,requestDto,requestId,request);
+    }
 }

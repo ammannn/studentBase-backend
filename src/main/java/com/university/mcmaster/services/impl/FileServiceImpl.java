@@ -13,7 +13,6 @@ import com.university.mcmaster.repositories.FileRepo;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.services.UserService;
-import com.university.mcmaster.utils.Constants;
 import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +39,14 @@ public class FileServiceImpl implements FileService {
     public ResponseEntity<ApiResponse<?>> getUploadUrlForFile(GetUploadUrlForFileRequestDto requestDto, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
+        String rentalUnitId = null;
+        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto);
+        return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId);
+    }
+
+    private void verifyFileUploadRequest(String rentalUnitId,CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto) {
         if(null == requestDto.getFilePurpose()) throw new MissingRequiredParamException("purpose");
         if(null == requestDto.getContentType() || requestDto.getContentType().trim().isEmpty()) throw new MissingRequiredParamException("content_type");
-        String rentalUnitId = null;
         if(userDetails.getRoles().contains(UserRole.student)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
             requestDto.setRentalUnitElement(null);
@@ -58,6 +61,9 @@ public class FileServiceImpl implements FileService {
                 if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles()) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);
             }
         }
+    }
+
+    private ResponseEntity<ApiResponse<?>> getUploadUrlForFileUnAuth(CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto, String requestId,String rentalUnitId) {
         String fileId = UUID.randomUUID().toString();
         String path = userDetails.getId() + "/" + requestDto.getFilePurpose().toString() + "/" + fileId;
         File file = File.builder()
@@ -73,11 +79,11 @@ public class FileServiceImpl implements FileService {
         fileRepo.save(file);
         URL url = GcpStorageUtil.createPostUrl(path,requestDto.getContentType());
         return ResponseEntity.status(200).body(ApiResponse.builder()
-                        .status(200)
-                        .data(new HashMap<String,Object>(){{
-                            put("fileId",fileId);
-                            put("url",url.toString());
-                        }}).build());
+                .status(200)
+                .data(new HashMap<String,Object>(){{
+                    put("fileId",fileId);
+                    put("url",url.toString());
+                }}).build());
     }
 
     @Override
@@ -132,5 +138,22 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id) {
         return fileRepo.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(id);
+    }
+
+    @Override
+    public ResponseEntity<?> replaceFile(String fileId, GetUploadUrlForFileRequestDto requestDto, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails) throw new UnAuthenticatedUserException();
+        if(null == fileId || fileId.trim().isEmpty()) throw new MissingRequiredParamException();
+        File file = fileRepo.findById(fileId);
+        if(null == file) throw new EntityNotFoundException();
+        if(false == userDetails.getId().equals(file.getUserId())) throw new ActionNotAllowedException("replace_file","user can only update file uploaded by them self",403);
+        if(file.getPurpose() != requestDto.getFilePurpose()) throw new ActionNotAllowedException("replace_file","new file and existing file have different purposes",400);
+        String rentalUnitId = null;
+        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto);
+        fileRepo.update(fileId, new HashMap<String,Object>(){{
+            put("deleted",true);
+        }});
+        return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId);
     }
 }
