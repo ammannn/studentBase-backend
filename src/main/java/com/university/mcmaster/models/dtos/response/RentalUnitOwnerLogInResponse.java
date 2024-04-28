@@ -13,5 +13,8 @@ public class RentalUnitOwnerLogInResponse{
     private String phoneNumber;
     private UserRole userRole;
     private String name;
+    private String occupation;
+    private String preferredModOfContact;
+    private String reason;
     private boolean admin;
 }

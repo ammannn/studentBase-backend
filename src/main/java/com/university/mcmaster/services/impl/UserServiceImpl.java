@@ -151,6 +151,13 @@ public class UserServiceImpl implements UserService {
                     .userRole(UserRole.student)
                     .admin(user.getRole().contains(UserRole.admin))
                     .documents(docs)
+                            .verifiedOn(user.getVerifiedOn())
+                            .dob(user.getDob())
+                            .nationality(user.getNationality())
+                            .emergencyContact(user.getEmergencyContact())
+                            .additionalEmail(user.getAdditionalEmail())
+                            .addresses(user.getAddresses())
+                            .reason(user.getReason())
                     .build());
         } else if(user.getRole().contains(UserRole.rental_unit_owner)) {
             responseDto.setRentalUnitOwner(RentalUnitOwnerLogInResponse.builder()
@@ -159,6 +166,9 @@ public class UserServiceImpl implements UserService {
                     .name(user.getName())
                     .admin(user.getRole().contains(UserRole.admin))
                     .userRole(UserRole.rental_unit_owner)
+                            .preferredModOfContact(user.getPreferredModOfContact())
+                            .occupation(user.getOccupation())
+                            .reason(user.getReason())
                     .build());
         }
         return ResponseEntity.ok(responseDto);

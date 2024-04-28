@@ -2,6 +2,7 @@ package com.university.mcmaster.models.dtos.response;
 
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
+import com.university.mcmaster.models.entities.Address;
 import lombok.*;
 
 import java.util.List;
@@ -21,4 +22,10 @@ public class StudentLogInResponse {
     private String name;
     private List<Map<String,String>> documents;
     private boolean admin;
+    private String dob;
+    private String nationality;
+    private String emergencyContact;
+    private String additionalEmail;
+    private List<Address> addresses;
+    private String reason;
 }
