@@ -1,0 +1,128 @@
+{
+  "countries": [
+    {
+      "country": {
+        "label": "Unites States",
+        "value": "usa"
+      },
+      "states": [
+        {"label": "AL", "value": "Alabama"},
+        {"label": "AK", "value": "Alaska"},
+        {"label": "AZ", "value": "Arizona"},
+        {"label": "AR", "value": "Arkansas"},
+        {"label": "CA", "value": "California"},
+        {"label": "CO", "value": "Colorado"},
+        {"label": "CT", "value": "Connecticut"},
+        {"label": "DE", "value": "Delaware"},
+        {"label": "FL", "value": "Florida"},
+        {"label": "GA", "value": "Georgia"},
+        {"label": "HI", "value": "Hawaii"},
+        {"label": "ID", "value": "Idaho"},
+        {"label": "IL", "value": "Illinois"},
+        {"label": "IN", "value": "Indiana"},
+        {"label": "IA", "value": "Iowa"},
+        {"label": "KS", "value": "Kansas"},
+        {"label": "KY", "value": "Kentucky"},
+        {"label": "LA", "value": "Louisiana"},
+        {"label": "ME", "value": "Maine"},
+        {"label": "MD", "value": "Maryland"},
+        {"label": "MA", "value": "Massachusetts"},
+        {"label": "MI", "value": "Michigan"},
+        {"label": "MN", "value": "Minnesota"},
+        {"label": "MS", "value": "Mississippi"},
+        {"label": "MO", "value": "Missouri"},
+        {"label": "MT", "value": "Montana"},
+        {"label": "NE", "value": "Nebraska"},
+        {"label": "NV", "value": "Nevada"},
+        {"label": "NH", "value": "New Hampshire"},
+        {"label": "NJ", "value": "New Jersey"},
+        {"label": "NM", "value": "New Mexico"},
+        {"label": "NY", "value": "New York"},
+        {"label": "NC", "value": "North Carolina"},
+        {"label": "ND", "value": "North Dakota"},
+        {"label": "OH", "value": "Ohio"},
+        {"label": "OK", "value": "Oklahoma"},
+        {"label": "OR", "value": "Oregon"},
+        {"label": "PA", "value": "Pennsylvania"},
+        {"label": "RI", "value": "Rhode Island"},
+        {"label": "SC", "value": "South Carolina"},
+        {"label": "SD", "value": "South Dakota"},
+        {"label": "TN", "value": "Tennessee"},
+        {"label": "TX", "value": "Texas"},
+        {"label": "UT", "value": "Utah"},
+        {"label": "VT", "value": "Vermont"},
+        {"label": "VA", "value": "Virginia"},
+        {"label": "WA", "value": "Washington"},
+        {"label": "WV", "value": "West Virginia"},
+        {"label": "WI", "value": "Wisconsin"},
+        {"label": "WY", "value": "Wyoming"}
+      ]
+    },
+    {
+      "country": {
+        "label": "Canada",
+        "value": "ca"
+      },
+      "states": [
+        {"label": "AB", "value": "Alberta"},
+        {"label": "BC", "value": "British Columbia"},
+        {"label": "MB", "value": "Manitoba"},
+        {"label": "NB", "value": "New Brunswick"},
+        {"label": "NL", "value": "Newfoundland and Labrador"},
+        {"label": "NS", "value": "Nova Scotia"},
+        {"label": "ON", "value": "Ontario"},
+        {"label": "PE", "value": "Prince Edward Island"},
+        {"label": "QC", "value": "Quebec"},
+        {"label": "SK", "value": "Saskatchewan"}
+      ]
+    },
+    {
+      "country": {
+        "label": "United Kingdom",
+        "value": "uk"
+      },
+      "states": [
+        {"label": "ENG", "value": "England"},
+        {"label": "SCO", "value": "Scotland"},
+        {"label": "WAL", "value": "Wales"},
+        {"label": "NI", "value": "Northern Ireland"}
+      ]
+    },
+    {
+      "country": {
+        "label": "India",
+        "value": "in"
+      },
+      "states": [
+        {"label": "AP", "value": "Andhra Pradesh"},
+        {"label": "AR", "value": "Arunachal Pradesh"},
+        {"label": "AS", "value": "Assam"},
+        {"label": "BR", "value": "Bihar"},
+        {"label": "CG", "value": "Chhattisgarh"},
+        {"label": "GA", "value": "Goa"},
+        {"label": "GJ", "value": "Gujarat"},
+        {"label": "HR", "value": "Haryana"},
+        {"label": "HP", "value": "Himachal Pradesh"},
+        {"label": "JH", "value": "Jharkhand"},
+        {"label": "KA", "value": "Karnataka"},
+        {"label": "KL", "value": "Kerala"},
+        {"label": "MP", "value": "Madhya Pradesh"},
+        {"label": "MH", "value": "Maharashtra"},
+        {"label": "MN", "value": "Manipur"},
+        {"label": "ML", "value": "Meghalaya"},
+        {"label": "MZ", "value": "Mizoram"},
+        {"label": "NL", "value": "Nagaland"},
+        {"label": "OR", "value": "Odisha"},
+        {"label": "PB", "value": "Punjab"},
+        {"label": "RJ", "value": "Rajasthan"},
+        {"label": "SK", "value": "Sikkim"},
+        {"label": "TN", "value": "Tamil Nadu"},
+        {"label": "TS", "value": "Telangana"},
+        {"label": "TR", "value": "Tripura"},
+        {"label": "UP", "value": "Uttar Pradesh"},
+        {"label": "UK", "value": "Uttarakhand"},
+        {"label": "WB", "value": "West Bengal"}
+      ]
+    }
+  ]
+}
