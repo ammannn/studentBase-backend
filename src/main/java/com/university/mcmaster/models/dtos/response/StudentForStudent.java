@@ -3,6 +3,7 @@ package com.university.mcmaster.models.dtos.response;
 import com.university.mcmaster.enums.VerificationStatus;
 import lombok.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,5 +21,5 @@ public class StudentForStudent {
 
     private VerificationStatus verificationStatus;
     private long verifiedOn;
-    private List<Map<String,String>> docs;
+    private List<Map<String, HashMap<String,Object>>> docs;
 }

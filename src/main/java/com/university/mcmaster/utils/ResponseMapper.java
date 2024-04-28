@@ -157,11 +157,13 @@ public class ResponseMapper {
                 .build();
     }
 
-    public List<Map<String,String>> getStudentDocs(User user){
+    public List<Map<String,HashMap<String,Object>>> getStudentDocs(User user){
         return Optional.ofNullable(user.getDocumentPaths()).map(Map::entrySet)
                 .stream().flatMap(Collection::stream)
-                .map(e->new HashMap<String,String>(){{
-                    put(e.getKey(), (null != e.getValue() && false == e.getValue().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(e.getValue()).toString() : "");
+                .map(e->new HashMap<String,HashMap<String,Object>>(){{
+                    put(e.getKey(), new HashMap<String,Object>(){{
+                        put("url",(null != e.getValue() && false == e.getValue().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(e.getValue()).toString() : "");
+                    }});
                 }}).collect(Collectors.toList());
     }
 

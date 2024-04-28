@@ -5,6 +5,7 @@ import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.Address;
 import lombok.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class StudentLogInResponse {
     private long verifiedOn;
     private UserRole userRole;
     private String name;
-    private List<Map<String,String>> documents;
+    private List<Map<String, HashMap<String,Object>>> documents;
     private boolean admin;
     private String dob;
     private String nationality;

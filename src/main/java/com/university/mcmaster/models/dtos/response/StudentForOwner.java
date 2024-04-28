@@ -5,6 +5,7 @@ import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.Address;
 import lombok.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,5 +23,5 @@ public class StudentForOwner {
 
     private VerificationStatus verificationStatus;
     private long verifiedOn;
-    private List<Map<String,String>> docs;
+    private List<Map<String, HashMap<String,Object>>> docs;
 }
