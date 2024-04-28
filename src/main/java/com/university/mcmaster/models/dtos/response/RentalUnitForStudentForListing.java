@@ -6,6 +6,7 @@ import com.university.mcmaster.models.entities.Contact;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import lombok.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,5 +31,5 @@ public class RentalUnitForStudentForListing {
     private int likes;
     private int givenRating;
     private Contact contact;
-    private List<Map<String,String>> images;
+    private Map<String,List<HashMap<String,Object>>> images;
 }

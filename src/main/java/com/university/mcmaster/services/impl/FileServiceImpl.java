@@ -1,6 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.university.mcmaster.enums.FilePurpose;
+import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
@@ -45,14 +46,16 @@ public class FileServiceImpl implements FileService {
         String rentalUnitId = null;
         if(userDetails.getRoles().contains(UserRole.student)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
+            requestDto.setRentalUnitElement(null);
         }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
             if(null == requestDto.getRentalUnitId() || requestDto.getRentalUnitId().isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
+            if(null == requestDto.getRentalUnitElement()) requestDto.setRentalUnitElement(RentalUnitElement.others);
             rentalUnitId = requestDto.getRentalUnitId().trim();
-            if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()){
-                List<File> files = fileRepo.getFilesByRentalUnitIdAndDeletedFalseAndUploadedOnGcpTrue(rentalUnitId);
-                if(files.size() >= Constants.RENTAL_UNIT_IMAGES_LIMIT) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit : " + Constants.RENTAL_UNIT_IMAGES_LIMIT,400);
+            if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()) {
+                List<File> files = fileRepo.getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(rentalUnitId,requestDto.getRentalUnitElement());
+                if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles()) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);
             }
         }
         String fileId = UUID.randomUUID().toString();
@@ -65,6 +68,7 @@ public class FileServiceImpl implements FileService {
                 .filePath(path)
                 .purpose(requestDto.getFilePurpose())
                 .rentalUnitId(rentalUnitId)
+                .rentalUnitElement(requestDto.getRentalUnitElement())
                 .build();
         fileRepo.save(file);
         URL url = GcpStorageUtil.createPostUrl(path,requestDto.getContentType());
@@ -128,18 +132,5 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id) {
         return fileRepo.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(id);
-    }
-
-    @Override
-    public List<Map<String,String>> getImagesByRentalUnitI(String id) {
-        try {
-            return fileRepo.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(id).stream().map(f->new HashMap<String,String>(){{
-                put("imageId",f.getId());
-                put("url",GcpStorageUtil.createGetUrl(f.getFilePath()).toString());
-            }}).collect(Collectors.toList());
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
-     return Collections.emptyList();
     }
 }

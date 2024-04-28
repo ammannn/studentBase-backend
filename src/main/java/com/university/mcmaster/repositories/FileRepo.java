@@ -1,5 +1,6 @@
 package com.university.mcmaster.repositories;
 
+import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.models.entities.File;
 
 import java.util.HashMap;
@@ -15,6 +16,8 @@ public interface FileRepo {
     boolean save(File file);
 
     List<File> getFilesByRentalUnitIdAndDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId);
+
+    List<File> getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId, RentalUnitElement element);
 
     List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
 }

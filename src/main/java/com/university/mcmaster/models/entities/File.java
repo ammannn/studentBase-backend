@@ -1,6 +1,7 @@
 package com.university.mcmaster.models.entities;
 
 import com.university.mcmaster.enums.FilePurpose;
+import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.models.FirebaseCommonProps;
 import com.university.mcmaster.utils.FirestoreConstants;
 import lombok.*;
@@ -18,6 +19,7 @@ public class File implements FirebaseCommonProps {
     private FilePurpose purpose;
     private String rentalUnitId;
     private String fileName;
+    private RentalUnitElement rentalUnitElement;
 
     @Override
     public String getCollection() {

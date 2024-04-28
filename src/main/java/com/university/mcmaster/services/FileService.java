@@ -15,6 +15,4 @@ public interface FileService {
     ResponseEntity<?> deleteFile(String fileId, String requestId, HttpServletRequest request);
     File getFileById(String posterImageId);
     List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
-
-    List<Map<String,String>> getImagesByRentalUnitI(String id);
 }

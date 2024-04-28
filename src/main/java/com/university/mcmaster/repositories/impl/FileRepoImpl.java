@@ -1,6 +1,7 @@
 package com.university.mcmaster.repositories.impl;
 
 import com.google.firebase.cloud.FirestoreClient;
+import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.models.entities.File;
 import com.university.mcmaster.repositories.FileRepo;
 import com.university.mcmaster.repositories.utils.FirebaseUtils;
@@ -8,7 +9,6 @@ import com.university.mcmaster.utils.Constants;
 import com.university.mcmaster.utils.FirestoreConstants;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -41,13 +41,24 @@ public class FileRepoImpl extends FirebaseUtils<File> implements FileRepo {
     }
 
     @Override
+    public List<File> getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId, RentalUnitElement element) {
+        return processQueryForEntityList(
+                FirestoreClient.getFirestore().collection(FirestoreConstants.FS_FILES)
+                        .whereEqualTo("rentalUnitId",rentalUnitId)
+                        .whereEqualTo("deleted",false)
+                        .whereEqualTo("rentalUnitElement",element)
+                        .whereEqualTo("uploadedOnGcp",true)
+                ,File.class);
+    }
+
+    @Override
     public List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String rentalUnitId) {
         return processQueryForEntityList(
                 FirestoreClient.getFirestore().collection(FirestoreConstants.FS_FILES)
                         .whereEqualTo("rentalUnitId",rentalUnitId)
                         .whereEqualTo("deleted",false)
                         .whereEqualTo("uploadedOnGcp",true)
-                        .limit(Constants.RENTAL_UNIT_IMAGES_LIMIT)
+                        .limit(RentalUnitElement.getTotalAllowedFiles())
                 ,File.class
         );
     }

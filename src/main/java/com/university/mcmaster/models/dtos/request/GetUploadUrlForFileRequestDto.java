@@ -2,6 +2,7 @@ package com.university.mcmaster.models.dtos.request;
 
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.FileType;
+import com.university.mcmaster.enums.RentalUnitElement;
 import lombok.*;
 
 @Getter
@@ -15,4 +16,5 @@ public class GetUploadUrlForFileRequestDto {
     private FilePurpose filePurpose;
     private String rentalUnitId;
     private String fileName;
+    private RentalUnitElement rentalUnitElement;
 }

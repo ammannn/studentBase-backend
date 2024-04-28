@@ -1,6 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.google.cloud.firestore.FieldValue;
+import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
@@ -214,13 +215,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     public List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen) {
        List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(verificationStatus,limit,lastSeen);
         for (RentalUnit rentalUnit : rentalUnits) {
-            rentalUnit.setCustomFields(new HashMap<>());
-            if(null != rentalUnit.getPosterImagePath()) rentalUnit.getCustomFields().put("posterImagePath",GcpStorageUtil.createGetUrl(rentalUnit.getPosterImagePath()));
-            List<File> files = fileService.getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(rentalUnit.getId());
-            rentalUnit.getCustomFields().put("images",files.stream().map(f->new HashMap<String,Object>(){{
-                put("imageId",f.getId());
-                put("url",GcpStorageUtil.createGetUrl(f.getFilePath()));
-            }}).collect(Collectors.toList()));
+            responseMapper.setRentalUnitImages(rentalUnit);
         }
        return rentalUnits;
     }
