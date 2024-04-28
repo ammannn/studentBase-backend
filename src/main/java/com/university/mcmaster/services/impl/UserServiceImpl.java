@@ -241,7 +241,7 @@ public class UserServiceImpl implements UserService {
             log.trace("[update_student] updating 'validatedAddresses'");
             updateMap.put("addresses",validatedAddresses);
         }
-        if(VerificationStatus.verified != user.getVerificationStatus() && isAdmin){
+        if(VerificationStatus.verified != user.getVerificationStatus() || isAdmin){
             if(false == nationality.isEmpty() && false == nationality.equals(user.getNationality())){
                 log.trace("[update_student] updating 'nationality'");
                 updateMap.put("nationality",nationality);
