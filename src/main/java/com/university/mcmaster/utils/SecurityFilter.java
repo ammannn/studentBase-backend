@@ -16,6 +16,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("running sec filter before request");
         String authHeader = request.getHeader("Authorization");
         if(null != authHeader && authHeader.startsWith("Bearer ")){
             String tokenStr = authHeader.substring(7);
@@ -31,5 +32,6 @@ public class SecurityFilter extends OncePerRequestFilter {
             logger.trace("no auth token provided");
         }
         filterChain.doFilter(request, response);
+        System.out.println("running sec filter after request : "  + response.getStatus());
     }
 }
