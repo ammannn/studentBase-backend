@@ -18,10 +18,7 @@ import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.repositories.UserRepo;
 import com.university.mcmaster.services.UserService;
-import com.university.mcmaster.utils.EnvironmentVariables;
-import com.university.mcmaster.utils.FirebaseAuthenticationService;
-import com.university.mcmaster.utils.GcpStorageUtil;
-import com.university.mcmaster.utils.Utility;
+import com.university.mcmaster.utils.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.A;
@@ -42,6 +39,7 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepo userRepo;
+    private final ResponseMapper responseMapper;
 
     @EventListener
     public void createAdminUser(ApplicationStartedEvent event){
@@ -138,11 +136,6 @@ public class UserServiceImpl implements UserService {
         }
         responseDto.setRegistered(true);
         if(user.getRole().contains(UserRole.student)) {
-            List<Map<String,String>> docs = Optional.ofNullable(user.getDocumentPaths()).map(Map::entrySet)
-                    .stream().flatMap(Collection::stream)
-                    .map(e->new HashMap<String,String>(){{
-                        put(e.getKey(), GcpStorageUtil.createGetUrl(e.getValue()).toString());
-                    }}).collect(Collectors.toList());
             responseDto.setStudent(StudentLogInResponse.builder()
                     .email(user.getEmail())
                     .phoneNumber(user.getPhoneNumber())
@@ -150,7 +143,7 @@ public class UserServiceImpl implements UserService {
                     .name(user.getName())
                     .userRole(UserRole.student)
                     .admin(user.getRole().contains(UserRole.admin))
-                    .documents(docs)
+                    .documents(responseMapper.getStudentDocs(user))
                             .verifiedOn(user.getVerifiedOn())
                             .dob(user.getDob())
                             .nationality(user.getNationality())
