@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -31,7 +32,7 @@ public class MainController {
         ObjectMapper mapper = new ObjectMapper();
         HashMap<String, Object> jsonMap = null;
         try {
-            jsonMap = mapper.readValue(new File("src/main/resources/static/countries.json"), HashMap.class);
+            jsonMap = mapper.readValue(new File(Paths.get("src","main","resources","static","countries.json").toString()), HashMap.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
