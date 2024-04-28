@@ -28,11 +28,11 @@ public enum FilePurpose {
         return false;
     }
 
-    private static List<FilePurpose> validForRentalUnitOwner(){
+    public static List<FilePurpose> validForRentalUnitOwner(){
         return Arrays.asList(rental_unit_image,rental_unit_poster_image);
     }
 
-    private static List<FilePurpose> validForStudent(){
+    public static List<FilePurpose> validForStudent(){
         return Arrays.asList(bank_statement,
                 credit_score_report,
                 parents_bank_statement,

@@ -2,10 +2,7 @@ package com.university.mcmaster.services.impl;
 
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.UserRole;
-import com.university.mcmaster.exceptions.ActionNotAllowedException;
-import com.university.mcmaster.exceptions.EntityNotFoundException;
-import com.university.mcmaster.exceptions.MissingRequiredParamException;
-import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
+import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.GetUploadUrlForFileRequestDto;
 import com.university.mcmaster.models.entities.CustomUserDetails;
@@ -46,10 +43,10 @@ public class FileServiceImpl implements FileService {
         if(null == requestDto.getContentType() || requestDto.getContentType().trim().isEmpty()) throw new MissingRequiredParamException("content_type");
         String rentalUnitId = null;
         if(userDetails.getRoles().contains(UserRole.student)){
-            if(FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new ActionNotAllowedException("upload_file","invalid file purpose",400);
+            if(false == FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
         }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
-            if(FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new ActionNotAllowedException("upload_file","invalid file purpose",400);
+            if(false == FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
             if(null == requestDto.getRentalUnitId() || requestDto.getRentalUnitId().isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
             rentalUnitId = requestDto.getRentalUnitId().trim();
             if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()){
