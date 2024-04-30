@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
         for (User user : users) {
             user.setCustomFields(new HashMap<String, Object>(){{
                 put("documents",responseMapper.getStudentDocs(user));
+                put("profileImageUrl",(null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "");
             }});
         }
         return users;
@@ -131,6 +132,7 @@ public class UserServiceImpl implements UserService {
                     .verificationStatus(user.getVerificationStatus())
                     .name(user.getName())
                     .userRole(UserRole.student)
+                            .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
                     .admin(user.getRole().contains(UserRole.admin))
                     .documents(responseMapper.getStudentDocs(user))
                             .verifiedOn(user.getVerifiedOn())
@@ -146,6 +148,7 @@ public class UserServiceImpl implements UserService {
                     .email(user.getEmail())
                     .phoneNumber(user.getPhoneNumber())
                     .name(user.getName())
+                    .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
                     .admin(user.getRole().contains(UserRole.admin))
                     .userRole(UserRole.rental_unit_owner)
                             .preferredModOfContact(user.getPreferredModOfContact())

@@ -118,6 +118,7 @@ public class ResponseMapper {
                 .verifiedOn(user.getVerifiedOn())
                 .phoneNumber(user.getPhoneNumber())
                 .userId(user.getId())
+                .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
                 .docs(getStudentDocs(user))
                 .build();
     }

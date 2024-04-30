@@ -39,6 +39,8 @@ public class User implements FirebaseCommonProps {
         private Map<String,StudentDocFile> documentPaths;
         private Map<String,Object> customFields;
 
+        private StudentDocFile profileImage;
+
         @Override
         public String getCollection() {
                 return collection;

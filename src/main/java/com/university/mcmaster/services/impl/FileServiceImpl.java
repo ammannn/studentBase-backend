@@ -47,6 +47,7 @@ public class FileServiceImpl implements FileService {
     private void verifyFileUploadRequest(String rentalUnitId,CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto) {
         if(null == requestDto.getFilePurpose()) throw new MissingRequiredParamException("purpose");
         if(null == requestDto.getContentType() || requestDto.getContentType().trim().isEmpty()) throw new MissingRequiredParamException("content_type");
+        if(FilePurpose.user_profile_image == requestDto.getFilePurpose()) return;
         if(userDetails.getRoles().contains(UserRole.student)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
             requestDto.setRentalUnitElement(null);
@@ -96,7 +97,14 @@ public class FileServiceImpl implements FileService {
         fileRepo.update(fileId,new HashMap<String,Object>(){{
             put("uploadedOnGcp",true);
         }});
-        if(file.getPurpose().isProfileFile()) {
+        if(FilePurpose.user_profile_image == file.getPurpose()){
+            userService.updateUser(userDetails.getId(),new HashMap<String,Object>(){{
+                put("profileImage", StudentDocFile.builder()
+                        .path(file.getFilePath())
+                        .name(file.getFileName())
+                        .build());
+            }});
+        } else if(file.getPurpose().isProfileFile()) {
             userService.updateUser(userDetails.getId(),new HashMap<String,Object>(){{
                 put("documentPaths."+file.getPurpose().toString(), StudentDocFile.builder()
                         .path(file.getFilePath())

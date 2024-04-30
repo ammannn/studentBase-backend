@@ -17,4 +17,5 @@ public class RentalUnitOwnerLogInResponse{
     private String preferredModOfContact;
     private String reason;
     private boolean admin;
+    private String profileImageUrl;
 }

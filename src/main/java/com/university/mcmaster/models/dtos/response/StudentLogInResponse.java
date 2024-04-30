@@ -29,4 +29,5 @@ public class StudentLogInResponse {
     private String additionalEmail;
     private List<Address> addresses;
     private String reason;
+    private String profileImageUrl;
 }

@@ -14,7 +14,8 @@ public enum FilePurpose {
     gic_certificate(true,true),
     parents_bank_statement(true,true),
     student_id(true,true),
-    national_id(true,true);
+    national_id(true,true),
+    user_profile_image(true,true);
     private FilePurpose(boolean deleteOld,boolean profileFile){
         this.deleteOld = deleteOld;
         this.profileFile = profileFile;
@@ -29,7 +30,7 @@ public enum FilePurpose {
     }
 
     public static List<FilePurpose> validForRentalUnitOwner(){
-        return Arrays.asList(rental_unit_image,rental_unit_poster_image);
+        return Arrays.asList(rental_unit_image,rental_unit_poster_image,user_profile_image);
     }
 
     public static List<FilePurpose> validForStudent(){
@@ -37,7 +38,7 @@ public enum FilePurpose {
                 credit_score_report,
                 parents_bank_statement,
                 gic_certificate,
-                student_id,
+                student_id,user_profile_image,
                 national_id);
     }
 }
