@@ -62,18 +62,22 @@ public class ResponseMapper {
         Map<String, RentalUnitForOwner> rentalUnitMap = new HashMap<>();
         Map<String, StudentForOwner> userMap = new HashMap<>();
         for (Application application : applications) {
-            res.add(ApplicationForRentalUnitOwner.builder()
-                    .applicationId(application.getId())
-                    .rentalUnit(getRentalUnitByIdForOwner(application.getRentalUnitId(), rentalUnitMap))
-                    .applicationStatus(application.getApplicationStatus())
-                    .lastUpdatedOn(application.getLastUpdatedOn())
-                    .createdOn(application.getCreatedOn())
-                    .students(application.getStudents().stream().map(s -> getStudentByIdForRentalUnitOwner(s, userMap)).collect(Collectors.toList()))
-                    .createdBy(getStudentByIdForRentalUnitOwner(application.getCreatedBy(), userMap))
-                    .visitingSchedule(application.getVisitingSchedule())
-                    .build());
+            res.add(getApplicationForRentalUnitOwner(application,rentalUnitMap,userMap,requestId));
         }
         return res;
+    }
+
+    public ApplicationForRentalUnitOwner getApplicationForRentalUnitOwner(Application application, Map<String, RentalUnitForOwner> rentalUnitMap, Map<String, StudentForOwner> userMap, String requestId) {
+        return ApplicationForRentalUnitOwner.builder()
+                .applicationId(application.getId())
+                .rentalUnit(getRentalUnitByIdForOwner(application.getRentalUnitId(), rentalUnitMap))
+                .applicationStatus(application.getApplicationStatus())
+                .lastUpdatedOn(application.getLastUpdatedOn())
+                .createdOn(application.getCreatedOn())
+                .students(application.getStudents().stream().map(s -> getStudentByIdForRentalUnitOwner(s, userMap)).collect(Collectors.toList()))
+                .createdBy(getStudentByIdForRentalUnitOwner(application.getCreatedBy(), userMap))
+                .visitingSchedule(application.getVisitingSchedule())
+                .build();
     }
 
     private StudentForOwner getStudentByIdForRentalUnitOwner(String userId, Map<String, StudentForOwner> userMap) {
@@ -84,7 +88,7 @@ public class ResponseMapper {
         return studentForOwner;
     }
 
-    private StudentForStudent getStudentByIdForStudent(String userId, Map<String, StudentForStudent> userMap) {
+    public StudentForStudent getStudentByIdForStudent(String userId, Map<String, StudentForStudent> userMap) {
         if (userMap.containsKey(userId)) return userMap.get(userId);
         User user = userRepo.findById(userId);
         StudentForStudent studentForOwner = getStudentForStudent(user);
@@ -105,7 +109,7 @@ public class ResponseMapper {
                 .build();
     }
 
-    private StudentForStudent getStudentForStudent(User user) {
+    public StudentForStudent getStudentForStudent(User user) {
         return StudentForStudent.builder()
                 .name(user.getName())
                 .email(user.getEmail())
@@ -174,18 +178,22 @@ public class ResponseMapper {
         Map<String, RentalUnitForStudentForListing> rentalUnitMap = new HashMap<>();
         Map<String, StudentForStudent> userMap = new HashMap<>();
         for (Application application : applications) {
-            res.add(ApplicationForStudent.builder()
-                    .applicationId(application.getId())
-                    .rentalUnit(getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap))
-                    .applicationStatus(application.getApplicationStatus())
-                    .lastUpdatedOn(application.getLastUpdatedOn())
-                    .createdOn(application.getCreatedOn())
-                    .students(application.getStudents().stream().map(s -> getStudentByIdForStudent(s, userMap)).collect(Collectors.toList()))
-                    .createdBy(getStudentByIdForStudent(application.getCreatedBy(), userMap))
-                    .visitingSchedule(application.getVisitingSchedule())
-                    .build());
+            res.add(getApplicationForStudent(application,userId,requestId,userMap,rentalUnitMap));
         }
         return res;
+    }
+
+    public ApplicationForStudent getApplicationForStudent(Application application, String userId, String requestId, Map<String, StudentForStudent> userMap, Map<String, RentalUnitForStudentForListing> rentalUnitMap) {
+        return ApplicationForStudent.builder()
+                .applicationId(application.getId())
+                .rentalUnit(getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap))
+                .applicationStatus(application.getApplicationStatus())
+                .lastUpdatedOn(application.getLastUpdatedOn())
+                .createdOn(application.getCreatedOn())
+                .students(application.getStudents().stream().map(s -> getStudentByIdForStudent(s, userMap)).collect(Collectors.toList()))
+                .createdBy(getStudentByIdForStudent(application.getCreatedBy(), userMap))
+                .visitingSchedule(application.getVisitingSchedule())
+                .build();
     }
 
     private RentalUnitForStudentForListing getRentalUnitByIdForStudent(String userId, String rentalUnitId, Map<String, RentalUnitForStudentForListing> cache) {

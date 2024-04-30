@@ -146,7 +146,7 @@ public class CalendarServiceImpl implements CalendarService {
                             .build();
                     timeSlot.getEnd().setDayPeriod(timeSlot.getEnd().getHour() >= 12 ? DayPeriod.PM : DayPeriod.AM);
                     timeSlot.getStart().setDayPeriod(timeSlot.getStart().getHour() >= 12 ? DayPeriod.PM : DayPeriod.AM);
-                    timeSlot.setAvailable(finalTemplate ? true : applicationService.isVistingTimeSlotAvailble(userId,date,timeZone,timeSlot.getStart(),timeSlot.getEnd()));
+//                    timeSlot.setAvailable(finalTemplate ? true : applicationService.isVistingTimeSlotAvailble(userId,date,timeZone,timeSlot.getStart(),timeSlot.getEnd()));
                     add(timeSlot);
                 }
             }});

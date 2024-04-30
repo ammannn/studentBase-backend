@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
         }
         student = User.builder()
                 .id(userDetails.getId())
-                .email(requestDto.getEmail())
+                .email(userDetails.getEmail())
                 .name(requestDto.getName())
                 .phoneNumber(requestDto.getPhoneNumber())
                 .role(roles)

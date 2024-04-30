@@ -1,6 +1,7 @@
 package com.university.mcmaster.controllers;
 
 import com.university.mcmaster.enums.ApplicationStatus;
+import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
 import com.university.mcmaster.services.ApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,12 +39,12 @@ public class ApplicationController {
     }
 
     @PutMapping("/applications/{applicationId}")
-    public ResponseEntity<?> updateApplication(
+    public ResponseEntity<?> getApplicationById(
             @PathVariable("applicationId") String applicationId,
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
-        return applicationService.updateApplication(applicationId,requestId,request);
+        return applicationService.getApplicationById(applicationId,requestId,request);
     }
 
     @PutMapping("/applications/{applicationId}/status")
@@ -63,5 +64,15 @@ public class ApplicationController {
             HttpServletRequest request
     ){
         return applicationService.deleteApplication(applicationId,requestId,request);
+    }
+
+    @PutMapping("/applications/{applicationId}/students")
+    public ResponseEntity<?> addOrRemoveStudentsForApplication(
+            @PathVariable("applicationId") String applicationId,
+            @RequestBody AddOrRemoveStudentsForApplicationRequestDto requestDto,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return applicationService.addOrRemoveStudentsForApplication(applicationId,requestDto,requestId,request);
     }
 }

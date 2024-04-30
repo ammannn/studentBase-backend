@@ -4,10 +4,7 @@ import com.google.firebase.auth.UserRecord;
 import com.university.mcmaster.controllers.LogInResponseDto;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
-import com.university.mcmaster.exceptions.ActionNotAllowedException;
-import com.university.mcmaster.exceptions.EntityNotFoundException;
-import com.university.mcmaster.exceptions.MissingRequiredParamException;
-import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
+import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.UpdateUserRequestDto;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
@@ -160,6 +157,20 @@ public class UserServiceImpl implements UserService {
                     .build());
         }
         return ResponseEntity.ok(responseDto);
+    }
+
+    @Override
+    public ResponseEntity<?> searchUserForApplication(String email, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
+        if(false == userDetails.getRoles().contains(UserRole.student)) throw new UnAuthenticatedUserException();
+        if(null == email || email.trim().isEmpty()) throw new MissingRequiredParamException();
+        if(false == Utility.isValidEmail(email)) throw new InvalidParamValueException();
+        User user = userRepo.findUserByEmail(email);
+        if(null == user) throw new EntityNotFoundException();
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(responseMapper.getStudentForStudent(user))
+                .build());
     }
 
     private ResponseEntity<?> updateRentalUnitOwnerUserUnAuth(String userId, UpdateUserRequestDto requestDto, boolean isAdmin, String requestId) {

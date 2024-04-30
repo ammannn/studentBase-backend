@@ -3,6 +3,7 @@ package com.university.mcmaster.services.impl;
 import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.*;
+import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
 import com.university.mcmaster.models.dtos.response.ApplicationForRentalUnitOwner;
@@ -80,8 +81,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .createdOn(Instant.now().toEpochMilli())
                 .visitingSchedule(RequestedVisitingSchedule.builder()
                         .timeZone(requestDto.getTimeZone())
-                        .startTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitStartTime(),requestDto.getTimeZone()))
-                        .endTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitEndTime(),requestDto.getTimeZone()))
+                        .date(requestDto.getDate())
+//                        .startTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitStartTime(),requestDto.getTimeZone()))
+//                        .endTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitEndTime(),requestDto.getTimeZone()))
                         .build())
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .build();
@@ -96,8 +98,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == requestDto.getTimeZone() || requestDto.getTimeZone().trim().isEmpty()) throw new MissingRequiredParamException("timeZone");
         if(null == requestDto.getDate() || requestDto.getDate().trim().isEmpty()) throw new MissingRequiredParamException("date");
         if(false == Utility.verifyDateFormat(requestDto.getDate())) throw new InvalidParamValueException("date","yyyy-MM-dd");
-        if(null == requestDto.getVisitStartTime() || null == requestDto.getVisitStartTime().getDayPeriod() || requestDto.getVisitStartTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
-        if(null == requestDto.getVisitEndTime() || null == requestDto.getVisitEndTime().getDayPeriod() || requestDto.getVisitEndTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
+//        if(null == requestDto.getVisitStartTime() || null == requestDto.getVisitStartTime().getDayPeriod() || requestDto.getVisitStartTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
+//        if(null == requestDto.getVisitEndTime() || null == requestDto.getVisitEndTime().getDayPeriod() || requestDto.getVisitEndTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
     }
 
     @Override
@@ -197,5 +199,48 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Application> temp1 = applicationRepo.getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitStartTimeInRange(ownerId,startTimeStamp,endTimeStamp);
         List<Application> temp2 = applicationRepo.getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitEndTimeInRange(ownerId,startTimeStamp,endTimeStamp);
         return temp1.isEmpty() && temp2.isEmpty();
+    }
+
+    @Override
+    public ResponseEntity<?> addOrRemoveStudentsForApplication(String applicationId, AddOrRemoveStudentsForApplicationRequestDto requestDto, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
+        if(null == requestDto.getStudents() || requestDto.getStudents().isEmpty()) throw new MissingRequiredParamException();
+        if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
+        Application application = applicationRepo.findById(applicationId);
+        if(null == application) throw new EntityNotFoundException();
+        if(false == userDetails.getId().equals(application.getCreatedBy())) throw new ActionNotAllowedException("add_remove_students_from_application","only students, who created application can add or remove students from application",400);
+        Set<String> filtredList = new HashSet<>();
+        for (String studentId : requestDto.getStudents()) {
+            User user = userService.findUserById(studentId);
+            if(null == user) throw new ActionNotAllowedException("add_remove_students_from_application","no user found for specified id",400);
+            filtredList.add(studentId);
+        }
+        filtredList.add(userDetails.getId());
+        applicationRepo.update(application.getId(),new HashMap<String, Object>(){{
+            put("students",new ArrayList<String>(filtredList));
+        }});
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data("updated students list")
+                .build());
+    }
+
+    @Override
+    public ResponseEntity<?> getApplicationById(String applicationId, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
+        if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
+        Application application = applicationRepo.findById(applicationId);
+        if(null == application) throw new EntityNotFoundException();
+        Object res = null;
+        if(userDetails.getRoles().contains(UserRole.student)){
+            res = responseMapper.getApplicationForStudent(application,userDetails.getId(),requestId,new HashMap<>(),new HashMap<>());
+        }
+        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
+            res = responseMapper.getApplicationForRentalUnitOwner(application,new HashMap<>(),new HashMap<>(),requestId);
+        }
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(res)
+                .build());
     }
 }

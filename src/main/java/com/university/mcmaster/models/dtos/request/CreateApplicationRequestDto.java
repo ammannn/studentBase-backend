@@ -11,7 +11,7 @@ import lombok.*;
 public class CreateApplicationRequestDto {
     private String rentalUnitId;
     private String date;
-    private Time visitStartTime;
-    private Time visitEndTime;
+//    private Time visitStartTime;
+//    private Time visitEndTime;
     private String timeZone;
 }

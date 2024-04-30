@@ -30,4 +30,13 @@ public class UserController {
     ){
         return userService.getUserDetails(requestId,request);
     }
+
+    @GetMapping("/users-for-applications")
+    public ResponseEntity<?> searchUserForApplication(
+            @RequestBody String email,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return userService.searchUserForApplication(email,requestId,request);
+    }
 }

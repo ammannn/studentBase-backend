@@ -2,6 +2,7 @@ package com.university.mcmaster.services;
 
 import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.FilePurpose;
+import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
 import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,4 +61,8 @@ public interface ApplicationService {
     ResponseEntity<?> updateApplicationStatus(String applicationId, ApplicationStatus status, String requestId, HttpServletRequest request);
 
     boolean isVistingTimeSlotAvailble(String ownerId,LocalDate date, String timeZone, Time start, Time end);
+
+    ResponseEntity<?> addOrRemoveStudentsForApplication(String applicationId, AddOrRemoveStudentsForApplicationRequestDto requestDto, String requestId, HttpServletRequest request);
+
+    ResponseEntity<?> getApplicationById(String applicationId, String requestId, HttpServletRequest request);
 }

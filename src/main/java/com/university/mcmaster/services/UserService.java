@@ -20,4 +20,6 @@ public interface UserService {
     List<User> getPaginatedUsersByVerificationStatusForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen);
 
     ResponseEntity<?> getUserDetails(String requestId, HttpServletRequest request);
+
+    ResponseEntity<?> searchUserForApplication(String email, String requestId, HttpServletRequest request);
 }

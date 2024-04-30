@@ -29,6 +29,7 @@ public class UserRepoImpl extends FirebaseUtils<User> implements UserRepo {
     @Override
     public User findById(String id) {
         try {
+            if(null == id || id.trim().isEmpty()) return null;
             return FirestoreClient.getFirestore().collection(FirestoreConstants.FS_USERS).document(id).get().get().toObject(User.class);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
