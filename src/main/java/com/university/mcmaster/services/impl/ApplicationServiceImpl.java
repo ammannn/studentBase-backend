@@ -209,6 +209,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
         Application application = applicationRepo.findById(applicationId);
         if(null == application) throw new EntityNotFoundException();
+        if(ApplicationStatus.pending_document_upload != application.getApplicationStatus()) throw new ActionNotAllowedException("add_remove_students_from_application","new students can be added only when the application is in status 'pending_document_upload'",400);
         if(false == userDetails.getId().equals(application.getCreatedBy())) throw new ActionNotAllowedException("add_remove_students_from_application","only students, who created application can add or remove students from application",400);
         Set<String> filtredList = new HashSet<>();
         for (String studentId : requestDto.getStudents()) {
