@@ -3,6 +3,7 @@ package com.university.mcmaster.services.impl;
 import com.university.mcmaster.controllers.LogInResponseDto;
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.UserRole;
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
 import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
@@ -102,6 +103,7 @@ public class AuthServiceImpl implements AuthService {
                 .name(requestDto.getName())
                 .phoneNumber(requestDto.getPhoneNumber())
                 .role(roles)
+                .verificationStatus(VerificationStatus.pending)
                 .createdOn(Instant.now().toEpochMilli())
                 .documentPaths(new HashMap<String,StudentDocFile>(){{
                     put(FilePurpose.bank_statement.toString(), StudentDocFile.builder().build());

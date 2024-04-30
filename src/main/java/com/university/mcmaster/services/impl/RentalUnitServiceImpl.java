@@ -86,6 +86,13 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         validateCreateRentalPropertyRequest(requestDto);
+        List<String> featureSearchList = new ArrayList<>();
+        for (Map.Entry<String, Boolean> eminityEntry : requestDto.getFeatures().getFeaturesAmenities().entrySet()) {
+            if(eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey());
+        }
+        for (Map.Entry<String, Boolean> utilityEntry : requestDto.getFeatures().getFeaturesUtilities().entrySet()) {
+            if(utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey());
+        }
         RentalUnit rentalUnit = RentalUnit.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(userDetails.getId())
@@ -102,6 +109,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .description(Optional.ofNullable(requestDto.getDescription()).map(s->s.trim()).orElse(""))
                 .leaseTerm(requestDto.getLeaseTerm())
                 .leaseStartDate(requestDto.getLeaseStartDate())
+                .featureSearchList(featureSearchList)
                 .build();
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()
@@ -274,7 +282,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 //       featuresFlags , featuresNumbers , extraFeatures
         Map<String,Boolean> utilities = Arrays.stream("Heat, Water , Wifi , Cable , Electricity".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
-        Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished/partially furnished".split(","))
+        Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished, partially furnished".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
         Map<String,Double> featuresNumbers = Arrays.stream("Beds, Baths, Kitchen,Yard".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->0.0));

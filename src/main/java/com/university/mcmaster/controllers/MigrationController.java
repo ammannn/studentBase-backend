@@ -4,10 +4,16 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.storage.*;
 import com.google.common.collect.ImmutableList;
 import com.google.firebase.cloud.FirestoreClient;
+import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.FilePurpose;
+import com.university.mcmaster.enums.UserRole;
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.StudentDocFile;
+import com.university.mcmaster.models.entities.User;
+import com.university.mcmaster.repositories.UserRepo;
 import com.university.mcmaster.utils.EnvironmentVariables;
 import com.university.mcmaster.utils.FirestoreConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +29,9 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @RequestMapping("/migration")
 public class MigrationController {
+
+    @Autowired
+    private UserRepo userRepo;
 
     @GetMapping("/user-doc")
     public ResponseEntity<?> fixUserDocsMap() {
@@ -62,5 +71,19 @@ public class MigrationController {
         bucket.toBuilder().setCors(ImmutableList.of(corsConfiguration)).build().update();
         System.out.println("done");
         return ResponseEntity.ok("updated cors");
+    }
+
+    @GetMapping("/student-verification-status")
+    public ResponseEntity<?> studentVerificationStatus(){
+        List<User> users = userRepo.getAllUsersByRole(UserRole.student);
+        for (User user : users) {
+            if(null == user.getVerificationStatus()){
+                userRepo.update(user.getId(),new HashMap<String, Object>(){{
+                    put("verificationStatus", VerificationStatus.pending);
+                }});
+            }
+        }
+        System.out.println("done");
+        return ResponseEntity.ok("updated users");
     }
 }

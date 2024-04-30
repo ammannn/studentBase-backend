@@ -8,6 +8,7 @@ import com.university.mcmaster.models.FirebaseCommonProps;
 import com.university.mcmaster.utils.FirestoreConstants;
 import lombok.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -38,6 +39,8 @@ public class RentalUnit implements FirebaseCommonProps {
     private String description;
     private int leaseTerm;
     private long leaseStartDate;
+    private List<String> featureSearchList;
+    private String reason;
 
     @Override
     public String getCollection() {

@@ -1,5 +1,6 @@
 package com.university.mcmaster.repositories;
 
+import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.User;
 
@@ -12,4 +13,6 @@ public interface UserRepo {
     boolean save(User user);
     void update(String userId,Map<String, Object> updateMap);
     List<User> getPaginatedUsersByVerificationStatusForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen);
+
+    List<User> getAllUsersByRole(UserRole userRole);
 }

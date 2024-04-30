@@ -2,6 +2,7 @@ package com.university.mcmaster.repositories.impl;
 
 import com.google.cloud.firestore.Query;
 import com.google.firebase.cloud.FirestoreClient;
+import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.repositories.UserRepo;
@@ -50,6 +51,14 @@ public class UserRepoImpl extends FirebaseUtils<User> implements UserRepo {
         query = addLastSeen(query,FirestoreConstants.FS_USERS,lastSeen);
         return processQueryForEntityList(
                 query,User.class
+        );
+    }
+
+    @Override
+    public List<User> getAllUsersByRole(UserRole userRole) {
+        return processQueryForEntityList(FirestoreClient.getFirestore()
+                .collection(FirestoreConstants.FS_USERS)
+                .whereArrayContains("role",userRole),User.class
         );
     }
 }

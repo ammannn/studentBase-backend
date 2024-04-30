@@ -177,7 +177,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findById(userId);
         if(null == user) throw new EntityNotFoundException();
         Map<String,Object> updateMap = new HashMap<>();
-//        phoneNumber , name , dob , nationality , emergencyContact , additionalEmail , address
         String phoneNumber = Optional.ofNullable(requestDto.getPhoneNumber()).map(s->s.trim()).orElse("");
         String name = Optional.ofNullable(requestDto.getName()).map(s->s.trim()).orElse("");
         String occupation = Optional.ofNullable(requestDto.getOccupation()).map(s->s.trim()).orElse("");

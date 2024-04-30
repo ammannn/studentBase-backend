@@ -15,6 +15,8 @@ import com.university.mcmaster.services.UserService;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +27,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
     private final UserService userService;
     private final RentalUnitService rentalUnitService;
 
     @Override
     public ResponseEntity<?> getUsers(VerificationStatus verificationStatus,int limit,String lastSeen, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
+        log.trace("request received to get users by admin [requestId : "+requestId+"]");
         if(null == userDetails || (false == userDetails.getRoles().contains(UserRole.admin) && false == userDetails.getRoles().contains(UserRole.platform_admin))) throw new UnAuthenticatedUserException();
         List<User> users = userService.getPaginatedUsersByVerificationStatusForAdmin(verificationStatus,limit,lastSeen);
         return ResponseEntity.ok(ApiResponse.builder()

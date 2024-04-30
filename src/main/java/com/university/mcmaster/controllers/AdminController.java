@@ -41,7 +41,7 @@ public class AdminController {
             @PathVariable("rentalUnitId") String rentalUnitId,
             @RequestParam(name = "verificationStatus",required = false,defaultValue = "pending") VerificationStatus verificationStatus,
             @RequestHeader("requestId") String requestId,
-            @RequestParam("reason") String reason,
+            @RequestParam(name = "reason",required = false) String reason,
             HttpServletRequest request
     ){
         return adminService.updateRentalUnitsStatus(rentalUnitId,verificationStatus,reason,requestId,request);
@@ -52,7 +52,7 @@ public class AdminController {
             @PathVariable("userId") String userId,
             @RequestParam(name = "verificationStatus",required = false,defaultValue = "pending") VerificationStatus verificationStatus,
             @RequestHeader("requestId") String requestId,
-            @RequestParam("reason") String reason,
+            @RequestParam(name = "reason",required = false) String reason,
             HttpServletRequest request
     ){
         return adminService.updateUserStatus(userId,verificationStatus,reason,requestId,request);

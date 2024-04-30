@@ -26,8 +26,9 @@ public class SecurityFilter extends OncePerRequestFilter {
                 token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(token);
                 request.setAttribute("user",userDetails);
+            }else{
+                logger.trace("user user found for give token on firebase auth");
             }
-            
         }else{
             logger.trace("no auth token provided");
         }
