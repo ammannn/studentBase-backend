@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(registry ->
                     registry
                             .requestMatchers(getPublicRouts()).permitAll()
-                            .requestMatchers(getAdminRouts()).hasAnyRole("admin","platform_admin")
+                            .requestMatchers(getAdminRouts()).authenticated()
                             .anyRequest().authenticated()
                 )
                 .sessionManagement(config->config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
