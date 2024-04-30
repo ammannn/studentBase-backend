@@ -135,18 +135,29 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     }
 
     private void validateAddress(AddUpdateRentalUnitRequestDto requestDto, List<String> missingProps) {
-        String country = Optional.ofNullable(requestDto.getAddress().getCountry()).map(s->s.trim().toLowerCase()).orElse("");
-        String state = Optional.ofNullable(requestDto.getAddress().getState()).map(s->s.trim().toLowerCase()).orElse("");
+        String countryLabel = Optional.ofNullable(requestDto.getAddress().getCountry()).map(a->a.getLabel()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
+        String countryValue = Optional.ofNullable(requestDto.getAddress().getCountry()).map(a->a.getValue()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
+        String stateLabel = Optional.ofNullable(requestDto.getAddress().getState()).map(a->a.getLabel()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
+        String stateValue = Optional.ofNullable(requestDto.getAddress().getState()).map(a->a.getValue()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
         String zip = Optional.ofNullable(requestDto.getAddress().getZip()).map(s->s.trim().toLowerCase()).orElse("");
         String city = Optional.ofNullable(requestDto.getAddress().getCity()).map(s->s.trim().toLowerCase()).orElse("");
-        if(country.isEmpty()) missingProps.add("country");
-        if(state.isEmpty()) missingProps.add("state");
+        if(countryLabel.isEmpty()) missingProps.add("countryLabel");
+        if(countryValue.isEmpty()) missingProps.add("countryValue");
+        if(stateLabel.isEmpty()) missingProps.add("stateLabel");
+        if(stateValue.isEmpty()) missingProps.add("stateValue");
         if(zip.isEmpty()) missingProps.add("zip");
         if(city.isEmpty()) missingProps.add("city");
+        if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
         requestDto.getAddress().setCity(city);
-        requestDto.getAddress().setCountry(country);
+        requestDto.getAddress().setCountry(LabelValueMap.builder()
+                .label(countryLabel)
+                .value(countryValue)
+                .build());
         requestDto.getAddress().setZip(zip);
-        requestDto.getAddress().setState(state);
+        requestDto.getAddress().setState(LabelValueMap.builder()
+                .label(stateLabel)
+                .value(stateValue)
+                .build());
     }
 
     @Override

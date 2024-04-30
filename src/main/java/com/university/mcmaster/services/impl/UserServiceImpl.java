@@ -9,10 +9,7 @@ import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.UpdateUserRequestDto;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
 import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
-import com.university.mcmaster.models.entities.Address;
-import com.university.mcmaster.models.entities.CustomUserDetails;
-import com.university.mcmaster.models.entities.RentalUnit;
-import com.university.mcmaster.models.entities.User;
+import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.UserRepo;
 import com.university.mcmaster.services.UserService;
 import com.university.mcmaster.utils.*;
@@ -257,20 +254,30 @@ public class UserServiceImpl implements UserService {
         if(addresses == null || addresses.isEmpty()) return Collections.emptyList();
         for (Address address : addresses) {
 //            country , state , zip , city
-            String country = Optional.ofNullable(address.getCountry()).map(s->s.trim().toLowerCase()).orElse("");
-            String state = Optional.ofNullable(address.getState()).map(s->s.trim().toLowerCase()).orElse("");
+            String countryLabel = Optional.ofNullable(address.getCountry()).map(a->a.getLabel()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
+            String countryValue = Optional.ofNullable(address.getCountry()).map(a->a.getValue()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
+            String stateLabel = Optional.ofNullable(address.getState()).map(a->a.getLabel()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
+            String stateValue = Optional.ofNullable(address.getState()).map(a->a.getValue()).filter(Objects::nonNull).map(a->a.trim()).orElse("");
             String zip = Optional.ofNullable(address.getZip()).map(s->s.trim().toLowerCase()).orElse("");
             String city = Optional.ofNullable(address.getCity()).map(s->s.trim().toLowerCase()).orElse("");
             List<String> missingProps = new ArrayList<>();
-            if(country.isEmpty()) missingProps.add("country");
-            if(state.isEmpty()) missingProps.add("state");
+            if(countryLabel.isEmpty()) missingProps.add("countryLabel");
+            if(countryValue.isEmpty()) missingProps.add("countryValue");
+            if(stateLabel.isEmpty()) missingProps.add("stateLabel");
+            if(stateValue.isEmpty()) missingProps.add("stateValue");
             if(zip.isEmpty()) missingProps.add("zip");
             if(city.isEmpty()) missingProps.add("city");
             if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
             address.setCity(city);
-            address.setCountry(country);
+            address.setCountry(LabelValueMap.builder()
+                            .label(countryLabel)
+                            .value(countryValue)
+                    .build());
             address.setZip(zip);
-            address.setState(state);
+            address.setState(LabelValueMap.builder()
+                        .label(stateLabel)
+                        .value(stateValue)
+                    .build());
         }
         return addresses;
     }

@@ -12,8 +12,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address {
-    private String country;
-    private String state;
+    private LabelValueMap country;
+    private LabelValueMap state;
     private String zip;
     private String city;
     private boolean primary;

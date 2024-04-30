@@ -51,7 +51,7 @@ application stage
 
 Landlord form add changes
 - [Y] Add landlord name
-- [ ] Explain images get the doc
+- [Y] Explain images get the doc
 - [ ] Explain the features implementation
 - [ ] Listing should not go to admin for verification till landlord add all the things like images for property and all the important details
 
