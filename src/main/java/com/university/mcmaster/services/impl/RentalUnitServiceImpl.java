@@ -114,7 +114,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
-                        .msg(rentalUnit.getId())
+                        .data(rentalUnit.getId())
                 .build());
     }
 
