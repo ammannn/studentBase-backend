@@ -139,7 +139,7 @@ public class ResponseMapper {
         return res;
     }
 
-    private RentalUnitForOwner getRentalUnitForOwner(RentalUnit rentalUnit) {
+    public RentalUnitForOwner getRentalUnitForOwner(RentalUnit rentalUnit) {
         String url = null;
         if (null != rentalUnit.getPosterImagePath())
             url = GcpStorageUtil.createGetUrl(rentalUnit.getPosterImagePath()).toString();

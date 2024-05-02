@@ -26,6 +26,15 @@ public class RentalUnitController {
         return rentalUnitService.getRentalUnits(limit,lastSeen,requestId,request);
     }
 
+    @GetMapping("/rental-units/{rentalUnitId}")
+    public ResponseEntity<ApiResponse<?>> getRentalUnitById(
+            @PathVariable("rentalUnitId") String rentalUnitId,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return rentalUnitService.getRentalUnitById(rentalUnitId,requestId,request);
+    }
+
     @PostMapping("/rental-units")
     public ResponseEntity<ApiResponse<?>> addRentalUnit(
             @RequestBody AddUpdateRentalUnitRequestDto requestDto,

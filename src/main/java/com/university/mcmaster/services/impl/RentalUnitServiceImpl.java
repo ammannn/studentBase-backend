@@ -114,7 +114,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
-                        .msg("added rental unit")
+                        .msg(rentalUnit.getId())
                 .build());
     }
 
@@ -304,6 +304,27 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                                 .featuresNumbers(featuresNumbers)
                                 .build())
                 .build());
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> getRentalUnitById(String rentalUnitId, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
+        if(null == rentalUnitId || rentalUnitId.trim().isEmpty()) throw new MissingRequiredParamException();
+        RentalUnit rentalUnit = rentalUnitRepo.findById(rentalUnitId);
+        if(null == rentalUnit) throw new EntityNotFoundException();
+        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)) {
+            return ResponseEntity.ok(ApiResponse.builder()
+                            .data(responseMapper.getRentalUnitForOwner(rentalUnit))
+                    .build());
+        }
+        if(userDetails.getRoles().contains(UserRole.student)) {
+            LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),rentalUnit.getId());
+            return ResponseEntity.ok(ApiResponse.builder()
+                            .data(responseMapper.mapRentalUnitToResponseDtoForStudent(rentalUnit,likeAndRating))
+                    .build());
+        }
+        throw new UnAuthenticatedUserException();
     }
 
 }

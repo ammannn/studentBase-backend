@@ -33,4 +33,6 @@ public interface RentalUnitService {
     RentalUnit getRentalUnitById(String rentalUnitId);
 
     ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request);
+
+    ResponseEntity<ApiResponse<?>> getRentalUnitById(String rentalUnitId, String requestId, HttpServletRequest request);
 }
