@@ -39,7 +39,7 @@ public class FileServiceImpl implements FileService {
     public ResponseEntity<ApiResponse<?>> getUploadUrlForFile(GetUploadUrlForFileRequestDto requestDto, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
-        String rentalUnitId = null;
+        String rentalUnitId = requestDto.getRentalUnitId().trim();
         verifyFileUploadRequest(rentalUnitId,userDetails,requestDto);
         return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId);
     }
@@ -51,12 +51,11 @@ public class FileServiceImpl implements FileService {
         if(userDetails.getRoles().contains(UserRole.student)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
             requestDto.setRentalUnitElement(null);
-        }
-        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
+            rentalUnitId = null;
+        }else if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
-            if(null == requestDto.getRentalUnitId() || requestDto.getRentalUnitId().isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
+            if(null == rentalUnitId || rentalUnitId.isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
             if(null == requestDto.getRentalUnitElement()) requestDto.setRentalUnitElement(RentalUnitElement.others);
-            rentalUnitId = requestDto.getRentalUnitId().trim();
             if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()) {
                 List<File> files = fileRepo.getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(rentalUnitId,requestDto.getRentalUnitElement());
                 if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles()) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);

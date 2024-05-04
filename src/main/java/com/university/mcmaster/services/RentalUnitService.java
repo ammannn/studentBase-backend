@@ -3,6 +3,7 @@ package com.university.mcmaster.services;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
+import com.university.mcmaster.models.dtos.request.SearchRentalUnitRequestDto;
 import com.university.mcmaster.models.entities.RentalUnit;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -35,4 +36,6 @@ public interface RentalUnitService {
     ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request);
 
     ResponseEntity<ApiResponse<?>> getRentalUnitById(String rentalUnitId, String requestId, HttpServletRequest request);
+
+    ResponseEntity<ApiResponse<?>> searchRentalUnits(SearchRentalUnitRequestDto requestDto, int limit, String lastSeen, String requestId, HttpServletRequest request);
 }

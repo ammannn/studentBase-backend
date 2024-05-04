@@ -2,6 +2,7 @@ package com.university.mcmaster.utils;
 
 import com.university.mcmaster.enums.DayPeriod;
 import com.university.mcmaster.models.entities.CustomUserDetails;
+import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -9,10 +10,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.zone.ZoneRulesException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -147,6 +145,33 @@ public class Utility {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of(timeZone));
         // Extract and return the month
         return zonedDateTime.getMonth();
+    }
+
+    public static List<String> getRentalUnitFeatureList(RentalUnitFeatures features) {
+        List<String> featureSearchList = new ArrayList<>();
+        for (Map.Entry<String, Boolean> eminityEntry : features.getFeaturesAmenities().entrySet()) {
+            if(eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey());
+        }
+        for (Map.Entry<String, Boolean> utilityEntry : features.getFeaturesUtilities().entrySet()) {
+            if(utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey());
+        }
+        StringBuilder builder = new StringBuilder();
+        if(null != features.getFeaturesNumbers()){
+            if(null != features.getFeaturesNumbers().get("room") && features.getFeaturesNumbers().get("room") > 0){
+                builder.append(features.getFeaturesNumbers().get("room")).append("b");
+            }
+            if(null != features.getFeaturesNumbers().get("hall") && features.getFeaturesNumbers().get("hall") > 0){
+                builder.append(features.getFeaturesNumbers().get("hall")).append("h");
+            }
+            if(null != features.getFeaturesNumbers().get("kitchen") && features.getFeaturesNumbers().get("kitchen") > 0){
+                builder.append(features.getFeaturesNumbers().get("kitchen")).append("k");
+            }
+        }
+        String roomStr = builder.toString();
+        if(false == roomStr.trim().isEmpty()){
+            featureSearchList.add(roomStr);
+        }
+        return featureSearchList;
     }
 }
 

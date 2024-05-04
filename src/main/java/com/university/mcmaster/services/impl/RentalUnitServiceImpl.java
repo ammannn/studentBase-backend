@@ -10,6 +10,7 @@ import com.university.mcmaster.exceptions.MissingRequiredParamException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
+import com.university.mcmaster.models.dtos.request.SearchRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.response.RentalUnitForOwner;
 import com.university.mcmaster.models.dtos.response.RentalUnitForStudentForListing;
 import com.university.mcmaster.models.entities.*;
@@ -49,13 +50,13 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
-        if(userDetails.getRoles().contains(UserRole.student)) {
-            return getRentalUnitsForStudent(userDetails,limit,lastSeen,requestId);
-        }
+//        if(userDetails.getRoles().contains(UserRole.student)) {
+//            return getRentalUnitsForStudent(userDetails,limit,lastSeen,requestId);
+//        }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)) {
             return getRentalUnitsForRentalUnitOwner(userDetails,limit,lastSeen,requestId);
         }
-        throw new ActionNotAllowedException("get_rental_units","user is not registered either as student or rental unit owner",401);
+        throw new ActionNotAllowedException("get_rental_units","user is not registered either as rental unit owner",401);
     }
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForRentalUnitOwner(CustomUserDetails userDetails, int limit, String lastSeen, String requestId) {
@@ -67,7 +68,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .build());
     }
 
-    private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
+    private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(SearchRentalUnitRequestDto requestDto,CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
         List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByVerificationStatusVerifiedAndDeletedFalse(limit,lastSeen);
         List<RentalUnitForStudentForListing> res = rentalUnits.stream().map(r -> {
             LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),r.getId());
@@ -84,13 +85,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         validateCreateRentalPropertyRequest(requestDto);
-        List<String> featureSearchList = new ArrayList<>();
-        for (Map.Entry<String, Boolean> eminityEntry : requestDto.getFeatures().getFeaturesAmenities().entrySet()) {
-            if(eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey());
-        }
-        for (Map.Entry<String, Boolean> utilityEntry : requestDto.getFeatures().getFeaturesUtilities().entrySet()) {
-            if(utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey());
-        }
+        List<String> featureSearchList = Utility.getRentalUnitFeatureList(requestDto.getFeatures());
         RentalUnit rentalUnit = RentalUnit.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(userDetails.getId())
@@ -206,6 +201,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             validateFeatures(requestDto,missingProps);
             if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
             updateMap.put("features",requestDto.getFeatures());
+            updateMap.put("searchList",Utility.getRentalUnitFeatureList(requestDto.getFeatures()));
         }
         if(null != requestDto.getPosterImageId() && false == requestDto.getPosterImageId().trim().isEmpty() && false == requestDto.getPosterImageId().trim().equals(rentalUnit.getPosterImageId())){
             File file = fileService.getFileById(requestDto.getPosterImageId());
@@ -299,7 +295,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
         Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished, partially furnished".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
-        Map<String,Double> featuresNumbers = Arrays.stream("Beds, Baths, Kitchen,Yard".split(","))
+        Map<String,Double> featuresNumbers = Arrays.stream("Room,hall,Beds, Baths, Kitchen,Yard".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->0.0));
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(RentalUnitFeatures.builder()
@@ -329,6 +325,16 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                     .build());
         }
         throw new UnAuthenticatedUserException();
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> searchRentalUnits(SearchRentalUnitRequestDto requestDto, int limit, String lastSeen, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails) throw new UnAuthenticatedUserException();
+        if(userDetails.getRoles().contains(UserRole.student)) {
+            return getRentalUnitsForStudent(requestDto,userDetails,limit,lastSeen,requestId);
+        }
+        throw new ActionNotAllowedException("get_rental_units","user is not registered either as rental unit owner",401);
     }
 
 }

@@ -2,6 +2,7 @@ package com.university.mcmaster.controllers;
 
 import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
+import com.university.mcmaster.models.dtos.request.SearchRentalUnitRequestDto;
 import com.university.mcmaster.services.RentalUnitService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,17 @@ public class RentalUnitController {
             HttpServletRequest request
     ){
         return rentalUnitService.getRentalUnits(limit,lastSeen,requestId,request);
+    }
+
+    @PostMapping("/rental-units/search")
+    public ResponseEntity<ApiResponse<?>> searchRentalUnits(
+            @RequestBody SearchRentalUnitRequestDto requestDto,
+            @RequestHeader("requestId") String requestId,
+            @RequestParam(name = "limit",required = false,defaultValue = "10") int limit,
+            @RequestParam(name = "lastSeen",required = false) String lastSeen,
+            HttpServletRequest request
+    ){
+        return rentalUnitService.searchRentalUnits(requestDto,limit,lastSeen,requestId,request);
     }
 
     @GetMapping("/rental-units/{rentalUnitId}")
