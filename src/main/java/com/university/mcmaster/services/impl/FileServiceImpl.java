@@ -156,7 +156,7 @@ public class FileServiceImpl implements FileService {
         if(null == file) throw new EntityNotFoundException();
         if(false == userDetails.getId().equals(file.getUserId())) throw new ActionNotAllowedException("replace_file","user can only update file uploaded by them self",403);
         if(file.getPurpose() != requestDto.getFilePurpose()) throw new ActionNotAllowedException("replace_file","new file and existing file have different purposes",400);
-        String rentalUnitId = null;
+        String rentalUnitId = requestDto.getRentalUnitId();
         verifyFileUploadRequest(rentalUnitId,userDetails,requestDto);
         fileRepo.update(fileId, new HashMap<String,Object>(){{
             put("deleted",true);
