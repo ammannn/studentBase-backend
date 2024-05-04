@@ -19,9 +19,6 @@ public class AddUpdateRentalUnitRequestDto {
     private String posterImageId;
     private Contact contact;
     private String description;
-    private int leaseTerm;
+    private String leaseTerm;
     private long leaseStartDate;
 }
-/*
-
- */

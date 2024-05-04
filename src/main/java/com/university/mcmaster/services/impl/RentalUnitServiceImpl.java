@@ -183,9 +183,6 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(0 != requestDto.getRent() && requestDto.getRent() != rentalUnit.getRent()){
             updateMap.put("rent",requestDto.getRent());
         }
-        if(0 != requestDto.getLeaseTerm() && requestDto.getLeaseTerm() != rentalUnit.getLeaseTerm()){
-            updateMap.put("leaseTerm",requestDto.getLeaseTerm());
-        }
         if(0 != requestDto.getLeaseStartDate() && requestDto.getLeaseStartDate() != rentalUnit.getLeaseStartDate()){
             updateMap.put("leaseStartDate",requestDto.getLeaseStartDate());
         }
@@ -197,6 +194,15 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         }
         if(null != requestDto.getDescription() && false == requestDto.getDescription().trim().isEmpty() && false == requestDto.getDescription().equals(rentalUnit.getDescription())){
             updateMap.put("description",requestDto.getDescription());
+        }
+        if(null != requestDto.getContact() && false == requestDto.getContact().equals(rentalUnit.getContact())){
+            updateMap.put("contact",requestDto.getContact());
+        }
+        if(null != requestDto.getLeaseTerm() && false == requestDto.getLeaseTerm().equals(rentalUnit.getLeaseTerm())){
+            updateMap.put("leaseTerm",requestDto.getLeaseTerm());
+        }
+        if(0 != requestDto.getLeaseStartDate() && requestDto.getLeaseStartDate() != rentalUnit.getLeaseStartDate()){
+            updateMap.put("leaseStartDate",requestDto.getLeaseStartDate());
         }
         if(null != requestDto.getFeatures() && false == requestDto.getFeatures().equals(rentalUnit.getFeatures())){
             validateFeatures(requestDto,missingProps);
