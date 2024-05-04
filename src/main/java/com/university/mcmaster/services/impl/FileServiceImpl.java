@@ -40,11 +40,11 @@ public class FileServiceImpl implements FileService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
         String rentalUnitId = requestDto.getRentalUnitId().trim();
-        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto);
+        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto,"add");
         return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId);
     }
 
-    private void verifyFileUploadRequest(String rentalUnitId,CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto) {
+    private void verifyFileUploadRequest(String rentalUnitId,CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto,String action) {
         if(null == requestDto.getFilePurpose()) throw new MissingRequiredParamException("purpose");
         if(null == requestDto.getContentType() || requestDto.getContentType().trim().isEmpty()) throw new MissingRequiredParamException("content_type");
         if(FilePurpose.user_profile_image == requestDto.getFilePurpose()) return;
@@ -58,7 +58,7 @@ public class FileServiceImpl implements FileService {
             if(null == requestDto.getRentalUnitElement()) requestDto.setRentalUnitElement(RentalUnitElement.others);
             if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()) {
                 List<File> files = fileRepo.getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(rentalUnitId,requestDto.getRentalUnitElement());
-                if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles()) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);
+                if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles() && "add".equals(action)) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);
             }
         }
     }
@@ -157,7 +157,7 @@ public class FileServiceImpl implements FileService {
         if(false == userDetails.getId().equals(file.getUserId())) throw new ActionNotAllowedException("replace_file","user can only update file uploaded by them self",403);
         if(file.getPurpose() != requestDto.getFilePurpose()) throw new ActionNotAllowedException("replace_file","new file and existing file have different purposes",400);
         String rentalUnitId = requestDto.getRentalUnitId();
-        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto);
+        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto,"replace");
         fileRepo.update(fileId, new HashMap<String,Object>(){{
             put("deleted",true);
         }});

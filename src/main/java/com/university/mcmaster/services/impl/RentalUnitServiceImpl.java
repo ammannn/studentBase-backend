@@ -1,6 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.google.cloud.firestore.FieldValue;
+import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
@@ -106,6 +107,10 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .leaseTerm(requestDto.getLeaseTerm())
                 .leaseStartDate(requestDto.getLeaseStartDate())
                 .featureSearchList(featureSearchList)
+                .counts(new HashMap<String,Integer>(){{
+                    put(ApplicationStatus.review_in_process.toString(),0);
+                    put(ApplicationStatus.rejected.toString(),0);
+                }})
                 .build();
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()
