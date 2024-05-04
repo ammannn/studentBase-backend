@@ -42,4 +42,15 @@ public class LikeAndRatingRepoImpl extends FirebaseUtils<LikeAndRating> implemen
 
         );
     }
+
+    @Override
+    public List<LikeAndRating> getLikeAndRatingDocsByRentalUnitIdIdAndDeletedFalse(String rentalUnitId,String lastSeen,int limit) {
+        Query query = FirestoreClient.getFirestore().collection(FirestoreConstants.FS_LIKE_AND_RATING)
+                .whereEqualTo("rentalUnitId",rentalUnitId)
+                .whereEqualTo("deleted",false)
+                .orderBy("createdOn", Query.Direction.DESCENDING);
+        query = addLastSeen(query,FirestoreConstants.FS_LIKE_AND_RATING,lastSeen);
+        if(limit > 0) query = query.limit(limit);
+        return processQueryForEntityList(query , LikeAndRating.class);
+    }
 }

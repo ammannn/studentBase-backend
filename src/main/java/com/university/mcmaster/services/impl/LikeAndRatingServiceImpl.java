@@ -5,6 +5,7 @@ import com.university.mcmaster.exceptions.InvalidParamValueException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.RateRentalUnitRequestDto;
+import com.university.mcmaster.models.dtos.response.RatingAndReviewResponse;
 import com.university.mcmaster.models.dtos.response.RentalUnitForStudentForListing;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.LikeAndRating;
@@ -126,6 +127,17 @@ public class LikeAndRatingServiceImpl implements LikeAndRatingService {
             RentalUnit rentalUnit = rentalUnitService.getRentalUnitById(lar.getRentalUnitId());
             return responseMapper.mapRentalUnitToResponseDtoForStudent(rentalUnit,lar);
         }).toList();
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(res)
+                .build());
+    }
+
+    @Override
+    public ResponseEntity<?> getReviewsByRentalUnitId(String rentalUnitId,String lastSeen,int limit, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles() ) throw new UnAuthenticatedUserException();
+        List<LikeAndRating> likeAndRatings = likeAndRatingRepo.getLikeAndRatingDocsByRentalUnitIdIdAndDeletedFalse(rentalUnitId,lastSeen,limit);
+        List<RatingAndReviewResponse> res = responseMapper.getRatingAndReview(likeAndRatings);
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(res)
                 .build());

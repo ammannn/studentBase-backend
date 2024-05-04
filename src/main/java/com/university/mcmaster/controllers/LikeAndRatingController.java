@@ -45,4 +45,15 @@ public class LikeAndRatingController {
         return likeAndRatingService.getLikedRentalUnits(requestId,request);
     }
 
+    @GetMapping("/reviews/{rentalUnitId}/rental-unit")
+    public ResponseEntity<?> getReviewsByRentalUnitId(
+            @PathVariable("rentalUnitId") String rentalUnitId,
+            @RequestHeader("requestId")String requestId,
+            @RequestParam(name = "lastSeen",required = false) String lastSeen,
+            @RequestParam(name = "limit",required = false,defaultValue = "100") int limit,
+            HttpServletRequest request
+    ){
+        return likeAndRatingService.getReviewsByRentalUnitId(rentalUnitId,lastSeen,limit,requestId,request);
+    }
+
 }

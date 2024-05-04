@@ -244,4 +244,15 @@ public class ResponseMapper {
             }};
         }).collect(Collectors.toList()))));
     }
+
+    public List<RatingAndReviewResponse> getRatingAndReview(List<LikeAndRating> likeAndRatings) {
+        return likeAndRatings.stream().map(lr->{
+            User user = userRepo.findById(lr.getUserId());
+            return RatingAndReviewResponse.builder()
+                    .name(user.getName())
+                    .rating(lr.getRating())
+                    .review(lr.getReview())
+                    .build();
+        }).collect(Collectors.toList());
+    }
 }

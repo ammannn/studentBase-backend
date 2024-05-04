@@ -13,4 +13,6 @@ public interface LikeAndRatingService {
     LikeAndRating getLikeAndRatingDocByUserIdAndRentalUnitId(String id, String id1);
 
     ResponseEntity<?> getLikedRentalUnits(String requestId, HttpServletRequest request);
+
+    ResponseEntity<?> getReviewsByRentalUnitId(String rentalUnitId,String lastSeen,int limit, String requestId, HttpServletRequest request);
 }
