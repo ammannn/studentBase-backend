@@ -1,7 +1,5 @@
 package com.university.mcmaster.models.entities;
 
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Internal;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.FirebaseCommonProps;
@@ -39,7 +37,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private String description;
     private String leaseTerm;
     private long leaseStartDate;
-    private List<String> featureSearchList;
+    private List<String> searchList;
     private String reason;
 
     @Override

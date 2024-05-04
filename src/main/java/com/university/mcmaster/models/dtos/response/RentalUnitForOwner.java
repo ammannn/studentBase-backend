@@ -28,4 +28,8 @@ public class RentalUnitForOwner {
     private int likes;
     private Contact contact;
     private Map<String,List<HashMap<String,Object>>> images;
+    private String title;
+    private String description;
+    private String leaseTerm;
+    private long leaseStartDate;
 }

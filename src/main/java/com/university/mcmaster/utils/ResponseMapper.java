@@ -53,6 +53,10 @@ public class ResponseMapper {
                 .images(getRentalUnitImages(r.getId()))
                 .features(r.getFeatures())
                 .rentalUnitStatus(r.getRentalUnitStatus())
+                .title(r.getTitle())
+                .description(r.getDescription())
+                .leaseTerm(r.getLeaseTerm())
+                .leaseStartDate(r.getLeaseStartDate())
                 .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
                 .build();
     }
@@ -158,6 +162,10 @@ public class ResponseMapper {
                 .createdOn(rentalUnit.getCreatedOn())
                 .images(getRentalUnitImages(rentalUnit.getId()))
                 .posterImageUrl(url)
+                .title(rentalUnit.getTitle())
+                .leaseTerm(rentalUnit.getLeaseTerm())
+                .leaseStartDate(rentalUnit.getLeaseStartDate())
+                .description(rentalUnit.getDescription())
                 .build();
     }
 

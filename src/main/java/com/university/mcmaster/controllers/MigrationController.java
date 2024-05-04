@@ -86,4 +86,21 @@ public class MigrationController {
         System.out.println("done");
         return ResponseEntity.ok("updated users");
     }
+
+    @GetMapping("/leas-term-to-string")
+    public ResponseEntity<?> leasTermToString(){
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<");
+        try {
+            for (QueryDocumentSnapshot document : FirestoreClient.getFirestore().collection(FirestoreConstants.FS_RENTAL_UNITS)
+                    .get().get().getDocuments()) {
+                FirestoreClient.getFirestore().collection(FirestoreConstants.FS_RENTAL_UNITS)
+                        .document(document.getId())
+                        .update("leaseTerm","1_year");
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println("done");
+        return ResponseEntity.ok("updated field");
+    }
 }

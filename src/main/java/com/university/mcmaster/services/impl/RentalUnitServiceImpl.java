@@ -1,7 +1,6 @@
 package com.university.mcmaster.services.impl;
 
 import com.google.cloud.firestore.FieldValue;
-import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
@@ -18,7 +17,6 @@ import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.LikeAndRatingService;
 import com.university.mcmaster.services.RentalUnitService;
-import com.university.mcmaster.utils.GcpStorageUtil;
 import com.university.mcmaster.utils.ResponseMapper;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
@@ -109,7 +107,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .description(Optional.ofNullable(requestDto.getDescription()).map(s->s.trim()).orElse(""))
                 .leaseTerm(requestDto.getLeaseTerm())
                 .leaseStartDate(requestDto.getLeaseStartDate())
-                .featureSearchList(featureSearchList)
+                .searchList(featureSearchList)
                 .build();
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()

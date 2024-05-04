@@ -18,7 +18,7 @@ import java.util.Map;
 public class RentalUnitForStudentForListing {
     private String title;
     private String description;
-    private int leaseTerm;
+    private String leaseTerm;
     private long leaseStartDate;
     private long rent;
     private long deposit;
