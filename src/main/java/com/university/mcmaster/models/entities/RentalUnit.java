@@ -37,7 +37,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private String description;
     private String leaseTerm;
     private long leaseStartDate;
-    private List<String> searchList;
+    private List<String> featureSearchList;
     private String reason;
 
     @Override
