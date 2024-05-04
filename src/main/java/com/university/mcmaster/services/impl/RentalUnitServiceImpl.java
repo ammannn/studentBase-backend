@@ -108,8 +108,9 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .leaseStartDate(requestDto.getLeaseStartDate())
                 .featureSearchList(featureSearchList)
                 .counts(new HashMap<String,Integer>(){{
-                    put(ApplicationStatus.review_in_process.toString(),0);
-                    put(ApplicationStatus.rejected.toString(),0);
+                    for (ApplicationStatus value : ApplicationStatus.values()) {
+                        put(value.toString(),0);
+                    }
                 }})
                 .build();
         rentalUnitRepo.save(rentalUnit);
@@ -288,9 +289,17 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         return rentalUnitRepo.findById(rentalUnitId);
     }
 
-    private void decrementOrIncrementRatingCountForRentalUnit(String rentalUnitId,int rating,String op) {
+    @Override
+    public void decrementOrIncrementRatingCountForRentalUnit(String rentalUnitId,int rating,String op) {
         rentalUnitRepo.update(rentalUnitId,new HashMap<String,Object>(){{
             put("rating."+rating, FieldValue.increment("inc".equals(op) ? 1 : -1));
+        }});
+    }
+
+    @Override
+    public void decrementOrIncrementGeneralCountForRentalUnit(String rentalUnitId,String count,int vale,String op) {
+        rentalUnitRepo.update(rentalUnitId,new HashMap<String,Object>(){{
+            put("counts."+count, FieldValue.increment("inc".equals(op) ? 1 : -1));
         }});
     }
 

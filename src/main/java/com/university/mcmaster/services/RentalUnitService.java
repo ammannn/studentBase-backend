@@ -33,6 +33,10 @@ public interface RentalUnitService {
 
     RentalUnit getRentalUnitById(String rentalUnitId);
 
+    void decrementOrIncrementRatingCountForRentalUnit(String rentalUnitId, int rating, String op);
+
+    void decrementOrIncrementGeneralCountForRentalUnit(String rentalUnitId, String count, int vale, String op);
+
     ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request);
 
     ResponseEntity<ApiResponse<?>> getRentalUnitById(String rentalUnitId, String requestId, HttpServletRequest request);

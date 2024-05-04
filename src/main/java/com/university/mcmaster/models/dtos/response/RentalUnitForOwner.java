@@ -32,4 +32,5 @@ public class RentalUnitForOwner {
     private String description;
     private String leaseTerm;
     private long leaseStartDate;
+    private Map<String,Integer> counts;
 }

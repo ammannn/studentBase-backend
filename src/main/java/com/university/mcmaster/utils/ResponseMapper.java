@@ -164,6 +164,7 @@ public class ResponseMapper {
                 .posterImageUrl(url)
                 .title(rentalUnit.getTitle())
                 .leaseTerm(rentalUnit.getLeaseTerm())
+                .counts(rentalUnit.getCounts())
                 .leaseStartDate(rentalUnit.getLeaseStartDate())
                 .description(rentalUnit.getDescription())
                 .build();

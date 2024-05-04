@@ -158,6 +158,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             updateMap.put("lastUpdatedOn",Instant.now().toEpochMilli());
         }
         boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
+        if(isUpdated){
+            new Thread(()->{
+                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
+                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+            }).start();
+        }
         return ResponseEntity.ok(ApiResponse.builder()
                         .data("updated application status")
                 .build());
@@ -177,6 +183,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             updateMap.put("lastUpdatedOn",Instant.now().toEpochMilli());
         }
         boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
+        if(isUpdated){
+            new Thread(()->{
+                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
+                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+            }).start();
+        }
         return ResponseEntity.ok(ApiResponse.builder()
                         .data("updated application status")
                 .build());
