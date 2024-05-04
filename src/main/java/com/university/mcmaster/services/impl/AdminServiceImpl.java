@@ -1,5 +1,6 @@
 package com.university.mcmaster.services.impl;
 
+import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.exceptions.EntityNotFoundException;
@@ -63,6 +64,9 @@ public class AdminServiceImpl implements AdminService {
         if(null == rentalUnit) throw new EntityNotFoundException();
         rentalUnitService.updateRentalUnit(rentalUnitId,new HashMap<String, Object>(){{
             put("verificationStatus",verificationStatus);
+            if(VerificationStatus.verified == verificationStatus){
+                put("stage", RentalUnitStage.listing_approved);
+            }
             put("reason",reason);
         }});
         return ResponseEntity.ok(ApiResponse.builder()

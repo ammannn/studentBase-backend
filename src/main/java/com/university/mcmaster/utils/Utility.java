@@ -149,11 +149,16 @@ public class Utility {
 
     public static List<String> getRentalUnitFeatureList(RentalUnitFeatures features) {
         List<String> featureSearchList = new ArrayList<>();
-        for (Map.Entry<String, Boolean> eminityEntry : features.getFeaturesAmenities().entrySet()) {
-            if(eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey());
+        if(null == features) return featureSearchList;
+        if(null != features.getFeaturesAmenities()){
+            for (Map.Entry<String, Boolean> eminityEntry : features.getFeaturesAmenities().entrySet()) {
+                if(eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey());
+            }
         }
-        for (Map.Entry<String, Boolean> utilityEntry : features.getFeaturesUtilities().entrySet()) {
-            if(utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey());
+        if(null != features.getFeaturesUtilities()){
+            for (Map.Entry<String, Boolean> utilityEntry : features.getFeaturesUtilities().entrySet()) {
+                if(utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey());
+            }
         }
         StringBuilder builder = new StringBuilder();
         if(null != features.getFeaturesNumbers()){

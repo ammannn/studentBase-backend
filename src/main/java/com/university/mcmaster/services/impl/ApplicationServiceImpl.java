@@ -1,6 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.university.mcmaster.enums.ApplicationStatus;
+import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
@@ -88,6 +89,15 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .build();
         applicationRepo.save(application);
+        if(false == Arrays.asList(
+                RentalUnitStage.viewing_booked,
+                RentalUnitStage.paperwork_in_review,
+                RentalUnitStage.lease_offered
+        ).contains(rentalUnit.getStage())){
+            rentalUnitService.updateRentalUnit(rentalUnit.getId(),new HashMap<String, Object>(){{
+                put("stage",RentalUnitStage.viewing_booked);
+            }});
+        }
         return ResponseEntity.status(200).body(ApiResponse.builder()
                         .msg("added applications")
                 .build());

@@ -1,5 +1,6 @@
 package com.university.mcmaster.models.entities;
 
+import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.FirebaseCommonProps;
@@ -24,6 +25,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private Address address;
     private RentalUnitFeatures features;
     private RentalUnitStatus rentalUnitStatus;
+    private RentalUnitStage stage;
     private long createdOn;
     private long lastUpdatedOn;
     private String userId;
