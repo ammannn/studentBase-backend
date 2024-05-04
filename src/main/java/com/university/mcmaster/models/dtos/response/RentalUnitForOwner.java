@@ -25,7 +25,6 @@ public class RentalUnitForOwner {
     private long createdOn;
     private String posterImageUrl;
     private double avgRating;
-    private int likes;
     private Contact contact;
     private Map<String,List<HashMap<String,Object>>> images;
     private String title;
@@ -33,4 +32,6 @@ public class RentalUnitForOwner {
     private String leaseTerm;
     private long leaseStartDate;
     private Map<String,Integer> counts;
+    private int likes;
+    private int reviews;
 }

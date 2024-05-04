@@ -111,6 +111,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                     for (ApplicationStatus value : ApplicationStatus.values()) {
                         put(value.toString(),0);
                     }
+                    put("likes",0);
+                    put("reviews",0);
                 }})
                 .build();
         rentalUnitRepo.save(rentalUnit);
@@ -260,12 +262,12 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 
     @Override
     public void increamentLikeCountForRentalUnit(String rentalUnitId) {
-        decrementOrIncrementLikeCountForRentalUnit(rentalUnitId,"inc");
+        decrementOrIncrementGeneralCountForRentalUnit(rentalUnitId,"like",1,"inc");
     }
 
     @Override
     public void decreamentLikeCountForRentalUnit(String rentalUnitId) {
-        decrementOrIncrementLikeCountForRentalUnit(rentalUnitId,"dec");
+        decrementOrIncrementGeneralCountForRentalUnit(rentalUnitId,"like",1,"dec");
     }
 
     private void decrementOrIncrementLikeCountForRentalUnit(String rentalUnitId,String op) {

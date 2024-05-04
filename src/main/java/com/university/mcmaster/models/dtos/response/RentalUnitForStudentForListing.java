@@ -22,13 +22,15 @@ public class RentalUnitForStudentForListing {
     private long leaseStartDate;
     private long rent;
     private long deposit;
+    private int likes;
+    private int reviews;
+    private String review;
     private Address address;
     private RentalUnitFeatures features;
     private RentalUnitStatus rentalUnitStatus;
     private String posterImageUrl;
     private boolean liked;
     private double avgRating;
-    private int likes;
     private int givenRating;
     private Contact contact;
     private Map<String,List<HashMap<String,Object>>> images;

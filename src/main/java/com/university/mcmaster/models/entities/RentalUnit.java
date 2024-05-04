@@ -33,7 +33,6 @@ public class RentalUnit implements FirebaseCommonProps {
     private String posterImagePath;
     private Map<String,Object> customFields;
     private Map<String, Integer> rating;
-    private int likes;
     private Contact contact;
     private String title;
     private String description;
@@ -42,7 +41,6 @@ public class RentalUnit implements FirebaseCommonProps {
     private List<String> featureSearchList;
     private String reason;
     private Map<String,Integer> counts;
-
 
     @Override
     public String getCollection() {

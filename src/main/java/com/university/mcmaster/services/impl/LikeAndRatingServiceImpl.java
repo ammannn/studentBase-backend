@@ -4,6 +4,7 @@ import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.exceptions.InvalidParamValueException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
+import com.university.mcmaster.models.dtos.request.RateRentalUnitRequestDto;
 import com.university.mcmaster.models.dtos.response.RentalUnitForStudentForListing;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.LikeAndRating;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -67,7 +69,7 @@ public class LikeAndRatingServiceImpl implements LikeAndRatingService {
     }
 
     @Override
-    public ResponseEntity<?> rateRentalUnit(String rentalUnitId, int star, String requestId, HttpServletRequest request){
+    public ResponseEntity<?> rateRentalUnit(String rentalUnitId, int star, RateRentalUnitRequestDto requestDto, String requestId, HttpServletRequest request){
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.student)) throw new UnAuthenticatedUserException();
         if(star <= 0 || star > 5) throw new InvalidParamValueException();
@@ -79,17 +81,28 @@ public class LikeAndRatingServiceImpl implements LikeAndRatingService {
                     .rentalUnitId(rentalUnitId)
                     .liked(false)
                     .rating(star)
+                    .review(requestDto.getReview())
                     .createdOn(Instant.now().toEpochMilli())
                     .build();
             boolean saved = likeAndRatingRepo.save(likeAndRating);
             if(saved){
-                rentalUnitService.increamentRatingCountForRentalUnit(rentalUnitId,star);
+                new Thread(()->{
+                    rentalUnitService.increamentRatingCountForRentalUnit(rentalUnitId,star);
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(rentalUnitId,"reviews",1,"inc");
+                }).start();
             }
         }else{
+            HashMap<String,Object> updateMap = new HashMap<String,Object>();
+            boolean updateCounts = false;
             if(likeAndRating.getRating() != star){
-                likeAndRatingRepo.updateLikeAndRatingDoc(likeAndRating.getId(),new HashMap<String,Object>(){{
-                    put("rating",star);
-                }});
+                updateMap.put("rating",star);
+                updateCounts = true;
+            }
+            if(null != likeAndRating.getReview() && false == requestDto.getReview().equals(likeAndRating.getReview())){
+                updateMap.put("review",likeAndRating.getReview());
+            }
+            likeAndRatingRepo.updateLikeAndRatingDoc(likeAndRating.getId(),updateMap);
+            if(updateCounts) {
                 rentalUnitService.increamentRatingCountForRentalUnit(rentalUnitId,star);
                 if(likeAndRating.getRating() != 0) rentalUnitService.decreamentRatingCountForRentalUnit(rentalUnitId,likeAndRating.getRating());
             }
