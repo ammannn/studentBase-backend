@@ -42,6 +42,7 @@ public class ResponseMapper {
             givenRating = likeAndRating.getRating();
         }
         return RentalUnitForStudentForListing.builder()
+                .rentalUnitId(r.getId())
                 .rent(r.getRent())
                 .deposit(r.getDeposit())
                 .address(r.getAddress())

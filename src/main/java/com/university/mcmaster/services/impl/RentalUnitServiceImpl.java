@@ -306,7 +306,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     @Override
     public ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
-        if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
+        if(null == userDetails || null == userDetails.getRoles() || (false == userDetails.getRoles().contains(UserRole.rental_unit_owner) && false == userDetails.getRoles().contains(UserRole.user) )) throw new UnAuthenticatedUserException();
 //       featuresFlags , featuresNumbers , extraFeatures
         Map<String,Boolean> utilities = Arrays.stream("Heat, Water , Wifi , Cable , Electricity".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
