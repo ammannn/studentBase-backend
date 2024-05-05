@@ -13,4 +13,6 @@ public interface LikeAndRatingRepo {
     void updateLikeAndRatingDoc(String id, HashMap<String, Object> liked);
 
     List<LikeAndRating> getLikeAndRatingDocsByUserIdAndDeletedFalse(String userId);
+
+    List<LikeAndRating> getLikeAndRatingDocsByRentalUnitIdIdAndDeletedFalse(String rentalUnitId, String lastSeen, int limit);
 }

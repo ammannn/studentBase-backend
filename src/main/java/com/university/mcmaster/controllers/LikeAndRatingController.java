@@ -1,5 +1,7 @@
 package com.university.mcmaster.controllers;
 
+import com.university.mcmaster.models.dtos.request.RateRentalUnitRequestDto;
+import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.repositories.LikeAndRatingRepo;
 import com.university.mcmaster.services.LikeAndRatingService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,12 +28,13 @@ public class LikeAndRatingController {
 
     @PostMapping("/rating/rental-unit/{rentalUnitId}")
     public ResponseEntity<?> rateRentalUnit(
+            @RequestBody RateRentalUnitRequestDto requestDto,
             @PathVariable("rentalUnitId") String rentalUnitId,
             @RequestParam(name = "star",required = false,defaultValue = "3") int star,
             @RequestHeader("requestId")String requestId,
             HttpServletRequest request
     ){
-        return likeAndRatingService.rateRentalUnit(rentalUnitId,star,requestId,request);
+        return likeAndRatingService.rateRentalUnit(rentalUnitId,star,requestDto,requestId,request);
     }
 
     @GetMapping("/like/rental-unit")
@@ -40,6 +43,17 @@ public class LikeAndRatingController {
             HttpServletRequest request
     ){
         return likeAndRatingService.getLikedRentalUnits(requestId,request);
+    }
+
+    @GetMapping("/reviews/{rentalUnitId}/rental-unit")
+    public ResponseEntity<?> getReviewsByRentalUnitId(
+            @PathVariable("rentalUnitId") String rentalUnitId,
+            @RequestHeader("requestId")String requestId,
+            @RequestParam(name = "lastSeen",required = false) String lastSeen,
+            @RequestParam(name = "limit",required = false,defaultValue = "100") int limit,
+            HttpServletRequest request
+    ){
+        return likeAndRatingService.getReviewsByRentalUnitId(rentalUnitId,lastSeen,limit,requestId,request);
     }
 
 }

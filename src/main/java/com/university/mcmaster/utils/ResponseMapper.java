@@ -35,11 +35,14 @@ public class ResponseMapper {
     public RentalUnitForStudentForListing mapRentalUnitToResponseDtoForStudent(RentalUnit r, LikeAndRating likeAndRating) {
         boolean liked = false;
         double avgRating = Utility.getAverageRating(r.getRating());
-        int likes = r.getLikes();
+        int likes = null != r.getCounts() && null != r.getCounts().get(Constants.CountNames.likes.toString()) ? r.getCounts().get(Constants.CountNames.likes.toString()) : 0;
+        int reviews = null != r.getCounts() && null != r.getCounts().get(Constants.CountNames.reviews.toString()) ? r.getCounts().get(Constants.CountNames.reviews.toString()) : 0;
         int givenRating = 0;
+        String givenReview = null;
         if (null != likeAndRating) {
             liked = likeAndRating.isLiked();
             givenRating = likeAndRating.getRating();
+            givenReview = likeAndRating.getReview();
         }
         return RentalUnitForStudentForListing.builder()
                 .rentalUnitId(r.getId())
@@ -49,6 +52,8 @@ public class ResponseMapper {
                 .liked(liked)
                 .avgRating(avgRating)
                 .likes(likes)
+                .reviews(reviews)
+                .review(givenReview)
                 .contact(r.getContact())
                 .givenRating(givenRating)
                 .images(getRentalUnitImages(r.getId()))
@@ -148,9 +153,12 @@ public class ResponseMapper {
         String url = null;
         if (null != rentalUnit.getPosterImagePath())
             url = GcpStorageUtil.createGetUrl(rentalUnit.getPosterImagePath()).toString();
+        int likes = null != rentalUnit.getCounts() && null != rentalUnit.getCounts().get(Constants.CountNames.likes.toString()) ? rentalUnit.getCounts().get(Constants.CountNames.likes.toString()) : 0;
+        int reviews = null != rentalUnit.getCounts() && null != rentalUnit.getCounts().get(Constants.CountNames.reviews.toString()) ? rentalUnit.getCounts().get(Constants.CountNames.reviews.toString()) : 0;
         return RentalUnitForOwner.builder()
                 .avgRating(Utility.getAverageRating(rentalUnit.getRating()))
-                .likes(rentalUnit.getLikes())
+                .likes(likes)
+                .reviews(reviews)
                 .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
                 .rentalUnitId(rentalUnit.getId())
                 .rent(rentalUnit.getRent())
@@ -236,5 +244,16 @@ public class ResponseMapper {
                 put("url", GcpStorageUtil.createGetUrl(f.getFilePath()));
             }};
         }).collect(Collectors.toList()))));
+    }
+
+    public List<RatingAndReviewResponse> getRatingAndReview(List<LikeAndRating> likeAndRatings) {
+        return likeAndRatings.stream().map(lr->{
+            User user = userRepo.findById(lr.getUserId());
+            return RatingAndReviewResponse.builder()
+                    .name(user.getName())
+                    .rating(lr.getRating())
+                    .review(lr.getReview())
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

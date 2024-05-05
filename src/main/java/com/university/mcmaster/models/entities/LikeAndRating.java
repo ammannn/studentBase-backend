@@ -20,6 +20,7 @@ public class LikeAndRating implements FirebaseCommonProps {
     private boolean liked;
     private int rating;
     private long createdOn;
+    private String review;
 
     @Override
     public String getCollection() {
