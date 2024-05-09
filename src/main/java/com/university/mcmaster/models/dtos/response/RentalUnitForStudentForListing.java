@@ -4,6 +4,7 @@ import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.models.entities.Address;
 import com.university.mcmaster.models.entities.Contact;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
+import com.university.mcmaster.models.entities.VisitingSchedule;
 import lombok.*;
 
 import java.util.HashMap;
@@ -34,4 +35,5 @@ public class RentalUnitForStudentForListing {
     private int givenRating;
     private Contact contact;
     private Map<String,List<HashMap<String,Object>>> images;
+    private VisitingScheduleOfRentalUnitOwner visitingSchedule;
 }

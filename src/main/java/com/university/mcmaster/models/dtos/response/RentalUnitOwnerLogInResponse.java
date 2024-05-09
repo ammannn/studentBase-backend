@@ -18,4 +18,5 @@ public class RentalUnitOwnerLogInResponse{
     private String reason;
     private boolean admin;
     private String profileImageUrl;
+    private String userId;
 }

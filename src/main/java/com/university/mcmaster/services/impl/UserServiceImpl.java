@@ -128,6 +128,7 @@ public class UserServiceImpl implements UserService {
         if(user.getRole().contains(UserRole.student)) {
             responseDto.setStudent(StudentLogInResponse.builder()
                     .email(user.getEmail())
+                            .userId(userDetails.getId())
                     .phoneNumber(user.getPhoneNumber())
                     .verificationStatus(user.getVerificationStatus())
                     .name(user.getName())
@@ -146,6 +147,7 @@ public class UserServiceImpl implements UserService {
         } else if(user.getRole().contains(UserRole.rental_unit_owner)) {
             responseDto.setRentalUnitOwner(RentalUnitOwnerLogInResponse.builder()
                     .email(user.getEmail())
+                            .userId(userDetails.getId())
                     .phoneNumber(user.getPhoneNumber())
                     .name(user.getName())
                     .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")

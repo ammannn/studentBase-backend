@@ -30,4 +30,5 @@ public class StudentLogInResponse {
     private List<Address> addresses;
     private String reason;
     private String profileImageUrl;
+    private String userId;
 }

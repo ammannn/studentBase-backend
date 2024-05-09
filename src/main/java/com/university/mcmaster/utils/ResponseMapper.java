@@ -3,6 +3,7 @@ package com.university.mcmaster.utils;
 import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.models.dtos.response.*;
 import com.university.mcmaster.models.entities.*;
+import com.university.mcmaster.repositories.CalendarRepo;
 import com.university.mcmaster.repositories.LikeAndRatingRepo;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.repositories.UserRepo;
@@ -31,6 +32,8 @@ public class ResponseMapper {
     @Autowired
     @Lazy
     private LikeAndRatingRepo likeAndRatingRepo;
+    @Autowired
+    private CalendarRepo calendarRepo;
 
     public RentalUnitForStudentForListing mapRentalUnitToResponseDtoForStudent(RentalUnit r, LikeAndRating likeAndRating) {
         boolean liked = false;
@@ -39,6 +42,7 @@ public class ResponseMapper {
         int reviews = null != r.getCounts() && null != r.getCounts().get(Constants.CountNames.reviews.toString()) ? r.getCounts().get(Constants.CountNames.reviews.toString()) : 0;
         int givenRating = 0;
         String givenReview = null;
+        VisitingSchedule schedule =  calendarRepo.findByUserId(r.getUserId());
         if (null != likeAndRating) {
             liked = likeAndRating.isLiked();
             givenRating = likeAndRating.getRating();
@@ -62,6 +66,10 @@ public class ResponseMapper {
                 .description(r.getDescription())
                 .leaseTerm(r.getLeaseTerm())
                 .leaseStartDate(r.getLeaseStartDate())
+                .visitingSchedule(null  != schedule ? VisitingScheduleOfRentalUnitOwner.builder()
+                        .days(schedule.getDays())
+                        .timeZone(schedule.getTimeZone())
+                        .build(): null)
                 .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
                 .build();
     }

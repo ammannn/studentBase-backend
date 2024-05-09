@@ -172,6 +172,16 @@ public class ApplicationServiceImpl implements ApplicationService {
             new Thread(()->{
                 rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
                 rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+//                RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(application.getRentalUnitId());
+//                if(false == Arrays.asList(
+//                        RentalUnitStage.viewing_booked,
+//                        RentalUnitStage.paperwork_in_review,
+//                        RentalUnitStage.lease_offered
+//                ).contains(rentalUnit.getStage())){
+//                    rentalUnitService.updateRentalUnit(rentalUnit.getId(),new HashMap<String, Object>(){{
+//                        put("stage",RentalUnitStage.viewing_booked);
+//                    }});
+//                }
             }).start();
         }
         return ResponseEntity.ok(ApiResponse.builder()
