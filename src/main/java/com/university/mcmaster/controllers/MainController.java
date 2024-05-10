@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -39,5 +43,17 @@ public class MainController {
         return ResponseEntity.ok(ApiResponse.builder()
                 .data(jsonMap)
                 .build());
+    }
+
+    @GetMapping("/time-zones")
+    public ResponseEntity<?> getTimeZones() {
+        List<String[]> res = new ArrayList<>();
+        for (String zoneId : ZoneId.getAvailableZoneIds()) {
+            ZoneId id = ZoneId.of(zoneId);
+            ZoneOffset offset = id.getRules().getOffset(java.time.Instant.now());
+            String offsetStr = offset.toString();
+            res.add(new String[]{zoneId,zoneId + " : GMT" + (offsetStr.startsWith("-") ? offsetStr : "+" + offsetStr)});
+        }
+        return ResponseEntity.ok(res);
     }
 }
