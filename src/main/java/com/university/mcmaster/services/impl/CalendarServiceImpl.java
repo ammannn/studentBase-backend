@@ -68,6 +68,7 @@ public class CalendarServiceImpl implements CalendarService {
             if(null == ownerId || ownerId.trim().isEmpty()) ownerId = userDetails.getId();
         }
         VisitingSchedule schedule = calendarRepo.findByUserId(ownerId);
+        if(null == schedule) throw new EntityNotFoundException();
         Map<LocalDate,DayResponse> res = generateVisitingSchedule(schedule,ownerId,Utility.getCurrentMonth(schedule.getTimeZone()),
                 2024,schedule.getTimeZone(),false);
         return ResponseEntity.ok(ApiResponse.builder()
