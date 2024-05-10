@@ -33,7 +33,7 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public ResponseEntity<ApiResponse> createVisitingSchedule(CreateUpdateVisitingScheduleRequestDto requestDto, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
-        if(null == userDetails || null != userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
+        if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         verifyVisitingSchedule(requestDto);
         VisitingSchedule schedule = VisitingSchedule.builder()
                 .id(UUID.randomUUID().toString())
