@@ -92,6 +92,16 @@ public class ResponseMapper {
     }
 
     public ApplicationForRentalUnitOwner getApplicationForRentalUnitOwner(Application application, Map<String, RentalUnitForOwner> rentalUnitMap, Map<String, StudentForOwner> userMap, String requestId) {
+        if(null != application.getOfferedLeaseDetails()){
+            if(null != application.getOfferedLeaseDetails().getFilePath()){
+                application.getOfferedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getOfferedLeaseDetails().getFilePath()).toString());
+            }
+        }
+        if(null != application.getSignedLeaseDetails()){
+            if(null != application.getSignedLeaseDetails().getFilePath()){
+                application.getSignedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getSignedLeaseDetails().getFilePath()).toString());
+            }
+        }
         return ApplicationForRentalUnitOwner.builder()
                 .applicationId(application.getId())
                 .rentalUnit(getRentalUnitByIdForOwner(application.getRentalUnitId(), rentalUnitMap))
@@ -101,6 +111,8 @@ public class ResponseMapper {
                 .students(application.getStudents().stream().map(s -> getStudentByIdForRentalUnitOwner(s, userMap)).collect(Collectors.toList()))
                 .createdBy(getStudentByIdForRentalUnitOwner(application.getCreatedBy(), userMap))
                 .visitingSchedule(application.getVisitingSchedule())
+                .offeredLeaseDetails(application.getOfferedLeaseDetails())
+                .signedLeaseDetails(application.getSignedLeaseDetails())
                 .build();
     }
 
@@ -219,6 +231,17 @@ public class ResponseMapper {
 
     public ApplicationForStudent getApplicationForStudent(Application application, String userId, Map<String, StudentForStudent> userMap,
                                                           Map<String, RentalUnitForStudentForListing> rentalUnitMap) {
+
+        if(null != application.getOfferedLeaseDetails()){
+            if(null != application.getOfferedLeaseDetails().getFilePath()){
+                application.getOfferedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getOfferedLeaseDetails().getFilePath()).toString());
+            }
+        }
+        if(null != application.getSignedLeaseDetails()){
+            if(null != application.getSignedLeaseDetails().getFilePath()){
+                application.getSignedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getSignedLeaseDetails().getFilePath()).toString());
+            }
+        }
         return ApplicationForStudent.builder()
                 .applicationId(application.getId())
                 .rentalUnit(getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap))
@@ -228,6 +251,8 @@ public class ResponseMapper {
                 .students(application.getStudents().stream().map(s -> getStudentByIdForStudent(s, userMap)).collect(Collectors.toList()))
                 .createdBy(getStudentByIdForStudent(application.getCreatedBy(), userMap))
                 .visitingSchedule(application.getVisitingSchedule())
+                .offeredLeaseDetails(application.getOfferedLeaseDetails())
+                .signedLeaseDetails(application.getSignedLeaseDetails())
                 .build();
     }
 
