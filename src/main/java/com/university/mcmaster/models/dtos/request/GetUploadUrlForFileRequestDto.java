@@ -17,4 +17,5 @@ public class GetUploadUrlForFileRequestDto {
     private String rentalUnitId;
     private String fileName;
     private RentalUnitElement rentalUnitElement;
+    private String applicationId;
 }

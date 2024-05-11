@@ -98,6 +98,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 put("stage",RentalUnitStage.viewing_booked);
             }});
         }
+        rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(rentalUnit.getId(),ApplicationStatus.visit_requested.toString(),1,"inc");
         return ResponseEntity.status(200).body(ApiResponse.builder()
                         .msg("added applications")
                 .build());
@@ -166,12 +167,11 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         if(false == updateMap.isEmpty()){
             updateMap.put("lastUpdatedOn",Instant.now().toEpochMilli());
-        }
-        boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
-        if(isUpdated){
-            new Thread(()->{
-                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
-                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+            boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
+            if(isUpdated){
+                new Thread(()->{
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
 //                RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(application.getRentalUnitId());
 //                if(false == Arrays.asList(
 //                        RentalUnitStage.viewing_booked,
@@ -182,7 +182,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 //                        put("stage",RentalUnitStage.viewing_booked);
 //                    }});
 //                }
-            }).start();
+                }).start();
+            }
         }
         return ResponseEntity.ok(ApiResponse.builder()
                         .data("updated application status")
@@ -201,13 +202,13 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         if(false == updateMap.isEmpty()){
             updateMap.put("lastUpdatedOn",Instant.now().toEpochMilli());
-        }
-        boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
-        if(isUpdated){
-            new Thread(()->{
-                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
-                rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
-            }).start();
+            boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
+            if(isUpdated){
+                new Thread(()->{
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+                }).start();
+            }
         }
         return ResponseEntity.ok(ApiResponse.builder()
                         .data("updated application status")
@@ -275,5 +276,15 @@ public class ApplicationServiceImpl implements ApplicationService {
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(res)
                 .build());
+    }
+
+    @Override
+    public Application getApplicationById(String applicationId) {
+        return applicationRepo.findById(applicationId);
+    }
+
+    @Override
+    public void updateApplication(String applicationId, Map<String, Object> updateMap) {
+        applicationRepo.update(applicationId,updateMap);
     }
 }

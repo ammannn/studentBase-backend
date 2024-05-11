@@ -20,6 +20,7 @@ public class File implements FirebaseCommonProps {
     private String rentalUnitId;
     private String fileName;
     private RentalUnitElement rentalUnitElement;
+    private String applicationId;
 
     @Override
     public String getCollection() {

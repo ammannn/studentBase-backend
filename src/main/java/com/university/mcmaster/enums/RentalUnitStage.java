@@ -5,5 +5,6 @@ public enum RentalUnitStage {
     viewing_booked,
     paperwork_in_review,
     lease_offered,
+    lease_signed,
     deposit_received;
 }

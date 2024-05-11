@@ -1,15 +1,12 @@
 package com.university.mcmaster.services.impl;
 
-import com.university.mcmaster.enums.FilePurpose;
-import com.university.mcmaster.enums.RentalUnitElement;
-import com.university.mcmaster.enums.UserRole;
+import com.university.mcmaster.enums.*;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.GetUploadUrlForFileRequestDto;
-import com.university.mcmaster.models.entities.CustomUserDetails;
-import com.university.mcmaster.models.entities.File;
-import com.university.mcmaster.models.entities.StudentDocFile;
+import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.FileRepo;
+import com.university.mcmaster.services.ApplicationService;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.services.UserService;
@@ -19,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,36 +33,59 @@ public class FileServiceImpl implements FileService {
     private final FileRepo fileRepo;
     private final UserService userService;
     private final RentalUnitService rentalUnitService;
+    @Lazy
+    @Autowired
+    private ApplicationService applicationService;
 
     @Override
     public ResponseEntity<ApiResponse<?>> getUploadUrlForFile(GetUploadUrlForFileRequestDto requestDto, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
-        String rentalUnitId = requestDto.getRentalUnitId().trim();
-        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto,"add");
-        return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId);
+        String rentalUnitId = requestDto.getRentalUnitId();
+        String applicationId = requestDto.getApplicationId();
+        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto,applicationId,"add");
+        return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId,applicationId);
     }
 
-    private void verifyFileUploadRequest(String rentalUnitId,CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto,String action) {
+    private void verifyFileUploadRequest(String rentalUnitId,CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto,String applicationId,String action) {
         if(null == requestDto.getFilePurpose()) throw new MissingRequiredParamException("purpose");
         if(null == requestDto.getContentType() || requestDto.getContentType().trim().isEmpty()) throw new MissingRequiredParamException("content_type");
         if(FilePurpose.user_profile_image == requestDto.getFilePurpose()) return;
         if(userDetails.getRoles().contains(UserRole.student)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.student,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
+            if(FilePurpose.signed_lease_doc == requestDto.getFilePurpose()){
+                if(null == applicationId || applicationId.isEmpty()) throw new MissingRequiredParamException("applicationId");
+                Application application = applicationService.getApplicationById(applicationId);
+                if(null == application) throw new EntityNotFoundException();
+                if(ApplicationStatus.lease_offered != application.getApplicationStatus()) throw new ActionNotAllowedException("offer_lease","lease doc cannot be signed untill it is offered from landlord");
+                rentalUnitId = application.getRentalUnitId();
+            }else{
+                applicationId = null;
+                rentalUnitId = null;
+            }
             requestDto.setRentalUnitElement(null);
-            rentalUnitId = null;
+
         }else if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
-            if(null == rentalUnitId || rentalUnitId.isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
-            if(null == requestDto.getRentalUnitElement()) requestDto.setRentalUnitElement(RentalUnitElement.others);
-            if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()) {
-                List<File> files = fileRepo.getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(rentalUnitId,requestDto.getRentalUnitElement());
-                if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles() && "add".equals(action)) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);
+            if(FilePurpose.offered_lease_doc == requestDto.getFilePurpose()){
+                if(null == applicationId || applicationId.isEmpty()) throw new MissingRequiredParamException("applicationId");
+                Application application = applicationService.getApplicationById(applicationId);
+                if(null == application) throw new EntityNotFoundException();
+                if((ApplicationStatus.approved != application.getApplicationStatus() && ApplicationStatus.review_in_process != application.getApplicationStatus()) || ApplicationStatus.lease_offered == application.getApplicationStatus()) throw new ActionNotAllowedException("offer_lease","lease cannot be offered if application is not approved");
+                rentalUnitId = application.getRentalUnitId();
+            }else{
+                applicationId = null;
+                if(null == rentalUnitId || rentalUnitId.isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
+                if(null == requestDto.getRentalUnitElement()) requestDto.setRentalUnitElement(RentalUnitElement.others);
+                if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()) {
+                    List<File> files = fileRepo.getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(rentalUnitId,requestDto.getRentalUnitElement());
+                    if(files.size() >= requestDto.getRentalUnitElement().getAllowedFiles() && "add".equals(action)) throw new ActionNotAllowedException("upload_image","maximum allowed images per rental unit element '"+ requestDto.getRentalUnitElement().toString()+"' is " + requestDto.getRentalUnitElement().getAllowedFiles(),400);
+                }
             }
         }
     }
 
-    private ResponseEntity<ApiResponse<?>> getUploadUrlForFileUnAuth(CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto, String requestId,String rentalUnitId) {
+    private ResponseEntity<ApiResponse<?>> getUploadUrlForFileUnAuth(CustomUserDetails userDetails, GetUploadUrlForFileRequestDto requestDto, String requestId,String rentalUnitId,String applicationId) {
         String fileId = UUID.randomUUID().toString();
         String path = userDetails.getId() + "/" + requestDto.getFilePurpose().toString() + "/" + fileId;
         File file = File.builder()
@@ -73,6 +95,7 @@ public class FileServiceImpl implements FileService {
                 .userId(userDetails.getId())
                 .filePath(path)
                 .purpose(requestDto.getFilePurpose())
+                .applicationId(applicationId)
                 .rentalUnitId(rentalUnitId)
                 .rentalUnitElement(requestDto.getRentalUnitElement())
                 .build();
@@ -110,8 +133,32 @@ public class FileServiceImpl implements FileService {
                         .name(file.getFileName())
                         .build());
             }});
-        }else if(null != file.getRentalUnitId() && FilePurpose.rental_unit_poster_image == file.getPurpose()){
+        }else if(FilePurpose.rental_unit_poster_image == file.getPurpose() && null != file.getRentalUnitId()){
             rentalUnitService.updateRentalUnitPosterImage(file.getRentalUnitId(),file.getId(),file.getFilePath());
+        }else if(FilePurpose.offered_lease_doc == file.getPurpose()){
+            applicationService.updateApplication(file.getApplicationId(),new HashMap<String,Object>(){{
+                put("applicationStatus",ApplicationStatus.lease_offered);
+                put("offeredLeaseDetails", OfferedLeaseDetails.builder()
+                        .offeredOn(Instant.now().toEpochMilli())
+                        .fileId(fileId)
+                        .filePath(file.getFilePath())
+                        .build());
+            }});
+            rentalUnitService.updateRentalUnit(file.getRentalUnitId(),new HashMap<String, Object>(){{
+                put("RentalUnitStage", RentalUnitStage.lease_offered);
+            }});
+        }else if(FilePurpose.signed_lease_doc == file.getPurpose()){
+            applicationService.updateApplication(file.getApplicationId(),new HashMap<String,Object>(){{
+                put("applicationStatus",ApplicationStatus.lease_signed);
+                put("signedLeaseDetails", SignedLeaseDetails.builder()
+                        .signedOn(Instant.now().toEpochMilli())
+                        .fileId(fileId)
+                        .filePath(file.getFilePath())
+                        .build());
+            }});
+            rentalUnitService.updateRentalUnit(file.getRentalUnitId(),new HashMap<String, Object>(){{
+                put("RentalUnitStage", RentalUnitStage.lease_signed);
+            }});
         }
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
@@ -157,10 +204,11 @@ public class FileServiceImpl implements FileService {
         if(false == userDetails.getId().equals(file.getUserId())) throw new ActionNotAllowedException("replace_file","user can only update file uploaded by them self",403);
         if(file.getPurpose() != requestDto.getFilePurpose()) throw new ActionNotAllowedException("replace_file","new file and existing file have different purposes",400);
         String rentalUnitId = requestDto.getRentalUnitId();
-        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto,"replace");
+        String applicationId = requestDto.getApplicationId();
+        verifyFileUploadRequest(rentalUnitId,userDetails,requestDto,applicationId,"replace");
         fileRepo.update(fileId, new HashMap<String,Object>(){{
             put("deleted",true);
         }});
-        return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId);
+        return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId,applicationId);
     }
 }

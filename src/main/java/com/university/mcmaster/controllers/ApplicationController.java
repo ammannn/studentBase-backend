@@ -36,7 +36,7 @@ public class ApplicationController {
             @RequestParam(name = "status") ApplicationStatus status,
             @RequestParam(name = "rentalUnitId",required = false) String rentalUnitId,
             @RequestParam(name = "lastSeen",required = false) String lastSeen,
-            @RequestParam(name = "limit",required = false) int limit,
+            @RequestParam(name = "limit",required = false,defaultValue = "15") int limit,
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){

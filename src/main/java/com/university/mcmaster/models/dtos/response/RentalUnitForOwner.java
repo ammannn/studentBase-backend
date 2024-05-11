@@ -1,5 +1,6 @@
 package com.university.mcmaster.models.dtos.response;
 
+import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.Address;
@@ -34,4 +35,5 @@ public class RentalUnitForOwner {
     private Map<String,Integer> counts;
     private int likes;
     private int reviews;
+    private RentalUnitStage stage;
 }

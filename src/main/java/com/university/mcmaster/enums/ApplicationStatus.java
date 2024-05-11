@@ -8,7 +8,8 @@ public enum ApplicationStatus {
     pending_document_upload,
     review_in_process,
     approved,
-    rejected;
+    rejected, lease_offered, lease_signed;
+
 
     public static boolean isValidTransition(ApplicationStatus oldStatus,ApplicationStatus newStatus) {
         if(visit_requested == oldStatus) {

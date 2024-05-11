@@ -173,6 +173,7 @@ public class ResponseMapper {
                 .avgRating(Utility.getAverageRating(rentalUnit.getRating()))
                 .likes(likes)
                 .reviews(reviews)
+                .stage(rentalUnit.getStage())
                 .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
                 .rentalUnitId(rentalUnit.getId())
                 .rent(rentalUnit.getRent())

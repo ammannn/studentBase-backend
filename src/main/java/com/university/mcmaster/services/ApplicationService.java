@@ -4,13 +4,16 @@ import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
+import com.university.mcmaster.models.entities.Application;
 import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface ApplicationService {
     static List<ApplicationStatus> getAllowedRentalUnitStatusForOwner() {
@@ -65,4 +68,8 @@ public interface ApplicationService {
     ResponseEntity<?> addOrRemoveStudentsForApplication(String applicationId, AddOrRemoveStudentsForApplicationRequestDto requestDto, String requestId, HttpServletRequest request);
 
     ResponseEntity<?> getApplicationById(String applicationId, String requestId, HttpServletRequest request);
+
+    Application getApplicationById(String applicationId);
+
+    void updateApplication(String applicationId, Map<String, Object> updateMap);
 }
