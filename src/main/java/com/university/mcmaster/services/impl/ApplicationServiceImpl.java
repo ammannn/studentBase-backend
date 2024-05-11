@@ -59,7 +59,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private ResponseEntity<?> getApplicationsForStudent(String userId,String rentalUnitId, ApplicationStatus status,int limit, String lastSeen, String requestId) {
         if(false == ApplicationService.getAllowedRentalUnitStatusForStudentToListApplication().contains(status)) throw new InvalidParamValueException("status",ApplicationService.getAllowedRentalUnitStatusForStudentToListApplication().toString());
         List<Application> applications = applicationRepo.getPaginatedApplicationsByStudentIdAndNullableRentalUnitIdAndStatusAndDeletedFalse(userId,rentalUnitId,status,limit,lastSeen);
-        List<ApplicationForStudent> res = responseMapper.getApplicationsForStudent(userId,applications,requestId);
+        List<ApplicationForStudent> res = responseMapper.getApplicationsForStudent(userId,applications);
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(res)
                         .build());
@@ -267,7 +267,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == application) throw new EntityNotFoundException();
         Object res = null;
         if(userDetails.getRoles().contains(UserRole.student)){
-            res = responseMapper.getApplicationForStudent(application,userDetails.getId(),requestId,new HashMap<>(),new HashMap<>());
+            res = responseMapper.getApplicationForStudent(application,userDetails.getId(),new HashMap<>(),new HashMap<>());
         }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
             res = responseMapper.getApplicationForRentalUnitOwner(application,new HashMap<>(),new HashMap<>(),requestId);

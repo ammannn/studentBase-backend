@@ -16,4 +16,6 @@ public interface ApplicationRepo {
 
     List<Application> getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitStartTimeInRange(String ownerId, long startTimeStamp, long endTimeStamp);
     List<Application> getApplicationsByRentalUnitOwnerAndStatusViewPropertyAndVisitEndTimeInRange(String ownerId, long startTimeStamp, long endTimeStamp);
+
+    Application getApplicationByStudentIdAndRentalUnitIdAndDeletedFalse(String studentId, String rentalUnitId);
 }

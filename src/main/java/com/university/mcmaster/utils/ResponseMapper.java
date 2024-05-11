@@ -3,10 +3,7 @@ package com.university.mcmaster.utils;
 import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.models.dtos.response.*;
 import com.university.mcmaster.models.entities.*;
-import com.university.mcmaster.repositories.CalendarRepo;
-import com.university.mcmaster.repositories.LikeAndRatingRepo;
-import com.university.mcmaster.repositories.RentalUnitRepo;
-import com.university.mcmaster.repositories.UserRepo;
+import com.university.mcmaster.repositories.*;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.impl.LikeAndRatingServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +31,10 @@ public class ResponseMapper {
     private LikeAndRatingRepo likeAndRatingRepo;
     @Autowired
     private CalendarRepo calendarRepo;
+    @Autowired
+    private ApplicationRepo applicationRepo;
 
-    public RentalUnitForStudentForListing mapRentalUnitToResponseDtoForStudent(RentalUnit r, LikeAndRating likeAndRating) {
+    public RentalUnitForStudentForListing mapRentalUnitToResponseDtoForStudent(String studentId,RentalUnit r) {
         boolean liked = false;
         double avgRating = Utility.getAverageRating(r.getRating());
         int likes = null != r.getCounts() && null != r.getCounts().get(Constants.CountNames.likes.toString()) ? r.getCounts().get(Constants.CountNames.likes.toString()) : 0;
@@ -43,10 +42,16 @@ public class ResponseMapper {
         int givenRating = 0;
         String givenReview = null;
         VisitingSchedule schedule =  calendarRepo.findByUserId(r.getUserId());
+        LikeAndRating likeAndRating = likeAndRatingRepo.findByUserIdAndRentalUnitIdAndDeletedFalse(studentId,r.getId());
         if (null != likeAndRating) {
             liked = likeAndRating.isLiked();
             givenRating = likeAndRating.getRating();
             givenReview = likeAndRating.getReview();
+        }
+        Application application = applicationRepo.getApplicationByStudentIdAndRentalUnitIdAndDeletedFalse(studentId,r.getId());
+        ApplicationForStudent applicationForStudent = null;
+        if(null != application){
+            applicationForStudent = getApplicationForStudent(application,studentId,new HashMap<>(),new HashMap<>(),false);
         }
         return RentalUnitForStudentForListing.builder()
                 .rentalUnitId(r.getId())
@@ -72,6 +77,7 @@ public class ResponseMapper {
                         .timeZone(schedule.getTimeZone())
                         .build(): null)
                 .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
+                .application(applicationForStudent)
                 .build();
     }
 
@@ -200,17 +206,18 @@ public class ResponseMapper {
         return res;
     }
 
-    public List<ApplicationForStudent> getApplicationsForStudent(String userId, List<Application> applications, String requestId) {
+    public List<ApplicationForStudent> getApplicationsForStudent(String userId, List<Application> applications) {
         List<ApplicationForStudent> res = new ArrayList<>();
         Map<String, RentalUnitForStudentForListing> rentalUnitMap = new HashMap<>();
         Map<String, StudentForStudent> userMap = new HashMap<>();
         for (Application application : applications) {
-            res.add(getApplicationForStudent(application,userId,requestId,userMap,rentalUnitMap));
+            res.add(getApplicationForStudent(application,userId,userMap,rentalUnitMap));
         }
         return res;
     }
 
-    public ApplicationForStudent getApplicationForStudent(Application application, String userId, String requestId, Map<String, StudentForStudent> userMap, Map<String, RentalUnitForStudentForListing> rentalUnitMap) {
+    public ApplicationForStudent getApplicationForStudent(Application application, String userId, Map<String, StudentForStudent> userMap,
+                                                          Map<String, RentalUnitForStudentForListing> rentalUnitMap) {
         return ApplicationForStudent.builder()
                 .applicationId(application.getId())
                 .rentalUnit(getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap))
@@ -223,10 +230,25 @@ public class ResponseMapper {
                 .build();
     }
 
+    public ApplicationForStudent getApplicationForStudent(Application application, String userId,
+                                                          Map<String, StudentForStudent> userMap,
+                                                          Map<String, RentalUnitForStudentForListing> rentalUnitMap,boolean setRentalUnit) {
+        return ApplicationForStudent.builder()
+                .applicationId(application.getId())
+                .rentalUnit(setRentalUnit ? getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap) : null)
+                .applicationStatus(application.getApplicationStatus())
+                .lastUpdatedOn(application.getLastUpdatedOn())
+                .createdOn(application.getCreatedOn())
+                .students(application.getStudents().stream().map(s -> getStudentByIdForStudent(s, userMap)).collect(Collectors.toList()))
+                .createdBy(getStudentByIdForStudent(application.getCreatedBy(), userMap))
+                .visitingSchedule(application.getVisitingSchedule())
+                .build();
+    }
+
     private RentalUnitForStudentForListing getRentalUnitByIdForStudent(String userId, String rentalUnitId, Map<String, RentalUnitForStudentForListing> cache) {
         if (cache.containsKey(rentalUnitId)) return cache.get(rentalUnitId);
         RentalUnit rentalUnit = rentalUnitRepo.findById(rentalUnitId);
-        RentalUnitForStudentForListing res = mapRentalUnitToResponseDtoForStudent(rentalUnit, likeAndRatingRepo.findByUserIdAndRentalUnitIdAndDeletedFalse(userId, rentalUnitId));
+        RentalUnitForStudentForListing res = mapRentalUnitToResponseDtoForStudent(userId,rentalUnit);
         cache.put(rentalUnitId, res);
         return res;
     }

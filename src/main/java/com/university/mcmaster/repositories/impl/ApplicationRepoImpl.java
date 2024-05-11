@@ -78,4 +78,14 @@ public class ApplicationRepoImpl extends FirebaseUtils<Application> implements A
                 .whereLessThan("visitingSchedule.endTime",endTimeStamp)
                 .limit(1), Application.class);
     }
+
+    @Override
+    public Application getApplicationByStudentIdAndRentalUnitIdAndDeletedFalse(String studentId, String rentalUnitId) {
+        return processQueryForEntity(FirestoreClient.getFirestore()
+                .collection(FirestoreConstants.FS_APPLICATIONS)
+                .whereEqualTo("deleted",false)
+                .whereEqualTo("rentalUnitId",rentalUnitId)
+                .whereEqualTo("createdBy",studentId)
+                .limit(1), Application.class);
+    }
 }

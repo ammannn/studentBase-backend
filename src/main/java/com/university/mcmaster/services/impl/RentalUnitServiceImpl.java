@@ -75,8 +75,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 Utility.getRentalUnitFeatureList(requestDto.getFeatures()),requestDto.getCountry(),requestDto.getState(),requestDto.getCity(),requestDto.getMaxRent(),requestDto.getMinRent(),limit,lastSeen
         );
         List<RentalUnitForStudentForListing> res = rentalUnits.stream().map(r -> {
-            LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),r.getId());
-            return responseMapper.mapRentalUnitToResponseDtoForStudent(r,likeAndRating);
+            return responseMapper.mapRentalUnitToResponseDtoForStudent(userDetails.getId(),r);
         }).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
@@ -338,9 +337,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                     .build());
         }
         if(userDetails.getRoles().contains(UserRole.student)) {
-            LikeAndRating likeAndRating = likeAndRatingService.getLikeAndRatingDocByUserIdAndRentalUnitId(userDetails.getId(),rentalUnit.getId());
             return ResponseEntity.ok(ApiResponse.builder()
-                            .data(responseMapper.mapRentalUnitToResponseDtoForStudent(rentalUnit,likeAndRating))
+                            .data(responseMapper.mapRentalUnitToResponseDtoForStudent(userDetails.getId(),rentalUnit))
                     .build());
         }
         throw new UnAuthenticatedUserException();

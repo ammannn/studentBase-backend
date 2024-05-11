@@ -125,7 +125,7 @@ public class LikeAndRatingServiceImpl implements LikeAndRatingService {
         List<LikeAndRating> likeAndRatings = likeAndRatingRepo.getLikeAndRatingDocsByUserIdAndDeletedFalse(userDetails.getId());
         List<RentalUnitForStudentForListing> res = likeAndRatings.stream().map(lar->{
             RentalUnit rentalUnit = rentalUnitService.getRentalUnitById(lar.getRentalUnitId());
-            return responseMapper.mapRentalUnitToResponseDtoForStudent(rentalUnit,lar);
+            return responseMapper.mapRentalUnitToResponseDtoForStudent(userDetails.getId(),rentalUnit);
         }).toList();
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(res)
