@@ -21,6 +21,7 @@ public interface ApplicationService {
                 ApplicationStatus.rejected,
                 ApplicationStatus.approved,
                 ApplicationStatus.visit_requested,
+                ApplicationStatus.view_property,
                 ApplicationStatus.review_in_process
         );
     }
