@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -85,6 +87,16 @@ public class ApplicationController {
             HttpServletRequest request
     ){
         return applicationService.updateApplicationStatus(applicationId,status,requestId,request);
+    }
+
+    @PutMapping("/applications/status/v2")
+    public ResponseEntity<?> updateApplicationStatusV2(
+            @RequestBody List<String> applicationIds,
+            @RequestParam("status") ApplicationStatus status,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return applicationService.updateApplicationStatusV2(applicationIds,status,requestId,request);
     }
 
     @DeleteMapping("/applications/{applicationId}")

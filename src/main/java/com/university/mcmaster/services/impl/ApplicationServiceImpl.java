@@ -287,4 +287,29 @@ public class ApplicationServiceImpl implements ApplicationService {
     public void updateApplication(String applicationId, Map<String, Object> updateMap) {
         applicationRepo.update(applicationId,updateMap);
     }
+
+    @Override
+    public ResponseEntity<?> updateApplicationStatusV2(List<String> applicationIds, ApplicationStatus status, String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
+        if(null == status) throw new MissingRequiredParamException();
+        List<Application> applications = new ArrayList<>();
+        for (String applicationId : applicationIds) {
+            if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
+            Application application = applicationRepo.findById(applicationId);
+            if(null == application) throw new EntityNotFoundException();
+            if(status == application.getApplicationStatus()) throw new ActionNotAllowedException("update_application_status","old and requested status are same");
+            if(false == ApplicationStatus.isValidTransition(application.getApplicationStatus(),status)) throw new ActionNotAllowedException("update_application_status","invalid status update request");
+            applications.add(application);
+        }
+        for (Application application : applications) {
+            if(userDetails.getRoles().contains(UserRole.student)){
+                return updateApplicationStatusForStudent(userDetails.getId(),application,status,requestId);
+            }
+            if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
+                return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,requestId);
+            }
+        }
+        throw new UnAuthenticatedUserException();
+    }
 }

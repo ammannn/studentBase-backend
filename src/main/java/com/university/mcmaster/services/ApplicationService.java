@@ -72,4 +72,6 @@ public interface ApplicationService {
     Application getApplicationById(String applicationId);
 
     void updateApplication(String applicationId, Map<String, Object> updateMap);
+
+    ResponseEntity<?> updateApplicationStatusV2(List<String> applicationIds, ApplicationStatus status, String requestId, HttpServletRequest request);
 }
