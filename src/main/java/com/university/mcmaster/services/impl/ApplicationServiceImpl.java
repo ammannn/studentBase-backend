@@ -170,8 +170,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
             if(isUpdated){
                 new Thread(()->{
-                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
-                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"inc");
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"dec");
 //                RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(application.getRentalUnitId());
 //                if(false == Arrays.asList(
 //                        RentalUnitStage.viewing_booked,
@@ -205,8 +205,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             boolean isUpdated = applicationRepo.update(application.getId(),updateMap);
             if(isUpdated){
                 new Thread(()->{
-                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"dec");
-                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"inc");
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"inc");
+                    rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"dec");
                 }).start();
             }
         }
