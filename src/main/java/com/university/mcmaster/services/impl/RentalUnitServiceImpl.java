@@ -111,6 +111,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                         put(value.toString(),0);
                     }
                     put("likes",0);
+                    put("totalApplications",0);
                     put("reviews",0);
                 }})
                 .build();

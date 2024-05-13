@@ -41,6 +41,8 @@ public class RentalUnit implements FirebaseCommonProps {
     private List<String> featureSearchList;
     private String reason;
     private Map<String,Integer> counts;
+    private StripeProduct stripeProduct;
+    private boolean eligibleForListing;
 
     @Override
     public String getCollection() {

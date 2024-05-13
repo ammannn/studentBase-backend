@@ -6,4 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface PaymentService {
     ResponseEntity<?> createPaymentLink(PaymentRequestDto requestDto, String requestId, HttpServletRequest httpServletRequest);
+
+    ResponseEntity<?> processPaymentWebhook(String request,String sigHeader);
 }

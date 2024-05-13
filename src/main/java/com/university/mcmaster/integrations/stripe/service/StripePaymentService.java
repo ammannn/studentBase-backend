@@ -4,12 +4,14 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.PriceCreateParams;
 import com.stripe.param.ProductCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.university.mcmaster.enums.Currency;
 import com.university.mcmaster.models.dtos.response.MethodResponse;
 import com.university.mcmaster.models.entities.StripeProduct;
+import com.university.mcmaster.utils.EnvironmentVariables;
 import com.university.mcmaster.utils.Utility;
 import org.checkerframework.checker.units.qual.A;
 
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 
 public class StripePaymentService {
 
-    public MethodResponse<StripeProduct,?,?> createProductAndPrice(
+    public static MethodResponse<StripeProduct,?,?> createProductAndPrice(
             String productName, String productDescription, Currency unit, long amount
     ){
         MethodResponse<StripeProduct,?,?> res = new MethodResponse<>();
@@ -28,7 +30,8 @@ public class StripePaymentService {
                             .setName(productName)
                             .setDescription(productDescription)
                             .build();
-            Product product = Product.create(productParams);
+            Product product = Product.create(productParams,RequestOptions.builder()
+                    .setApiKey(EnvironmentVariables.STRIPE_API_KEY).build());
             PriceCreateParams params =
                     PriceCreateParams
                             .builder()
@@ -36,7 +39,8 @@ public class StripePaymentService {
                             .setCurrency(unit.toString())
                             .setUnitAmount(amount)
                             .build();
-            Price price = Price.create(params);
+            Price price = Price.create(params, RequestOptions.builder()
+                    .setApiKey(EnvironmentVariables.STRIPE_API_KEY).build());
             res.setResult_1(StripeProduct.builder()
                     .stripeProductId(product.getId())
                     .stripePriceId(price.getId())
@@ -51,8 +55,8 @@ public class StripePaymentService {
         return res;
     }
 
-    public MethodResponse<String,String,?> createCheckoutSession(String userEmail, String stripeProductId){
-        MethodResponse<String,String,?> response = new MethodResponse<>();
+    public static MethodResponse<String,String,String> createCheckoutSession(String userEmail, String stripeProductId){
+        MethodResponse<String,String,String> response = new MethodResponse<>();
         try {
             Product product = Product.retrieve(stripeProductId);
             Price price = product.getDefaultPriceObject();
@@ -74,10 +78,13 @@ public class StripePaymentService {
                                             .setPrice(price.getId())
                                             .build())
                             .build();
-            Session session = com.stripe.model.checkout.Session.create(params);
+            Session session = com.stripe.model.checkout.Session.create(params,RequestOptions.builder()
+                    .setApiKey(EnvironmentVariables.STRIPE_API_KEY).build());
             response.setResult_1(session.getUrl());
             response.setResult_2(session.getId());
+            response.setResult_3(session.getPaymentIntent());
         }catch (Exception e){
+            e.printStackTrace();
             response.setFlag(true);
             response.setErrorMsg(e.getMessage());
         }

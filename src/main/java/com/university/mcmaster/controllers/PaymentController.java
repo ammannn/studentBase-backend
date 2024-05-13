@@ -22,6 +22,4 @@ public class PaymentController {
     ){
         return paymentService.createPaymentLink(requestDto,requestId,httpServletRequest);
     }
-
-
 }

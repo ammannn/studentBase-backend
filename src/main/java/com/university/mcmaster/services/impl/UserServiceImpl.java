@@ -35,50 +35,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final ResponseMapper responseMapper;
 
-    @EventListener
-    public void createAdminUser(ApplicationStartedEvent event){
-        String email = EnvironmentVariables.ADMIN_EMAIL;
-        if(null != email && false == email.isEmpty()){
-            log.trace("checking for admin account for email : " + email);
-            User user = userRepo.findUserByEmail(email);
-            if(null == user){
-                log.trace("user admin not account found, creating new admin account for : " + email);
-                UserRecord record = FirebaseAuthenticationService.createAdminAccount(email);
-                if(null != record){
-                    user = User.builder()
-                            .createdOn(Instant.now().toEpochMilli())
-                            .id(record.getUid())
-                            .email(email.trim().toLowerCase())
-                            .name("mcmaster admin")
-                            .verificationStatus(VerificationStatus.verified)
-                            .role(Arrays.asList(UserRole.user,UserRole.admin))
-                            .build();
-                    userRepo.save(user);
-                    User finalUser1 = user;
-                    FirebaseAuthenticationService.updateClaims(user.getId(),new HashMap<String, Object>(){{
-                        put("roles", finalUser1.getRole().stream().map(UserRole::toString).collect(Collectors.joining(",")));
-                        put("verified", true);
-                    }});
-                }else{
-                    log.trace("failed to create admin account");
-                }
-            }else if(false == user.getRole().contains(UserRole.admin)) {
-                log.trace("found an existing admin account with missing admin role, updating user");
-                User finalUser = user;
-                user.getRole().add(UserRole.admin);
-                userRepo.update(user.getId(),new HashMap<String, Object>(){{
-                    put("role",finalUser.getRole());
-                }});
-                FirebaseAuthenticationService.updateClaims(user.getId(),new HashMap<String, Object>(){{
-                    put("roles", finalUser.getRole().stream().map(UserRole::toString).collect(Collectors.joining(",")));
-                    put("verified", true);
-                }});
-            }
-        }else{
-            log.trace("no admin email set");
-        }
-    }
-
     @Override
     public User findUserById(String id) {
         return userRepo.findById(id);
