@@ -3,38 +3,85 @@ package com.university.mcmaster.integrations.stripe.service;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
-import com.stripe.param.AccountCreateParams;
+import com.stripe.model.checkout.Session;
 import com.stripe.param.PriceCreateParams;
 import com.stripe.param.ProductCreateParams;
-import com.university.mcmaster.models.dtos.request.ApiResponse;
+import com.stripe.param.checkout.SessionCreateParams;
+import com.university.mcmaster.enums.Currency;
 import com.university.mcmaster.models.dtos.response.MethodResponse;
-import com.university.mcmaster.models.entities.User;
+import com.university.mcmaster.models.entities.StripeProduct;
+import com.university.mcmaster.utils.Utility;
+import org.checkerframework.checker.units.qual.A;
+
+import java.time.Instant;
+import java.util.ArrayList;
 
 public class StripePaymentService {
 
-    public void test() throws StripeException {
-        ProductCreateParams productParams =
-                ProductCreateParams.builder()
-                        .setName("Starter Subscription")
-                        .setDescription("$12/Month subscription")
-                        .build();
-        Product product = Product.create(productParams);
-        System.out.println("Success! Here is your starter subscription product id: " + product.getId());
+    public MethodResponse<StripeProduct,?,?> createProductAndPrice(
+            String productName, String productDescription, Currency unit, long amount
+    ){
+        MethodResponse<StripeProduct,?,?> res = new MethodResponse<>();
+        try {
+            ProductCreateParams productParams =
+                    ProductCreateParams.builder()
+                            .setName(productName)
+                            .setDescription(productDescription)
+                            .build();
+            Product product = Product.create(productParams);
+            PriceCreateParams params =
+                    PriceCreateParams
+                            .builder()
+                            .setProduct(product.getId())
+                            .setCurrency(unit.toString())
+                            .setUnitAmount(amount)
+                            .build();
+            Price price = Price.create(params);
+            res.setResult_1(StripeProduct.builder()
+                    .stripeProductId(product.getId())
+                    .stripePriceId(price.getId())
+                    .createdOn(Instant.now().toEpochMilli())
+                    .amount(price.getUnitAmount())
+                    .build());
+        }catch (Exception e){
+            e.printStackTrace();
+            res.setFlag(true);
+            res.setErrorMsg(e.getMessage());
+        }
+        return res;
+    }
 
-        PriceCreateParams params =
-                PriceCreateParams
-                        .builder()
-                        .setProduct(product.getId())
-                        .setCurrency("usd")
-                        .setUnitAmount(1200L)
-                        .setRecurring(
-                                PriceCreateParams.Recurring
-                                        .builder()
-                                        .setInterval(PriceCreateParams.Recurring.Interval.MONTH)
-                                        .build())
-                        .build();
-        Price price = Price.create(params);
-        System.out.println("Success! Here is your starter subscription price id: " + price.getId());
+    public MethodResponse<String,String,?> createCheckoutSession(String userEmail, String stripeProductId){
+        MethodResponse<String,String,?> response = new MethodResponse<>();
+        try {
+            Product product = Product.retrieve(stripeProductId);
+            Price price = product.getDefaultPriceObject();
+            SessionCreateParams params =
+                    SessionCreateParams.builder()
+                            .setMode(SessionCreateParams.Mode.PAYMENT)
+                            .setCustomerEmail(userEmail)
+                            .setCustomerCreation(SessionCreateParams.CustomerCreation.IF_REQUIRED)
+                            .addAllPaymentMethodType(new ArrayList<>(){{
+                                add(SessionCreateParams.PaymentMethodType.CARD);
+                                add(SessionCreateParams.PaymentMethodType.PAYNOW);
+                                add(SessionCreateParams.PaymentMethodType.PAYPAL);
+                            }})
+                            .setSuccessUrl(Utility.getPlatformUrl() + "/payment-success")
+                            .setCancelUrl(Utility.getPlatformUrl() + "/payment-canceled")
+                            .addLineItem(
+                                    SessionCreateParams.LineItem.builder()
+                                            .setQuantity(1L)
+                                            .setPrice(price.getId())
+                                            .build())
+                            .build();
+            Session session = com.stripe.model.checkout.Session.create(params);
+            response.setResult_1(session.getUrl());
+            response.setResult_2(session.getId());
+        }catch (Exception e){
+            response.setFlag(true);
+            response.setErrorMsg(e.getMessage());
+        }
+        return response;
     }
 
 }

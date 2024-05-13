@@ -12,5 +12,6 @@ public class MethodResponse<P,Q,R> {
     private Q result_2;
     private R result_3;
     private String resultStr;
+    private String errorMsg;
     private boolean flag;
 }

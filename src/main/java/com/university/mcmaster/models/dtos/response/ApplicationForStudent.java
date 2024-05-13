@@ -24,4 +24,5 @@ public class ApplicationForStudent {
     private RequestedVisitingSchedule visitingSchedule;
     private OfferedLeaseDetails offeredLeaseDetails;
     private SignedLeaseDetails signedLeaseDetails;
+    private boolean documentationCompleted;
 }

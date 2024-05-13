@@ -178,5 +178,9 @@ public class Utility {
         }
         return featureSearchList;
     }
+
+    public static String getPlatformUrl() {
+        return "";
+    }
 }
 

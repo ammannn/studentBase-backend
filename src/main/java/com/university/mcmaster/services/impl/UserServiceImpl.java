@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepo.getPaginatedUsersByVerificationStatusForAdmin(verificationStatus,limit,lastSeen);
         for (User user : users) {
             user.setCustomFields(new HashMap<String, Object>(){{
-                put("documents",responseMapper.getStudentDocs(user));
+                put("documents",responseMapper.getStudentDocs(user).getResult_1());
                 put("profileImageUrl",(null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "");
             }});
         }
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
                     .userRole(UserRole.student)
                             .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
                     .admin(user.getRole().contains(UserRole.admin))
-                    .documents(responseMapper.getStudentDocs(user))
+                    .documents(responseMapper.getStudentDocs(user).getResult_1())
                             .verifiedOn(user.getVerifiedOn())
                             .dob(user.getDob())
                             .nationality(user.getNationality())

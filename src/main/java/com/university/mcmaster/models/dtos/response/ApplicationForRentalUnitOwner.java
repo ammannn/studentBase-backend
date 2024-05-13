@@ -25,4 +25,5 @@ public class ApplicationForRentalUnitOwner {
     private RequestedVisitingSchedule visitingSchedule;
     private OfferedLeaseDetails offeredLeaseDetails;
     private SignedLeaseDetails signedLeaseDetails;
+    private boolean documentationCompleted;
 }

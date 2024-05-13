@@ -102,13 +102,21 @@ public class ResponseMapper {
                 application.getSignedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getSignedLeaseDetails().getFilePath()).toString());
             }
         }
+        List<StudentForOwner> students = new ArrayList<>();
+        boolean documentationCompleted = true;
+        for (String studentId : application.getStudents()) {
+            StudentForOwner temp = getStudentByIdForRentalUnitOwner(studentId, userMap);
+            students.add(temp);
+            documentationCompleted = documentationCompleted && temp.isDocumentationCompleted();
+        }
         return ApplicationForRentalUnitOwner.builder()
                 .applicationId(application.getId())
                 .rentalUnit(getRentalUnitByIdForOwner(application.getRentalUnitId(), rentalUnitMap))
                 .applicationStatus(application.getApplicationStatus())
                 .lastUpdatedOn(application.getLastUpdatedOn())
                 .createdOn(application.getCreatedOn())
-                .students(application.getStudents().stream().map(s -> getStudentByIdForRentalUnitOwner(s, userMap)).collect(Collectors.toList()))
+                .students(students)
+                .documentationCompleted(documentationCompleted)
                 .createdBy(getStudentByIdForRentalUnitOwner(application.getCreatedBy(), userMap))
                 .visitingSchedule(application.getVisitingSchedule())
                 .offeredLeaseDetails(application.getOfferedLeaseDetails())
@@ -133,6 +141,7 @@ public class ResponseMapper {
     }
 
     private StudentForOwner getStudentForRentalUnitOwner(User user) {
+        MethodResponse<Map<String, HashMap<String, Object>>,Boolean,?> docs = getStudentDocs(user);
         return StudentForOwner.builder()
                 .name(user.getName())
                 .email(user.getEmail())
@@ -141,11 +150,13 @@ public class ResponseMapper {
                 .verifiedOn(user.getVerifiedOn())
                 .phoneNumber(user.getPhoneNumber())
                 .userId(user.getId())
-                .docs(getStudentDocs(user))
+                .docs(docs.getResult_1())
+                .documentationCompleted(docs.getResult_2())
                 .build();
     }
 
     public StudentForStudent getStudentForStudent(User user) {
+        MethodResponse<Map<String, HashMap<String, Object>>,Boolean,?> docs = getStudentDocs(user);
         return StudentForStudent.builder()
                 .name(user.getName())
                 .email(user.getEmail())
@@ -155,7 +166,8 @@ public class ResponseMapper {
                 .phoneNumber(user.getPhoneNumber())
                 .userId(user.getId())
                 .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
-                .docs(getStudentDocs(user))
+                .docs(docs.getResult_1())
+                .documentationCompleted(docs.getResult_2())
                 .build();
     }
 
@@ -206,16 +218,22 @@ public class ResponseMapper {
                 .build();
     }
 
-    public Map<String, HashMap<String, Object>> getStudentDocs(User user) {
-        Map<String, HashMap<String, Object>> res = new HashMap<>();
+    public MethodResponse< Map<String, HashMap<String, Object>>,Boolean,?> getStudentDocs(User user) {
+        MethodResponse< Map<String, HashMap<String, Object>>,Boolean,?> res = new MethodResponse<>();
+        Map<String, HashMap<String, Object>> data = new HashMap<>();
+        boolean documentationStatus = true;
         if (null != user && null != user.getDocumentPaths()) {
             for (Map.Entry<String, StudentDocFile> docEntry : user.getDocumentPaths().entrySet()) {
-                res.put(docEntry.getKey(), new HashMap<String, Object>() {{
-                    put("url", (null != docEntry.getValue() && null != docEntry.getValue().getPath() && false == docEntry.getValue().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(docEntry.getValue().getPath()).toString() : "");
+                boolean isAvailable = (null != docEntry.getValue() && null != docEntry.getValue().getPath() && false == docEntry.getValue().getPath().trim().isEmpty());
+                documentationStatus = documentationStatus && isAvailable;
+                data.put(docEntry.getKey(), new HashMap<String, Object>() {{
+                    put("url", isAvailable ? GcpStorageUtil.createGetUrl(docEntry.getValue().getPath()).toString() : "");
                     put("name", (null != docEntry.getValue()) ? docEntry.getValue().getName() : "");
                 }});
             }
         }
+        res.setResult_1(data);
+        res.setResult_2(documentationStatus);
         return res;
     }
 
@@ -242,13 +260,21 @@ public class ResponseMapper {
                 application.getSignedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getSignedLeaseDetails().getFilePath()).toString());
             }
         }
+        List<StudentForStudent> students = new ArrayList<>();
+        boolean documentationCompleted = true;
+        for (String studentId : application.getStudents()) {
+            StudentForStudent temp = getStudentByIdForStudent(studentId, userMap);
+            students.add(temp);
+            documentationCompleted = documentationCompleted && temp.isDocumentationCompleted();
+        }
         return ApplicationForStudent.builder()
                 .applicationId(application.getId())
                 .rentalUnit(getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap))
                 .applicationStatus(application.getApplicationStatus())
                 .lastUpdatedOn(application.getLastUpdatedOn())
                 .createdOn(application.getCreatedOn())
-                .students(application.getStudents().stream().map(s -> getStudentByIdForStudent(s, userMap)).collect(Collectors.toList()))
+                .students(students)
+                .documentationCompleted(documentationCompleted)
                 .createdBy(getStudentByIdForStudent(application.getCreatedBy(), userMap))
                 .visitingSchedule(application.getVisitingSchedule())
                 .offeredLeaseDetails(application.getOfferedLeaseDetails())

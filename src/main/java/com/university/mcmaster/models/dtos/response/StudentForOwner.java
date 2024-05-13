@@ -24,4 +24,5 @@ public class StudentForOwner {
     private VerificationStatus verificationStatus;
     private long verifiedOn;
     private Map<String,HashMap<String,Object>> docs;
+    private boolean documentationCompleted;
 }

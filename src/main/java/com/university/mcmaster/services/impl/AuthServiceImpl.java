@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
         }
         responseDto.setRegistered(true);
         if(user.getRole().contains(UserRole.student)){
-            Map<String,HashMap<String,Object>> docs = responseMapper.getStudentDocs(user);
+            Map<String,HashMap<String,Object>> docs = responseMapper.getStudentDocs(user).getResult_1();
             responseDto.setStudent(StudentLogInResponse.builder()
                     .email(user.getEmail())
                     .phoneNumber(user.getPhoneNumber())
