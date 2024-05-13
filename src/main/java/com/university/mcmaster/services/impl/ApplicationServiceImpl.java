@@ -160,7 +160,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(ApplicationStatus.view_property == status){
 //          todo: take further action like sending notification
         }else if(ApplicationStatus.approved == status){
-            verifyApplicationForApprovalOrToSubmitApplication(application);
+//            verifyApplicationForApprovalOrToSubmitApplication(application);
 //          todo: take further action like sending notification
         }else if(ApplicationStatus.rejected == status){
 //          todo: take further action like sending notification with some reason
