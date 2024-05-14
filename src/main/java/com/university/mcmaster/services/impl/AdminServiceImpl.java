@@ -90,7 +90,10 @@ public class AdminServiceImpl implements AdminService {
         }
         AdminConfig adminConfig = adminRepo.getAdminConfig();
         if(null == adminConfig){
-            adminConfig = AdminConfig.builder().id(Constants.ADMIN_CONFIG_DOC_ID).build();
+            log.trace("no admin config doc found, creating new");
+            adminConfig = AdminConfig.builder()
+                    .id(Constants.ADMIN_CONFIG_DOC_ID)
+                    .build();
             adminRepo.saveAdminConfig(adminConfig);
         }
         if(null == adminConfig.getStripeProductIdForListing()){

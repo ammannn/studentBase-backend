@@ -5,10 +5,12 @@ import com.university.mcmaster.models.entities.AdminConfig;
 import com.university.mcmaster.repositories.AdminRepo;
 import com.university.mcmaster.utils.Constants;
 import com.university.mcmaster.utils.FirestoreConstants;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+@Repository
 public class AdminRepoImpl implements AdminRepo {
     @Override
     public AdminConfig getAdminConfig() {
@@ -27,7 +29,7 @@ public class AdminRepoImpl implements AdminRepo {
     public void saveAdminConfig(AdminConfig data) {
         FirestoreClient.getFirestore()
                 .collection(FirestoreConstants.ADMIN_WILD_DOCS)
-                .document(getAdminConfig().getId())
+                .document(data.getId())
                 .set(data);
     }
 

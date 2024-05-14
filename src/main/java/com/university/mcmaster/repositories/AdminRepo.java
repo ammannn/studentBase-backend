@@ -1,6 +1,7 @@
 package com.university.mcmaster.repositories;
 
 import com.university.mcmaster.models.entities.AdminConfig;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 
