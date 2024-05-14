@@ -200,7 +200,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(ApplicationStatus.pending_document_upload == status){
 //          todo: take further action like sending notification
         }else if(ApplicationStatus.review_in_process == status){
-            verifyApplicationForApprovalOrToSubmitApplication(application);
+//            verifyApplicationForApprovalOrToSubmitApplication(application);
 //          todo: take further action like sending notification
         }
         if(false == updateMap.isEmpty()){
