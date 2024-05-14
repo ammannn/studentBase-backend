@@ -90,7 +90,8 @@ public class AdminServiceImpl implements AdminService {
         }
         AdminConfig adminConfig = adminRepo.getAdminConfig();
         if(null == adminConfig){
-            adminRepo.saveAdminConfig(AdminConfig.builder().id(Constants.ADMIN_CONFIG_DOC_ID).build());
+            adminConfig = AdminConfig.builder().id(Constants.ADMIN_CONFIG_DOC_ID).build();
+            adminRepo.saveAdminConfig(adminConfig);
         }
         if(null == adminConfig.getStripeProductIdForListing()){
             log.trace("no stripe product found for listing payment, creating one");
