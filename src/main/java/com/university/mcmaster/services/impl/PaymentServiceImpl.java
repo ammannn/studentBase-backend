@@ -234,6 +234,10 @@ public class PaymentServiceImpl implements PaymentService {
             applicationService.updateApplication(application.getId(),new HashMap<String, Object>(){{
                 put("applicationStatus",ApplicationStatus.payment_done);
             }});
+            rentalUnitService.updateRentalUnit(payment.getRentalUnitId(),new HashMap<String, Object>(){{
+                put("rentalUnitStatus",RentalUnitStatus.rented);
+                put("eligibleForListing",false);
+            }});
             userService.incrementOrDecrementDashboardCounts(rentalUnit.getUserId(),"depositReceived",rentalUnit.getDeposit().getAmount(),"inc");
         }
     }

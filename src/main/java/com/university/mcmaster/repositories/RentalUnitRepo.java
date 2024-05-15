@@ -17,5 +17,5 @@ public interface RentalUnitRepo {
 
     List<RentalUnit> getPaginatedRentalUnitsByVerificationStatusAndDeletedFalseForAdmin(VerificationStatus verificationStatus, int limit, String lastSeen);
 
-    List<RentalUnit> getPaginatedRentalUnitsByRentalUnitStatusAvailableAndDeletedFalseAndSearchFilters(List<String> rentalUnitFeatureList, String country, String state, String city, long maxRent, long minRent, int limit, String lastSeen);
+    List<RentalUnit> getPaginatedRentalUnitsByEligibilityTrueAndDeletedFalseAndSearchFilters(List<String> rentalUnitFeatureList, String country, String state, String city, long maxRent, long minRent, int limit, String lastSeen);
 }

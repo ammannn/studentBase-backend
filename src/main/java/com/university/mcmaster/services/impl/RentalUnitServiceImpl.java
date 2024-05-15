@@ -68,7 +68,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(SearchRentalUnitRequestDto requestDto,CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
         if(null  == requestDto.getCountry() || requestDto.getCountry().trim().isEmpty()) throw new MissingRequiredParamException("country");
-        List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByRentalUnitStatusAvailableAndDeletedFalseAndSearchFilters(
+        List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByEligibilityTrueAndDeletedFalseAndSearchFilters(
                 Utility.getRentalUnitFeatureList(requestDto.getFeatures()),requestDto.getCountry(),requestDto.getState(),requestDto.getCity(),requestDto.getMaxRent(),requestDto.getMinRent(),limit,lastSeen
         );
         List<RentalUnitForStudentForListing> res = rentalUnits.stream().map(r -> {
