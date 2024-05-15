@@ -90,15 +90,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .build();
         applicationRepo.save(application);
         new Thread(() -> {
-            if(false == Arrays.asList(
-                    RentalUnitStage.viewing_booked,
-                    RentalUnitStage.paperwork_in_review,
-                    RentalUnitStage.lease_offered
-            ).contains(rentalUnit.getStage())){
-                rentalUnitService.updateRentalUnit(rentalUnit.getId(),new HashMap<String, Object>(){{
-                    put("stage",RentalUnitStage.viewing_booked);
-                }});
-            }
             rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(rentalUnit.getId(),ApplicationStatus.visit_requested.toString(),1,"inc");
             rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(rentalUnit.getId(),"totalApplications",1,"inc");
         }).start();

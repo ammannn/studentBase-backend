@@ -1,6 +1,9 @@
 package com.university.mcmaster.utils;
 
+import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.RentalUnitElement;
+import com.university.mcmaster.enums.RentalUnitStage;
+import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.dtos.response.*;
 import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.*;
@@ -197,7 +200,7 @@ public class ResponseMapper {
                 .avgRating(Utility.getAverageRating(rentalUnit.getRating()))
                 .likes(likes)
                 .reviews(reviews)
-                .stage(rentalUnit.getStage())
+                .stage(getRentalUnitStage(rentalUnit))
                 .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
                 .rentalUnitId(rentalUnit.getId())
                 .rent(rentalUnit.getRent())
@@ -216,6 +219,28 @@ public class ResponseMapper {
                 .leaseStartDate(rentalUnit.getLeaseStartDate())
                 .description(rentalUnit.getDescription())
                 .build();
+    }
+
+    private RentalUnitStage getRentalUnitStage(RentalUnit rentalUnit) {
+//     deposit_received,lease_signed, lease_offered , paperwork_in_review , viewing_booked , listing_approved
+        if(rentalUnit.getCounts().getOrDefault(ApplicationStatus.payment_done.toString(),0) > 0){
+            return RentalUnitStage.deposit_received;
+        }
+        if(rentalUnit.getCounts().getOrDefault(ApplicationStatus.lease_signed.toString(),0) > 0){
+            return RentalUnitStage.lease_signed;
+        }
+        if(rentalUnit.getCounts().getOrDefault(ApplicationStatus.lease_offered.toString(),0) > 0){
+            return RentalUnitStage.lease_offered;
+        }
+        if(rentalUnit.getCounts().getOrDefault(ApplicationStatus.review_in_process.toString(),0) > 0){
+            return RentalUnitStage.paperwork_in_review;
+        }
+        if(rentalUnit.getCounts().getOrDefault(ApplicationStatus.visit_requested.toString(),0) > 0){
+            return RentalUnitStage.viewing_booked;
+        }
+        if(VerificationStatus.verified == rentalUnit.getVerificationStatus()) return RentalUnitStage.listing_approved;
+        if(VerificationStatus.failed == rentalUnit.getVerificationStatus()) return RentalUnitStage.listing_approval_failed;
+        return RentalUnitStage.listing_approval_in_process;
     }
 
     public MethodResponse< Map<String, HashMap<String, Object>>,Boolean,?> getStudentDocs(User user) {

@@ -25,7 +25,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private Address address;
     private RentalUnitFeatures features;
     private RentalUnitStatus rentalUnitStatus;
-    private RentalUnitStage stage;
+//    private RentalUnitStage stage;
     private long createdOn;
     private long lastUpdatedOn;
     private String userId;
