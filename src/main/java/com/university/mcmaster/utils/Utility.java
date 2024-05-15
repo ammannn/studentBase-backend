@@ -180,7 +180,7 @@ public class Utility {
     }
 
     public static String getPlatformUrl() {
-        return "";
+        return "http://localhost:4200";
     }
 }
 

@@ -22,4 +22,6 @@ public interface UserService {
     ResponseEntity<?> getUserDetails(String requestId, HttpServletRequest request);
 
     ResponseEntity<?> searchUserForApplication(String email, String requestId, HttpServletRequest request);
+
+    void incrementOrDecrementDashboardCounts(String userId, String count, long amount, String operation);
 }

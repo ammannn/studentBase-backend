@@ -5,6 +5,7 @@
         "label": "Unites States",
         "value": "usa"
       },
+      "currency" : "usd",
       "states": [
         {"label": "AL", "value": "Alabama"},
         {"label": "AK", "value": "Alaska"},
@@ -63,6 +64,7 @@
         "label": "Canada",
         "value": "ca"
       },
+      "currency" : "cad",
       "states": [
         {"label": "AB", "value": "Alberta"},
         {"label": "BC", "value": "British Columbia"},
@@ -93,6 +95,7 @@
         "label": "India",
         "value": "in"
       },
+      "currency" : "inr",
       "states": [
         {"label": "AP", "value": "Andhra Pradesh"},
         {"label": "AR", "value": "Arunachal Pradesh"},

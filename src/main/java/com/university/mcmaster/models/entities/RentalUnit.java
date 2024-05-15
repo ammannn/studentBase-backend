@@ -1,5 +1,6 @@
 package com.university.mcmaster.models.entities;
 
+import com.university.mcmaster.enums.PaymentStatus;
 import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
@@ -18,12 +19,13 @@ import java.util.Map;
 public class RentalUnit implements FirebaseCommonProps {
     private static String collection = FirestoreConstants.FS_RENTAL_UNITS;
     private String id;
-    private long rent;
-    private long deposit;
+    private Amount rent;
+    private Amount deposit;
     private boolean deleted;
     private VerificationStatus verificationStatus;
     private Address address;
     private RentalUnitFeatures features;
+//    availability status
     private RentalUnitStatus rentalUnitStatus;
 //    private RentalUnitStage stage;
     private long createdOn;
@@ -42,7 +44,8 @@ public class RentalUnit implements FirebaseCommonProps {
     private String reason;
     private Map<String,Integer> counts;
     private StripeProduct stripeProduct;
-    private boolean eligibleForListing;
+    private boolean eligibleForListing; // payment_status = successfull and verification_status = verified
+    private PaymentStatus paymentStatus;
 
     @Override
     public String getCollection() {

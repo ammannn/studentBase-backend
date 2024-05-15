@@ -1,5 +1,6 @@
 package com.university.mcmaster.services.impl;
 
+import com.google.cloud.firestore.FieldValue;
 import com.google.firebase.auth.UserRecord;
 import com.university.mcmaster.controllers.LogInResponseDto;
 import com.university.mcmaster.enums.UserRole;
@@ -104,6 +105,7 @@ public class UserServiceImpl implements UserService {
             responseDto.setRentalUnitOwner(RentalUnitOwnerLogInResponse.builder()
                     .email(user.getEmail())
                     .userId(user.getId())
+                            .dashboard(user.getDashboard())
                     .phoneNumber(user.getPhoneNumber())
                     .name(user.getName())
                     .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
@@ -129,6 +131,13 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(responseMapper.getStudentForStudent(user))
                 .build());
+    }
+
+    @Override
+    public void incrementOrDecrementDashboardCounts(String userId, String count, long amount, String operation) {
+        userRepo.update(userId,new HashMap<String,Object>(){{
+            put("dashboard."+count, FieldValue.increment("inc".equals(operation) ? amount : -amount));
+        }});
     }
 
     private ResponseEntity<?> updateRentalUnitOwnerUserUnAuth(String userId, UpdateUserRequestDto requestDto, boolean isAdmin, String requestId) {

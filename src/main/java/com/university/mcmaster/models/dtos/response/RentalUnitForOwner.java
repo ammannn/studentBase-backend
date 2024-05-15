@@ -4,6 +4,7 @@ import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.entities.Address;
+import com.university.mcmaster.models.entities.Amount;
 import com.university.mcmaster.models.entities.Contact;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import lombok.*;
@@ -17,8 +18,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class RentalUnitForOwner {
     private String rentalUnitId;
-    private long rent;
-    private long deposit;
+    private Amount rent;
+    private Amount deposit;
     private VerificationStatus verificationStatus;
     private Address address;
     private RentalUnitFeatures features;

@@ -1,6 +1,7 @@
 package com.university.mcmaster.models.dtos.request;
 
 import com.university.mcmaster.models.entities.Address;
+import com.university.mcmaster.models.entities.Amount;
 import com.university.mcmaster.models.entities.Contact;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import lombok.*;
@@ -13,8 +14,8 @@ import lombok.*;
 public class AddUpdateRentalUnitRequestDto {
     private String title;
     private Address address;
-    private long deposit;
-    private long rent;
+    private Amount rent;
+    private Amount deposit;
     private RentalUnitFeatures features;
     private String posterImageId;
     private Contact contact;

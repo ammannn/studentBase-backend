@@ -8,6 +8,7 @@ import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
 import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
 import com.university.mcmaster.models.entities.CustomUserDetails;
+import com.university.mcmaster.models.entities.Dashboard;
 import com.university.mcmaster.models.entities.StudentDocFile;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
@@ -74,6 +75,7 @@ public class AuthServiceImpl implements AuthService {
         rentalUnitOwner = User.builder()
                 .id(userDetails.getId())
                 .email(requestDto.getEmail())
+                .dashboard(Dashboard.builder().build())
                 .phoneNumber(requestDto.getPhoneNumber())
                 .role(roles)
                 .createdOn(Instant.now().toEpochMilli())
@@ -102,6 +104,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(userDetails.getEmail())
                 .name(requestDto.getName())
                 .phoneNumber(requestDto.getPhoneNumber())
+                .dashboard(Dashboard.builder().build())
                 .role(roles)
                 .verificationStatus(VerificationStatus.pending)
                 .createdOn(Instant.now().toEpochMilli())

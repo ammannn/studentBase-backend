@@ -1,10 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.google.firebase.auth.UserRecord;
-import com.university.mcmaster.enums.Currency;
-import com.university.mcmaster.enums.RentalUnitStage;
-import com.university.mcmaster.enums.UserRole;
-import com.university.mcmaster.enums.VerificationStatus;
+import com.university.mcmaster.enums.*;
 import com.university.mcmaster.exceptions.EntityNotFoundException;
 import com.university.mcmaster.exceptions.MissingRequiredParamException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
@@ -59,6 +56,7 @@ public class AdminServiceImpl implements AdminService {
                     user = User.builder()
                             .createdOn(Instant.now().toEpochMilli())
                             .id(record.getUid())
+                            .dashboard(Dashboard.builder().build())
                             .email(email.trim().toLowerCase())
                             .name("mcmaster admin")
                             .verificationStatus(VerificationStatus.verified)
@@ -96,13 +94,17 @@ public class AdminServiceImpl implements AdminService {
                     .build();
             adminRepo.saveAdminConfig(adminConfig);
         }
-        if(null == adminConfig.getStripeProductIdForListing()){
+        if(null == adminConfig.getStripeProductIdForListing()) {
             log.trace("no stripe product found for listing payment, creating one");
-            MethodResponse<StripeProduct,?,?> res = StripePaymentService.createProductAndPrice("landlord_listing_plan","this product represent price required to make a listing live by land lord", Currency.usd,1000);
+            MethodResponse<StripeProduct,?,?> res = StripePaymentService.createProductAndPrice("landlord_listing_plan","this product represent price required to make a listing live by land lord", Currency.cad,100*100);
             if(false == res.isFlag()){
                 log.trace("created stripe product for listing payment");
                 adminRepo.updateAdminConfig(new HashMap<String,Object>(){{
                     put("stripeProductIdForListing",res.getResult_1().getStripeProductId());
+                    put("stripeProductAmountForListing",Amount.builder()
+                            .currency(Currency.cad)
+                            .amount(100)
+                            .build());
                 }});
             }else{
                 log.trace("failed to create stripe product for listing payment");
@@ -142,9 +144,8 @@ public class AdminServiceImpl implements AdminService {
         if(null == rentalUnit) throw new EntityNotFoundException();
         rentalUnitService.updateRentalUnit(rentalUnitId,new HashMap<String, Object>(){{
             put("verificationStatus",verificationStatus);
-            if(VerificationStatus.verified == verificationStatus){
-                put("stage", RentalUnitStage.listing_approved);
-            }
+            if(VerificationStatus.failed == rentalUnit.getVerificationStatus()) put("eligibleForListing",false);
+            else put("eligibleForListing", PaymentStatus.successful == rentalUnit.getPaymentStatus());
             put("reason",reason);
         }});
         return ResponseEntity.ok(ApiResponse.builder()

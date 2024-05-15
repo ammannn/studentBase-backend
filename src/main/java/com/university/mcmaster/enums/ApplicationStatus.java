@@ -8,7 +8,7 @@ public enum ApplicationStatus {
     pending_document_upload,
     review_in_process,
     approved,
-    rejected, lease_offered, lease_signed, payment_done
+    rejected, lease_offered, lease_signed, payment_done,payment_failed
     ;
 
 

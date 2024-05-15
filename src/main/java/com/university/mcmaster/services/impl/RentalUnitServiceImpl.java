@@ -1,10 +1,7 @@
 package com.university.mcmaster.services.impl;
 
 import com.google.cloud.firestore.FieldValue;
-import com.university.mcmaster.enums.ApplicationStatus;
-import com.university.mcmaster.enums.RentalUnitStatus;
-import com.university.mcmaster.enums.UserRole;
-import com.university.mcmaster.enums.VerificationStatus;
+import com.university.mcmaster.enums.*;
 import com.university.mcmaster.exceptions.ActionNotAllowedException;
 import com.university.mcmaster.exceptions.EntityNotFoundException;
 import com.university.mcmaster.exceptions.MissingRequiredParamException;
@@ -98,6 +95,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .address(requestDto.getAddress())
                 .features(requestDto.getFeatures())
                 .contact(requestDto.getContact())
+                .paymentStatus(PaymentStatus.not_started)
                 .createdOn(Instant.now().toEpochMilli())
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .rentalUnitStatus(RentalUnitStatus.available)
@@ -114,6 +112,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                     put("totalApplications",0);
                     put("reviews",0);
                 }})
+                .eligibleForListing(false)
                 .build();
         rentalUnitRepo.save(rentalUnit);
         return ResponseEntity.ok(ApiResponse.builder()
@@ -129,6 +128,16 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(null == requestDto.getFeatures()) missingProps.add("features");
         else validateFeatures(requestDto,missingProps);
         if(null == requestDto.getTitle() || requestDto.getTitle().trim().isEmpty()) missingProps.add("title");
+        if(null == requestDto.getRent()) missingProps.add("rent");
+        else{
+            if(requestDto.getRent().getAmount() <= 0) missingProps.add("rent.amount");
+            if(null == requestDto.getRent().getCurrency()) missingProps.add("rent.currency");
+        }
+        if(null == requestDto.getDeposit()) missingProps.add("deposit");
+        else{
+            if(requestDto.getDeposit().getAmount() <= 0) missingProps.add("deposit.amount");
+            if(null == requestDto.getDeposit().getCurrency()) missingProps.add("deposit.currency");
+        }
         if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
     }
 
@@ -184,13 +193,13 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
             updateMap.put("address",requestDto.getAddress());
         }
-        if(0 != requestDto.getRent() && requestDto.getRent() != rentalUnit.getRent()){
+        if(null != requestDto.getRent() && requestDto.getRent().equals(rentalUnit.getRent())){
             updateMap.put("rent",requestDto.getRent());
         }
         if(0 != requestDto.getLeaseStartDate() && requestDto.getLeaseStartDate() != rentalUnit.getLeaseStartDate()){
             updateMap.put("leaseStartDate",requestDto.getLeaseStartDate());
         }
-        if(0 != requestDto.getDeposit() && requestDto.getDeposit() != rentalUnit.getDeposit()){
+        if(null != requestDto.getDeposit() && requestDto.getDeposit().equals(rentalUnit.getDeposit())){
             updateMap.put("deposit",requestDto.getDeposit());
         }
         if(null != requestDto.getTitle() && false == requestDto.getTitle().trim().isEmpty() && false == requestDto.getTitle().equals(rentalUnit.getTitle())){

@@ -1,6 +1,7 @@
 package com.university.mcmaster.models.dtos.response;
 
 import com.university.mcmaster.enums.UserRole;
+import com.university.mcmaster.models.entities.Dashboard;
 import lombok.*;
 
 @Getter
@@ -19,4 +20,5 @@ public class RentalUnitOwnerLogInResponse{
     private boolean admin;
     private String profileImageUrl;
     private String userId;
+    private Dashboard dashboard;
 }

@@ -8,6 +8,8 @@ import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
+import com.university.mcmaster.models.entities.Application;
+import com.university.mcmaster.models.entities.Dashboard;
 import com.university.mcmaster.models.entities.StudentDocFile;
 import com.university.mcmaster.models.entities.User;
 import com.university.mcmaster.repositories.UserRepo;
@@ -69,7 +71,6 @@ public class MigrationController {
                 .setMaxAgeSeconds(3600)
                 .build();
         bucket.toBuilder().setCors(ImmutableList.of(corsConfiguration)).build().update();
-        System.out.println("done");
         return ResponseEntity.ok("updated cors");
     }
 
@@ -87,9 +88,19 @@ public class MigrationController {
         return ResponseEntity.ok("updated users");
     }
 
+    @GetMapping("/landlord-dashboard")
+    public ResponseEntity<?> updateLandlordDashboard(){
+        List<User> users = userRepo.getAllUsersByRole(UserRole.rental_unit_owner);
+        for (User user : users) {
+            userRepo.update(user.getId(),new HashMap<String, Object>(){{
+                put("dashboard", Dashboard.builder().build());
+            }});
+        }
+        return ResponseEntity.ok("updated user's dashboard");
+    }
+
     @GetMapping("/leas-term-to-string")
     public ResponseEntity<?> leasTermToString(){
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<");
         try {
             for (QueryDocumentSnapshot document : FirestoreClient.getFirestore().collection(FirestoreConstants.FS_RENTAL_UNITS)
                     .get().get().getDocuments()) {
@@ -100,7 +111,6 @@ public class MigrationController {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println("done");
         return ResponseEntity.ok("updated field");
     }
 }

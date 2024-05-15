@@ -1,10 +1,7 @@
 package com.university.mcmaster.models.dtos.response;
 
 import com.university.mcmaster.enums.RentalUnitStatus;
-import com.university.mcmaster.models.entities.Address;
-import com.university.mcmaster.models.entities.Contact;
-import com.university.mcmaster.models.entities.RentalUnitFeatures;
-import com.university.mcmaster.models.entities.VisitingSchedule;
+import com.university.mcmaster.models.entities.*;
 import lombok.*;
 
 import java.util.HashMap;
@@ -22,8 +19,8 @@ public class RentalUnitForStudentForListing {
     private String description;
     private String leaseTerm;
     private long leaseStartDate;
-    private long rent;
-    private long deposit;
+    private Amount rent;
+    private Amount deposit;
     private int likes;
     private int reviews;
     private String review;

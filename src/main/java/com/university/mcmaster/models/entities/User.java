@@ -41,6 +41,8 @@ public class User implements FirebaseCommonProps {
 
         private StudentDocFile profileImage;
 
+        private Dashboard dashboard;
+
         @Override
         public String getCollection() {
                 return collection;
