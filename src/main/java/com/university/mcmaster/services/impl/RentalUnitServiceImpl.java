@@ -44,7 +44,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     private ResponseMapper responseMapper;
 
     @Override
-    public ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<?>> getRentalUnits(boolean fetchLiveOnly,int limit,String lastSeen,String requestId, HttpServletRequest request) {
         
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails) throw new UnAuthenticatedUserException();
@@ -52,13 +52,13 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 //            return getRentalUnitsForStudent(userDetails,limit,lastSeen,requestId);
 //        }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)) {
-            return getRentalUnitsForRentalUnitOwner(userDetails,limit,lastSeen,requestId);
+            return getRentalUnitsForRentalUnitOwner(fetchLiveOnly,userDetails,limit,lastSeen,requestId);
         }
         throw new ActionNotAllowedException("get_rental_units","user is not registered either as rental unit owner",401);
     }
 
-    private ResponseEntity<ApiResponse<?>> getRentalUnitsForRentalUnitOwner(CustomUserDetails userDetails, int limit, String lastSeen, String requestId) {
-        List<RentalUnit> rentalUnits = rentalUnitRepo.getRentalUnitByUserIdAndDeletedFalse(userDetails.getId(),limit,lastSeen);
+    private ResponseEntity<ApiResponse<?>> getRentalUnitsForRentalUnitOwner(boolean fetchLiveOnly,CustomUserDetails userDetails, int limit, String lastSeen, String requestId) {
+        List<RentalUnit> rentalUnits = rentalUnitRepo.getRentalUnitByUserIdAndDeletedFalseAndEligibilityForListing(userDetails.getId(),fetchLiveOnly,limit,lastSeen);
         List<RentalUnitForOwner> res = responseMapper.getRentalUnitsForOwner(rentalUnits);
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)

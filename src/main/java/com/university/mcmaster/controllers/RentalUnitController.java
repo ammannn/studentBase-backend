@@ -22,9 +22,10 @@ public class RentalUnitController {
             @RequestHeader("requestId") String requestId,
             @RequestParam(name = "limit",required = false,defaultValue = "10") int limit,
             @RequestParam(name = "lastSeen",required = false) String lastSeen,
+            @RequestParam(name = "fetchLiveOnly",required = false) boolean fetchLiveOnly,
             HttpServletRequest request
     ){
-        return rentalUnitService.getRentalUnits(limit,lastSeen,requestId,request);
+        return rentalUnitService.getRentalUnits(fetchLiveOnly,limit,lastSeen,requestId,request);
     }
 
     @PostMapping("/rental-units/search")

@@ -74,4 +74,16 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
         query = addLastSeen(query,FirestoreConstants.FS_RENTAL_UNITS,lastSeen);
         return processQueryForEntityList(query,RentalUnit.class);
     }
+
+    @Override
+    public List<RentalUnit> getRentalUnitByUserIdAndDeletedFalseAndEligibilityForListing(String userId, boolean fetchLiveOnly, int limit, String lastSeen) {
+        Query query = FirestoreClient.getFirestore()
+                .collection(FirestoreConstants.FS_RENTAL_UNITS)
+                .whereEqualTo("deleted",false);
+        if(fetchLiveOnly) query = query.whereEqualTo("eligibleForListing",fetchLiveOnly);
+        query = query.orderBy("lastUpdatedOn", Query.Direction.DESCENDING);
+        if(limit > 0 ) query = query.limit(limit);
+        query = addLastSeen(query,FirestoreConstants.FS_RENTAL_UNITS,lastSeen);
+        return processQueryForEntityList(query,RentalUnit.class);
+    }
 }

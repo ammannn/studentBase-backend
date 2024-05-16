@@ -218,6 +218,7 @@ public class ResponseMapper {
                 .counts(rentalUnit.getCounts())
                 .leaseStartDate(rentalUnit.getLeaseStartDate())
                 .description(rentalUnit.getDescription())
+                .live(rentalUnit.isEligibleForListing())
                 .build();
     }
 

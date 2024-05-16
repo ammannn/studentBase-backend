@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public interface RentalUnitService {
-    ResponseEntity<ApiResponse<?>> getRentalUnits(int limit,String lastSeen,String requestId, HttpServletRequest request);
+    ResponseEntity<ApiResponse<?>> getRentalUnits(boolean fetchLiveOnly,int limit,String lastSeen,String requestId, HttpServletRequest request);
     ResponseEntity<ApiResponse<?>> addRentalUnit(AddUpdateRentalUnitRequestDto requestDto, String requestId, HttpServletRequest request);
     ResponseEntity<ApiResponse<?>> updateRentalUnits(String rentalUnitId,AddUpdateRentalUnitRequestDto requestDto,String requestId, HttpServletRequest request);
     ResponseEntity<ApiResponse<?>> deleteRentalUnits(String rentalUnitId, String requestId, HttpServletRequest request);

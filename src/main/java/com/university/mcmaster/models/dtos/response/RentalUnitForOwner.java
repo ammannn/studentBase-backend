@@ -37,4 +37,5 @@ public class RentalUnitForOwner {
     private int likes;
     private int reviews;
     private RentalUnitStage stage;
+    private boolean live;
 }
