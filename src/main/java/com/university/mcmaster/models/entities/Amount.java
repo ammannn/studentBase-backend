@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Amount {
     private long amount;
     private Currency currency;
+    private String currencySymbol;
 
     @Override
     public boolean equals(Object o) {

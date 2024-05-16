@@ -86,6 +86,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(null == userDetails || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         validateCreateRentalPropertyRequest(requestDto);
         List<String> featureSearchList = Utility.getRentalUnitFeatureList(requestDto.getFeatures());
+        requestDto.getRent().setCurrencySymbol(requestDto.getRent().getCurrency().getSymbol());
+        requestDto.getDeposit().setCurrencySymbol(requestDto.getDeposit().getCurrency().getSymbol());
         RentalUnit rentalUnit = RentalUnit.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(userDetails.getId())
@@ -194,12 +196,14 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             updateMap.put("address",requestDto.getAddress());
         }
         if(null != requestDto.getRent() && requestDto.getRent().equals(rentalUnit.getRent())){
+            requestDto.getRent().setCurrencySymbol(requestDto.getRent().getCurrencySymbol());
             updateMap.put("rent",requestDto.getRent());
         }
         if(0 != requestDto.getLeaseStartDate() && requestDto.getLeaseStartDate() != rentalUnit.getLeaseStartDate()){
             updateMap.put("leaseStartDate",requestDto.getLeaseStartDate());
         }
         if(null != requestDto.getDeposit() && requestDto.getDeposit().equals(rentalUnit.getDeposit())){
+            requestDto.getDeposit().setCurrencySymbol(requestDto.getDeposit().getCurrencySymbol());
             updateMap.put("deposit",requestDto.getDeposit());
         }
         if(null != requestDto.getTitle() && false == requestDto.getTitle().trim().isEmpty() && false == requestDto.getTitle().equals(rentalUnit.getTitle())){
