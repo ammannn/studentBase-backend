@@ -5,7 +5,10 @@
         "label": "Unites States",
         "value": "usa"
       },
-      "currency" : "usd",
+      "currency" : {
+        "label": "usd",
+        "sign": "$"
+      },
       "states": [
         {"value": "AL", "label": "Alabama"},
         {"value": "AK", "label": "Alaska"},
@@ -64,7 +67,10 @@
         "label": "Canada",
         "value": "ca"
       },
-      "currency" : "cad",
+      "currency" : {
+        "label" : "cad",
+        "sign": "ca$"
+      },
       "states": [
         {"value": "AB", "label": "Alberta"},
         {"value": "BC", "label": "British Columbia"},
@@ -83,7 +89,10 @@
         "label": "United Kingdom",
         "value": "uk"
       },
-      "currency" : "gbp",
+      "currency" : {
+        "label" : "gbp",
+        "sign" : "£"
+      },
       "states": [
         {"value": "ENG", "label": "England"},
         {"value": "SCO", "label": "Scotland"},
@@ -96,7 +105,10 @@
         "label": "India",
         "value": "in"
       },
-      "currency" : "inr",
+      "currency" : {
+        "label" : "inr",
+        "sign" : "₹"
+      },
       "states": [
         {"value": "AP", "label": "Andhra Pradesh"},
         {"value": "AR", "label": "Arunachal Pradesh"},
