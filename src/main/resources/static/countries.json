@@ -83,6 +83,7 @@
         "label": "United Kingdom",
         "value": "uk"
       },
+      "currency" : "gbp",
       "states": [
         {"label": "ENG", "value": "England"},
         {"label": "SCO", "value": "Scotland"},
