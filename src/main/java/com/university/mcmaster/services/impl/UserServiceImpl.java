@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
                     .phoneNumber(user.getPhoneNumber())
                     .verificationStatus(user.getVerificationStatus())
                     .name(user.getName())
+                            .nationality(user.getNationality())
                     .userRole(UserRole.student)
                             .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
                     .admin(user.getRole().contains(UserRole.admin))
