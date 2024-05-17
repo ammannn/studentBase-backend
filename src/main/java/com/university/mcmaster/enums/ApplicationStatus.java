@@ -22,8 +22,8 @@ public enum ApplicationStatus {
         if(pending_document_upload == oldStatus) {
             return Arrays.asList(review_in_process).contains(newStatus);
         }
-        if(review_in_process == oldStatus) {
-            return Arrays.asList(approved,rejected).contains(newStatus);
+        if(review_in_process == oldStatus || approved == oldStatus || rejected == oldStatus) {
+            return Arrays.asList(approved,rejected,lease_offered).contains(newStatus);
         }
         return false;
     }
