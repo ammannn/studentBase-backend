@@ -12,6 +12,25 @@ public class EnvironmentVariables {
     public static final String ADMIN_EMAIL = getEnvString("ADMIN_EMAIL",false);
     public static final String STRIPE_API_KEY = getEnvString("STRIPE_API_KEY",false);
     public static final String STRIPE_ENDPOINT_SECRET = getEnvString("STRIPE_ENDPOINT_SECRET",false);
+    public static final String PLATFORM_URL = getPlatformUrl();
+
+    private static String getPlatformUrl(){
+        String url = getEnvUrlString("PLATFORM_URL");
+        if (null == url) return "http://localhost:4200";
+        return url;
+    }
+    private static String getEnvUrlString(String env) {
+        String url = getEnvString(env,false);
+        if(null != url) url = removeTrailingSlash(url);
+        return url;
+    }
+
+    public static String removeTrailingSlash(String url) {
+        if (url != null && url.endsWith("/")) {
+            return url.substring(0, url.length() - 1);
+        }
+        return url;
+    }
 
     public static boolean isProd() {
         return ENVIRONMENT != null && ENVIRONMENT.contains("prod");

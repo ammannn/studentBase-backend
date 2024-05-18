@@ -69,7 +69,9 @@ public class StripePaymentService {
         return res;
     }
 
-    public static MethodResponse<String,String,String> createCheckoutSession(String userEmail, String stripeProductId, Map<String,String> metaData){
+    public static MethodResponse<String,String,String> createCheckoutSession(
+            String userEmail, String stripeProductId, Map<String,String> metaData, String successUrl,String failUrl
+    ){
         MethodResponse<String,String,String> response = new MethodResponse<>();
         try {
             Product product = Product.retrieve(stripeProductId,requestOptions);
@@ -89,8 +91,8 @@ public class StripePaymentService {
 //                                add(SessionCreateParams.PaymentMethodType.PAYNOW);
 //                                add(SessionCreateParams.PaymentMethodType.PAYPAL);
                             }})
-                            .setSuccessUrl(Utility.getPlatformUrl() + "/payment-success")
-                            .setCancelUrl(Utility.getPlatformUrl() + "/payment-canceled")
+                            .setSuccessUrl(successUrl)
+                            .setCancelUrl(failUrl)
                             .addLineItem(
                                     SessionCreateParams.LineItem.builder()
                                             .setQuantity(1L)

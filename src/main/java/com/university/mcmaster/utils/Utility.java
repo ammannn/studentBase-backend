@@ -1,10 +1,13 @@
 package com.university.mcmaster.utils;
 
 import com.university.mcmaster.enums.DayPeriod;
+import com.university.mcmaster.enums.PaymentRequestType;
+import com.university.mcmaster.enums.PaymentStatus;
 import com.university.mcmaster.models.entities.CustomUserDetails;
 import com.university.mcmaster.models.entities.RentalUnitFeatures;
 import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -179,8 +182,24 @@ public class Utility {
         return featureSearchList;
     }
 
-    public static String getPlatformUrl() {
-        return "http://localhost:4200";
+
+    public static String getPaymentPageBaseUrl() {
+        return EnvironmentVariables.PLATFORM_URL + "/payment-result";
     }
+
+    public static String createPaymentPageUrl(
+            String paymentRequestType,
+            String entityType,
+            String paymentStatus,
+            String entityId
+    ) {
+        return UriComponentsBuilder.fromUriString(Utility.getPaymentPageBaseUrl())
+                .queryParam("type", paymentRequestType)
+                .queryParam("entityType",entityType)
+                .queryParam("status", paymentStatus)
+                .queryParam("entityId",entityId)
+                .build().toUri().toString();
+    }
+
 }
 

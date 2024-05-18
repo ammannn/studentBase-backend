@@ -33,6 +33,7 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -75,7 +76,8 @@ public class PaymentServiceImpl implements PaymentService {
                     userDetails.getEmail(),adminConfig.getStripeProductIdForListing(),new HashMap<String, String>(){{
                         put("paymentId",paymentId);
                         put("requestId",requestId);
-                    }}
+                    }}, Utility.createPaymentPageUrl(PaymentRequestType.payment_for_listing.toString(),"rental_unit",PaymentStatus.successful.toString(),rentalUnit.getId()),
+                    Utility.createPaymentPageUrl(PaymentRequestType.payment_for_listing.toString(),"rental_unit",PaymentStatus.failed.toString(),rentalUnit.getId())
             );
             if(false == checkoutSessionRes.isFlag()) {
                 log.trace("creating payment object with intentId : " + checkoutSessionRes.getResult_3());
@@ -123,7 +125,8 @@ public class PaymentServiceImpl implements PaymentService {
                     userDetails.getEmail(),rentalUnit.getStripeProduct().getStripeProductId(),new HashMap<String, String>(){{
                         put("paymentId",paymentId);
                         put("requestId",requestId);
-                    }}
+                    }}, Utility.createPaymentPageUrl(PaymentRequestType.payment_for_deposit.toString(),"application",PaymentStatus.successful.toString(),application.getId()),
+                    Utility.createPaymentPageUrl(PaymentRequestType.payment_for_deposit.toString(),"application",PaymentStatus.failed.toString(),application.getId())
             );
             Payment payment = Payment.builder()
                     .rentalUnitId(rentalUnit.getId())
