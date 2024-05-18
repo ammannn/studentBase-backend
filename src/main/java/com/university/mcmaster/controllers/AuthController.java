@@ -1,5 +1,6 @@
 package com.university.mcmaster.controllers;
 
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationRequestDto;
 import com.university.mcmaster.models.dtos.request.LogInRequestDto;
 import com.university.mcmaster.models.dtos.request.RegisterRequestDto;
 import com.university.mcmaster.services.AuthService;
@@ -38,5 +39,13 @@ public class AuthController {
             HttpServletRequest request
     ){
         return authService.adminLogin(requestDto,requestId,request);
+    }
+
+    @PostMapping("/sheerId/verify")
+    public ResponseEntity<?> verifyOnSheerId(
+            @RequestBody SheerIdVerificationRequestDto requestDto,
+            @RequestHeader("requestId") String requestId
+    ){
+        return authService.verifyOnSheerId(requestDto,requestId);
     }
 }

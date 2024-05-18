@@ -1,6 +1,7 @@
 package com.university.mcmaster.services;
 
 import com.university.mcmaster.enums.UserRole;
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationRequestDto;
 import com.university.mcmaster.models.dtos.request.LogInRequestDto;
 import com.university.mcmaster.models.dtos.request.RegisterRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,4 +15,5 @@ public interface AuthService {
     ResponseEntity<?> registerUser(RegisterRequestDto requestDto, String requestId);
     ResponseEntity<?> login(LogInRequestDto requestDto,String requestId);
     ResponseEntity<?> adminLogin(LogInRequestDto requestDto, String requestId, HttpServletRequest request);
+    ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto, String requestId);
 }

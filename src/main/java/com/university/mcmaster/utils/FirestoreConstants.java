@@ -9,4 +9,5 @@ public class FirestoreConstants {
     public static final String FS_PAYMENTS = "payments";
     public static final String FS_USERS = "users";
     public static final String FS_RENTAL_UNITS = "rental-units";
+    public static final String VERIFICATION_DATA = "verification-data";
 }

@@ -79,6 +79,7 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
     public List<RentalUnit> getRentalUnitByUserIdAndDeletedFalseAndEligibilityForListing(String userId, boolean fetchLiveOnly, int limit, String lastSeen) {
         Query query = FirestoreClient.getFirestore()
                 .collection(FirestoreConstants.FS_RENTAL_UNITS)
+                .whereEqualTo("userId",userId)
                 .whereEqualTo("deleted",false);
         if(fetchLiveOnly) query = query.whereEqualTo("eligibleForListing",fetchLiveOnly);
         query = query.orderBy("lastUpdatedOn", Query.Direction.DESCENDING);

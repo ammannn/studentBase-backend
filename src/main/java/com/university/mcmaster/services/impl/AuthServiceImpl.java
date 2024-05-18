@@ -5,23 +5,21 @@ import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.exceptions.*;
+import com.university.mcmaster.integrations.sheerid.SheerIdService;
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationRequestDto;
+import com.university.mcmaster.integrations.sheerid.model.SheetIdVerificationResponseDto;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
 import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
-import com.university.mcmaster.models.entities.CustomUserDetails;
-import com.university.mcmaster.models.entities.Dashboard;
-import com.university.mcmaster.models.entities.StudentDocFile;
-import com.university.mcmaster.models.entities.User;
+import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.LogInRequestDto;
 import com.university.mcmaster.models.dtos.request.RegisterRequestDto;
+import com.university.mcmaster.repositories.VerificationRepo;
 import com.university.mcmaster.services.AuthService;
 import com.university.mcmaster.services.UserService;
 import com.university.mcmaster.utils.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -36,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
     private final ResponseMapper responseMapper;
+    private final VerificationRepo verificationRepo;
 
     @Override
     public ResponseEntity<?> registerUser(RegisterRequestDto requestDto, String requestId) {
@@ -92,6 +91,8 @@ public class AuthServiceImpl implements AuthService {
         if(null == userDetails) throw new InvalidParamValueException("authToken");
         User student = userService.findUserById(userDetails.getId());
         if(null != student) throw new ActionNotAllowedException("register_user","user already exists",400);
+        SheerIdVerificationData verificationData = verificationRepo.getLatestSheerIdVerificationByEmailAndStatusSuccess(userDetails.getEmail());
+        if(null == verificationData) throw new ActionNotAllowedException("register_user","user is not verified on sheer id");
         List<UserRole> roles = new ArrayList<>(){{
             add(UserRole.student);
             add(UserRole.user);
@@ -102,9 +103,11 @@ public class AuthServiceImpl implements AuthService {
         student = User.builder()
                 .id(userDetails.getId())
                 .email(userDetails.getEmail())
-                .name(requestDto.getName())
-                .phoneNumber(requestDto.getPhoneNumber())
+                .name(verificationData.getVerificationRequest().getFirstName() + " " + verificationData.getVerificationRequest().getLastName())
+                .phoneNumber(verificationData.getVerificationRequest().getPhoneNumber())
                 .dashboard(Dashboard.builder().build())
+                .dob(verificationData.getVerificationRequest().getBirthDate())
+                .organization(verificationData.getVerificationRequest().getOrganization().getName())
                 .role(roles)
                 .verificationStatus(VerificationStatus.pending)
                 .createdOn(Instant.now().toEpochMilli())
@@ -141,7 +144,9 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.findUserById(userDetails.getId());
         LogInResponseDto responseDto = new LogInResponseDto();
         if(null == user) {
-            return ResponseEntity.ok(ApiResponse.builder().build());
+            return ResponseEntity.ok(ApiResponse.builder()
+                            .data(responseDto)
+                    .build());
         }
         responseDto.setRegistered(true);
         if(user.getRole().contains(UserRole.student)){
@@ -182,5 +187,19 @@ public class AuthServiceImpl implements AuthService {
                             put("admin",true);
                         }})
                 .build());
+    }
+
+    @Override
+    public ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto, String requestId) {
+        SheetIdVerificationResponseDto responseDto = SheerIdService.verifyStudent(requestDto);
+        SheerIdVerificationData verificationData = SheerIdVerificationData.builder()
+                .verificationResponse(responseDto)
+                .createdOn(Instant.now().toEpochMilli())
+                .email(requestDto.getEmail())
+                .id(UUID.randomUUID().toString())
+                .status(false == "success".equalsIgnoreCase(responseDto.getCurrentStep()) ? "failed" : "success")
+                .build();
+        boolean res = verificationRepo.save(verificationData);
+        return ResponseEntity.ok(responseDto);
     }
 }

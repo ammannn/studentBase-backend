@@ -13,6 +13,7 @@ public class EnvironmentVariables {
     public static final String STRIPE_API_KEY = getEnvString("STRIPE_API_KEY",false);
     public static final String STRIPE_ENDPOINT_SECRET = getEnvString("STRIPE_ENDPOINT_SECRET",false);
     public static final String PLATFORM_URL = getPlatformUrl();
+    public static final String SHEERID_PROGRAM_ID = getEnvString("SHEERID_PROGRAM_ID",false);
 
     private static String getPlatformUrl(){
         String url = getEnvUrlString("PLATFORM_URL");

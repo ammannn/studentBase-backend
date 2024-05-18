@@ -61,6 +61,8 @@ public class SecurityConfig {
         return new String[]{
                 "/api/register",
                 "/api/login/**",
+                "/api/sheerId/verify/**",
+                "/api/sheerId/orgs/**",
                 "/api/version",
                 "/api/health",
                 "/swagger-ui/**",
