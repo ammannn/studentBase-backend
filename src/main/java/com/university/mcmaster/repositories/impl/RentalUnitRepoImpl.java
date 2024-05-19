@@ -9,6 +9,9 @@ import com.university.mcmaster.models.entities.RentalUnit;
 import com.university.mcmaster.repositories.RentalUnitRepo;
 import com.university.mcmaster.repositories.utils.FirebaseUtils;
 import com.university.mcmaster.utils.FirestoreConstants;
+import com.university.mcmaster.utils.Utility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +20,8 @@ import java.util.concurrent.ExecutionException;
 
 @Repository
 public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements RentalUnitRepo {
+
+    private static final Logger log = LoggerFactory.getLogger(RentalUnitRepoImpl.class);
 
     @Override
     public List<RentalUnit> getRentalUnitByUserIdAndDeletedFalse(String userId, int limit, String lastSeen) {
@@ -59,6 +64,16 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
     public List<RentalUnit> getPaginatedRentalUnitsByEligibilityTrueAndDeletedFalseAndSearchFilters(
             List<String> rentalUnitFeatureList, String country, String state, String city, long maxRent, long minRent, int limit, String lastSeen
     ) {
+        System.out.println("==================== query params ============================");
+        System.out.println("features : " + rentalUnitFeatureList);
+        System.out.println("country : " + country);
+        System.out.println("state : " + state);
+        System.out.println("city : " + city);
+        System.out.println("maxRent : " + maxRent);
+        System.out.println("minRent : " + minRent);
+        System.out.println("limit : " + limit);
+        System.out.println("lastSeen : " + lastSeen);
+        System.out.println("================================================");
         Query query = FirestoreClient.getFirestore()
                 .collection(FirestoreConstants.FS_RENTAL_UNITS)
                 .whereEqualTo("eligibleForListing",true)
