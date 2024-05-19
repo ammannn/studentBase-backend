@@ -195,6 +195,7 @@ public class AuthServiceImpl implements AuthService {
         SheetIdVerificationResponseDto responseDto = SheerIdService.verifyStudent(requestDto);
         SheerIdVerificationData verificationData = SheerIdVerificationData.builder()
                 .verificationResponse(responseDto)
+                .verificationRequest(requestDto)
                 .createdOn(Instant.now().toEpochMilli())
                 .email(requestDto.getEmail())
                 .id(UUID.randomUUID().toString())
