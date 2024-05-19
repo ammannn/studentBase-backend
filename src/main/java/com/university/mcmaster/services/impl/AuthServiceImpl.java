@@ -153,6 +153,7 @@ public class AuthServiceImpl implements AuthService {
             Map<String,HashMap<String,Object>> docs = responseMapper.getStudentDocs(user).getResult_1();
             responseDto.setStudent(StudentLogInResponse.builder()
                     .email(user.getEmail())
+                    .nationality(user.getNationality())
                     .phoneNumber(user.getPhoneNumber())
                     .verificationStatus(user.getVerificationStatus())
                     .name(user.getName())
