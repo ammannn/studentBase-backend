@@ -31,4 +31,5 @@ public class StudentLogInResponse {
     private String reason;
     private String profileImageUrl;
     private String userId;
+    private String organization;
 }
