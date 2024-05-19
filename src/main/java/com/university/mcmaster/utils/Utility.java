@@ -155,12 +155,12 @@ public class Utility {
         if(null == features) return featureSearchList;
         if(null != features.getFeaturesAmenities()){
             for (Map.Entry<String, Boolean> eminityEntry : features.getFeaturesAmenities().entrySet()) {
-                if(eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey());
+                if((null != eminityEntry.getKey() && false == eminityEntry.getKey().trim().isEmpty()) && eminityEntry.getValue()) featureSearchList.add(eminityEntry.getKey().trim().toLowerCase());
             }
         }
         if(null != features.getFeaturesUtilities()){
             for (Map.Entry<String, Boolean> utilityEntry : features.getFeaturesUtilities().entrySet()) {
-                if(utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey());
+                if((null != utilityEntry.getKey() && false == utilityEntry.getKey().trim().isEmpty()) && utilityEntry.getValue()) featureSearchList.add(utilityEntry.getKey().trim().toLowerCase());
             }
         }
         StringBuilder builder = new StringBuilder();
