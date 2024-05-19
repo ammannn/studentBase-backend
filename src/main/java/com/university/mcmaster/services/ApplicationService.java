@@ -4,6 +4,7 @@ import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
+import com.university.mcmaster.models.dtos.request.UpdateApplicationRequestDto;
 import com.university.mcmaster.models.entities.Application;
 import com.university.mcmaster.models.entities.Time;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,11 @@ public interface ApplicationService {
                 ApplicationStatus.approved,
                 ApplicationStatus.visit_requested,
                 ApplicationStatus.view_property,
-                ApplicationStatus.review_in_process
+                ApplicationStatus.review_in_process,
+                ApplicationStatus.lease_offered,
+                ApplicationStatus.lease_signed,
+                ApplicationStatus.payment_done,
+                ApplicationStatus.payment_failed
         );
     }
 
@@ -33,7 +38,11 @@ public interface ApplicationService {
                 ApplicationStatus.pending_document_upload,
                 ApplicationStatus.review_in_process,
                 ApplicationStatus.approved,
-                ApplicationStatus.rejected
+                ApplicationStatus.rejected,
+                ApplicationStatus.lease_offered,
+                ApplicationStatus.lease_signed,
+                ApplicationStatus.payment_done,
+                ApplicationStatus.payment_failed
         );
     }
 
@@ -58,7 +67,7 @@ public interface ApplicationService {
 
     ResponseEntity<?> createApplication(CreateApplicationRequestDto requestDto, String requestId, HttpServletRequest request);
 
-    ResponseEntity<?> updateApplication(String applicationId, String requestId, HttpServletRequest request);
+    ResponseEntity<?> updateApplication(String applicationId, UpdateApplicationRequestDto requestDto, String requestId, HttpServletRequest request);
 
     ResponseEntity<?> deleteApplication(String applicationId, String requestId, HttpServletRequest request);
 

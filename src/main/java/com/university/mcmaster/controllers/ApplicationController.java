@@ -3,6 +3,7 @@ package com.university.mcmaster.controllers;
 import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
+import com.university.mcmaster.models.dtos.request.UpdateApplicationRequestDto;
 import com.university.mcmaster.services.ApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -87,6 +88,16 @@ public class ApplicationController {
             HttpServletRequest request
     ){
         return applicationService.updateApplicationStatus(applicationId,status,requestId,request);
+    }
+
+    @PutMapping("/application/{applicationId}")
+    public ResponseEntity<?> updateApplication(
+            @RequestBody UpdateApplicationRequestDto requestDto,
+            @PathVariable("applicationId") String applicationId,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return applicationService.updateApplication(applicationId,requestDto,requestId,request);
     }
 
     @PutMapping("/applications/status/v2")

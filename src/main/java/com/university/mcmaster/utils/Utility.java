@@ -201,5 +201,8 @@ public class Utility {
                 .build().toUri().toString();
     }
 
+    public static boolean isStrValuePresent(String val) {
+        return null != val && false == val.trim().isEmpty();
+    }
 }
 

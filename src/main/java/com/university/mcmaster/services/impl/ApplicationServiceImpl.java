@@ -7,6 +7,7 @@ import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.models.dtos.request.AddOrRemoveStudentsForApplicationRequestDto;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.CreateApplicationRequestDto;
+import com.university.mcmaster.models.dtos.request.UpdateApplicationRequestDto;
 import com.university.mcmaster.models.dtos.response.ApplicationForRentalUnitOwner;
 import com.university.mcmaster.models.dtos.response.ApplicationForStudent;
 import com.university.mcmaster.models.entities.*;
@@ -72,7 +73,15 @@ public class ApplicationServiceImpl implements ApplicationService {
         verifyCreateApplicationRequest(requestDto);
         RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(requestDto.getRentalUnitId());
         if(null == rentalUnit) throw new EntityNotFoundException();
-        Application application = Application.builder()
+        Application application = applicationRepo.getApplicationByStudentIdAndRentalUnitIdAndDeletedFalse(userDetails.getId(),rentalUnit.getId());
+        if(null != application && Arrays.asList(
+                ApplicationStatus.visit_requested,
+                ApplicationStatus.view_property,
+                ApplicationStatus.pending_document_upload,
+                ApplicationStatus.review_in_process,
+                ApplicationStatus.lease_offered
+        ).contains(application.getApplicationStatus())) throw new ActionNotAllowedException("create_application","an application already exists");
+        application = Application.builder()
                 .id(UUID.randomUUID().toString())
                 .rentalUnitId(requestDto.getRentalUnitId())
                 .students(Arrays.asList(userDetails.getId()))
@@ -108,7 +117,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ResponseEntity<?> updateApplication(String applicationId, String requestId, HttpServletRequest request) {
+    public ResponseEntity<?> updateApplication(String applicationId, UpdateApplicationRequestDto requestDto, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.student)) throw new UnAuthenticatedUserException();
         if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
@@ -117,10 +126,37 @@ public class ApplicationServiceImpl implements ApplicationService {
 //        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
 //            return updateApplicationForRentalUnitOwner(userDetails,application,requestId);
 //        }
-//        if(userDetails.getRoles().contains(UserRole.student)){
-//            return updateApplicationForStudent(userDetails,application,requestId);
-//        }
+        if(userDetails.getRoles().contains(UserRole.student)){
+            return updateApplicationForStudent(userDetails,application,requestDto,requestId);
+        }
         throw new ActionNotAllowedException("update_application_status","invalid user role",401);
+    }
+
+    private ResponseEntity<?> updateApplicationForStudent(CustomUserDetails userDetails, Application application, UpdateApplicationRequestDto requestDto, String requestId) {
+        Map<String,Object> updateMap = new HashMap<>();
+        if(null == application.getVisitingSchedule()){
+            if(Utility.isStrValuePresent(requestDto.getTimeZone())){
+                updateMap.put("visitingSchedule.timeZone",requestDto.getTimeZone());
+            }
+            if(Utility.isStrValuePresent(requestDto.getDate())){
+                if(false == Utility.verifyDateFormat(requestDto.getDate())) throw new InvalidParamValueException("date");
+                updateMap.put("visitingSchedule.date",requestDto.getDate());
+            }
+        }else{
+            if(Utility.isStrValuePresent(requestDto.getTimeZone()) && false == requestDto.getTimeZone().equalsIgnoreCase(application.getVisitingSchedule().getTimeZone())){
+                updateMap.put("visitingSchedule.timeZone",requestDto.getTimeZone());
+            }
+            if(Utility.isStrValuePresent(requestDto.getDate()) && false == requestDto.getDate().equalsIgnoreCase(application.getVisitingSchedule().getDate())){
+                if(false == Utility.verifyDateFormat(requestDto.getDate())) throw new InvalidParamValueException("date");
+                updateMap.put("visitingSchedule.date",requestDto.getDate());
+            }
+        }
+        if(false == updateMap.isEmpty()){
+            applicationRepo.update(application.getId(),updateMap);
+        }
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .msg("updated application")
+                .build());
     }
 
     @Override
