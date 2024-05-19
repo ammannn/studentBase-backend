@@ -1,5 +1,6 @@
 package com.university.mcmaster.integrations.sheerid.model;
 
+import com.university.mcmaster.models.dtos.request.SheerIdUniversityRequestDto;
 import lombok.*;
 
 @Getter
@@ -12,6 +13,6 @@ public class SheerIdVerificationRequestDto {
     private String birthDate;
     private String firstName;
     private String lastName;
-    private SheerIdUniversity organization;
+    private SheerIdUniversityRequestDto organization;
     private String phoneNumber;
 }
