@@ -44,8 +44,9 @@ public class AuthController {
     @PostMapping("/sheerId/verify")
     public ResponseEntity<?> verifyOnSheerId(
             @RequestBody SheerIdVerificationRequestDto requestDto,
+            @RequestParam("country") String country,
             @RequestHeader("requestId") String requestId
     ){
-        return authService.verifyOnSheerId(requestDto,requestId);
+        return authService.verifyOnSheerId(requestDto,country,requestId);
     }
 }

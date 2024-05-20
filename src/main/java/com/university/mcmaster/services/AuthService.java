@@ -15,5 +15,5 @@ public interface AuthService {
     ResponseEntity<?> registerUser(RegisterRequestDto requestDto, String requestId);
     ResponseEntity<?> login(LogInRequestDto requestDto,String requestId);
     ResponseEntity<?> adminLogin(LogInRequestDto requestDto, String requestId, HttpServletRequest request);
-    ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto, String requestId);
+    ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto,String country, String requestId);
 }

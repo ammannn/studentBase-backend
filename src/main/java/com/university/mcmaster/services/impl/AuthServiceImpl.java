@@ -103,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
         }
         student = User.builder()
                 .id(userDetails.getId())
-                .nationality(requestDto.getNationality())
+                .nationality(verificationData.getCountry())
                 .email(userDetails.getEmail())
                 .name(verificationData.getVerificationRequest().getFirstName() + " " + verificationData.getVerificationRequest().getLastName())
                 .phoneNumber(verificationData.getVerificationRequest().getPhoneNumber())
@@ -204,13 +204,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto, String requestId) {
+    public ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto,String country, String requestId) {
         SheetIdVerificationResponseDto responseDto = SheerIdService.verifyStudent(requestDto);
         SheerIdVerificationData verificationData = SheerIdVerificationData.builder()
                 .verificationResponse(responseDto)
                 .verificationRequest(requestDto)
                 .createdOn(Instant.now().toEpochMilli())
                 .email(requestDto.getEmail())
+                .country(country)
                 .id(UUID.randomUUID().toString())
                 .status(false == "success".equalsIgnoreCase(responseDto.getCurrentStep()) ? "failed" : "success")
                 .build();

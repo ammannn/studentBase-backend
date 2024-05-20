@@ -19,6 +19,7 @@ public class SheerIdVerificationData implements FirebaseCommonProps {
     private SheetIdVerificationResponseDto verificationResponse;
     private SheerIdVerificationRequestDto verificationRequest;
     private long createdOn;
+    private String country;
 
     @Override
     public String getCollection() {
