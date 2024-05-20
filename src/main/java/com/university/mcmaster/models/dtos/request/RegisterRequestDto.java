@@ -19,4 +19,5 @@ public class RegisterRequestDto {
     private String name;
     private String role;
     private String authToken;
+    private String nationality;
 }

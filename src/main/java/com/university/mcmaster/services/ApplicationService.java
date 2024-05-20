@@ -71,7 +71,7 @@ public interface ApplicationService {
 
     ResponseEntity<?> deleteApplication(String applicationId, String requestId, HttpServletRequest request);
 
-    ResponseEntity<?> updateApplicationStatus(String applicationId, ApplicationStatus status, String requestId, HttpServletRequest request);
+    ResponseEntity<?> updateApplicationStatus(String applicationId, ApplicationStatus status,String fileId, String requestId, HttpServletRequest request);
 
     boolean isVistingTimeSlotAvailble(String ownerId,LocalDate date, String timeZone, Time start, Time end);
 
@@ -83,5 +83,5 @@ public interface ApplicationService {
 
     void updateApplication(String applicationId, Map<String, Object> updateMap);
 
-    ResponseEntity<?> updateApplicationStatusV2(List<String> applicationIds, ApplicationStatus status, String requestId, HttpServletRequest request);
+    ResponseEntity<?> updateApplicationStatusV2(List<String> applicationIds, ApplicationStatus status,String fileId, String requestId, HttpServletRequest request);
 }

@@ -67,14 +67,10 @@ public class FileServiceImpl implements FileService {
 
         }else if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
-            if(FilePurpose.offered_lease_doc == requestDto.getFilePurpose()){
-                if(null == applicationId || applicationId.isEmpty()) throw new MissingRequiredParamException("applicationId");
-                Application application = applicationService.getApplicationById(applicationId);
-                if(null == application) throw new EntityNotFoundException();
-                if((ApplicationStatus.approved != application.getApplicationStatus() && ApplicationStatus.review_in_process != application.getApplicationStatus()) || ApplicationStatus.lease_offered == application.getApplicationStatus()) throw new ActionNotAllowedException("offer_lease","lease cannot be offered if application is not approved");
-                rentalUnitId = application.getRentalUnitId();
+            applicationId = null;
+            if(FilePurpose.lease_doc == requestDto.getFilePurpose()){
+                rentalUnitId = null;
             }else{
-                applicationId = null;
                 if(null == rentalUnitId || rentalUnitId.isEmpty()) throw new MissingRequiredParamException("rentalUnitId");
                 if(null == requestDto.getRentalUnitElement()) requestDto.setRentalUnitElement(RentalUnitElement.others);
                 if(FilePurpose.rental_unit_image == requestDto.getFilePurpose()) {
@@ -135,18 +131,6 @@ public class FileServiceImpl implements FileService {
             }});
         }else if(FilePurpose.rental_unit_poster_image == file.getPurpose() && null != file.getRentalUnitId()){
             rentalUnitService.updateRentalUnitPosterImage(file.getRentalUnitId(),file.getId(),file.getFilePath());
-        }else if(FilePurpose.offered_lease_doc == file.getPurpose()){
-            applicationService.updateApplication(file.getApplicationId(),new HashMap<String,Object>(){{
-                put("applicationStatus",ApplicationStatus.lease_offered);
-                put("offeredLeaseDetails", OfferedLeaseDetails.builder()
-                        .offeredOn(Instant.now().toEpochMilli())
-                        .fileId(fileId)
-                        .filePath(file.getFilePath())
-                        .build());
-            }});
-            rentalUnitService.updateRentalUnit(file.getRentalUnitId(),new HashMap<String, Object>(){{
-                put("RentalUnitStage", RentalUnitStage.lease_offered);
-            }});
         }else if(FilePurpose.signed_lease_doc == file.getPurpose()){
             applicationService.updateApplication(file.getApplicationId(),new HashMap<String,Object>(){{
                 put("applicationStatus",ApplicationStatus.lease_signed);
@@ -210,5 +194,23 @@ public class FileServiceImpl implements FileService {
             put("deleted",true);
         }});
         return getUploadUrlForFileUnAuth(userDetails,requestDto,requestId,rentalUnitId,applicationId);
+    }
+
+    @Override
+    public ResponseEntity<?> getLeaseDocuments(String requestId, HttpServletRequest request) {
+        CustomUserDetails userDetails = Utility.customUserDetails(request);
+        if(null == userDetails) throw new UnAuthenticatedUserException();
+        List<File> files = fileRepo.getFilesByUserIdAndPurposeLeaseDocAndDeletedFalse(userDetails.getId());
+        List<Map<String,Object>> res = new ArrayList<>();
+        for (File file : files) {
+            res.add(new HashMap<String,Object>(){{
+                put("fileId",file.getId());
+                put("url",GcpStorageUtil.createGetUrl(file.getFilePath()));
+                put("fileName",file.getFileName());
+            }});
+        }
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(res)
+                .build());
     }
 }

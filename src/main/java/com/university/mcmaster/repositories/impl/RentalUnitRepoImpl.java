@@ -62,7 +62,7 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
 
     @Override
     public List<RentalUnit> getPaginatedRentalUnitsByEligibilityTrueAndDeletedFalseAndSearchFilters(
-            List<String> rentalUnitFeatureList, String country, String state, String city, long maxRent, long minRent, int limit, String lastSeen
+            List<String> rentalUnitFeatureList, String country, String state, String city, long maxRent, long minRent,String orgId, int limit, String lastSeen
     ) {
         System.out.println("==================== query params ============================");
         System.out.println("features : " + rentalUnitFeatureList);
@@ -73,11 +73,13 @@ public class RentalUnitRepoImpl extends FirebaseUtils<RentalUnit> implements Ren
         System.out.println("minRent : " + minRent);
         System.out.println("limit : " + limit);
         System.out.println("lastSeen : " + lastSeen);
+        System.out.println("orgId : " + orgId);
         System.out.println("================================================");
         Query query = FirestoreClient.getFirestore()
                 .collection(FirestoreConstants.FS_RENTAL_UNITS)
                 .whereEqualTo("eligibleForListing",true)
                 .whereEqualTo("deleted",false)
+                .whereEqualTo("sheerIdOrganizationId",orgId)
                 .whereEqualTo("address.country.value",country)
                 .orderBy("lastUpdatedOn", Query.Direction.DESCENDING);
         if(null != state && false == state.trim().isEmpty()) query = query.whereEqualTo("address.state.value",state.trim());

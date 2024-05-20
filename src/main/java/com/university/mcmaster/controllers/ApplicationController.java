@@ -84,10 +84,11 @@ public class ApplicationController {
     public ResponseEntity<?> updateApplicationStatus(
             @PathVariable("applicationId") String applicationId,
             @RequestParam("status") ApplicationStatus status,
+            @RequestParam(value = "fileId",required = false)String fileId,
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
-        return applicationService.updateApplicationStatus(applicationId,status,requestId,request);
+        return applicationService.updateApplicationStatus(applicationId,status,fileId,requestId,request);
     }
 
     @PutMapping("/application/{applicationId}")
@@ -103,11 +104,12 @@ public class ApplicationController {
     @PutMapping("/applications/status/v2")
     public ResponseEntity<?> updateApplicationStatusV2(
             @RequestBody List<String> applicationIds,
+            @RequestParam(value = "fileId",required = false)String fileId,
             @RequestParam("status") ApplicationStatus status,
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request
     ){
-        return applicationService.updateApplicationStatusV2(applicationIds,status,requestId,request);
+        return applicationService.updateApplicationStatusV2(applicationIds,status,fileId,requestId,request);
     }
 
     @DeleteMapping("/applications/{applicationId}")

@@ -32,7 +32,8 @@ public class User implements FirebaseCommonProps {
         private String additionalEmail;
         private String occupation;
         private String preferredModOfContact;
-        private String organization;
+        private String organizationName;
+        private String sheerIdOrganizationId;
 
         private String reason;
 

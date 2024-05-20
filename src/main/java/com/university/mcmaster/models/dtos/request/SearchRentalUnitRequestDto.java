@@ -15,4 +15,5 @@ public class SearchRentalUnitRequestDto {
     private String city;
     private long minRent;
     private long maxRent;
+    private String organizationId;
 }

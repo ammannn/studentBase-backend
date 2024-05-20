@@ -74,6 +74,7 @@ public class AuthServiceImpl implements AuthService {
         rentalUnitOwner = User.builder()
                 .id(userDetails.getId())
                 .email(requestDto.getEmail())
+                .nationality(requestDto.getNationality())
                 .dashboard(Dashboard.builder().build())
                 .phoneNumber(requestDto.getPhoneNumber())
                 .role(roles)
@@ -92,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
         User student = userService.findUserById(userDetails.getId());
         if(null != student) throw new ActionNotAllowedException("register_user","user already exists",400);
         SheerIdVerificationData verificationData = verificationRepo.getLatestSheerIdVerificationByEmailAndStatusSuccess(userDetails.getEmail());
-        if(null == verificationData) throw new ActionNotAllowedException("register_user","user is not verified on sheer id");
+        if(null == verificationData || null == verificationData.getVerificationRequest() || null == verificationData.getVerificationRequest().getOrganization()) throw new ActionNotAllowedException("register_user","user is not verified on sheer id");
         List<UserRole> roles = new ArrayList<>(){{
             add(UserRole.student);
             add(UserRole.user);
@@ -102,12 +103,14 @@ public class AuthServiceImpl implements AuthService {
         }
         student = User.builder()
                 .id(userDetails.getId())
+                .nationality(requestDto.getNationality())
                 .email(userDetails.getEmail())
                 .name(verificationData.getVerificationRequest().getFirstName() + " " + verificationData.getVerificationRequest().getLastName())
                 .phoneNumber(verificationData.getVerificationRequest().getPhoneNumber())
                 .dashboard(Dashboard.builder().build())
                 .dob(verificationData.getVerificationRequest().getBirthDate())
-                .organization(verificationData.getVerificationRequest().getOrganization().getName())
+                .organizationName(verificationData.getVerificationRequest().getOrganization().getName())
+                .sheerIdOrganizationId(verificationData.getVerificationRequest().getOrganization().getIdExtended())
                 .role(roles)
                 .verificationStatus(VerificationStatus.pending)
                 .createdOn(Instant.now().toEpochMilli())

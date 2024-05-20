@@ -68,8 +68,9 @@ public class RentalUnitServiceImpl implements RentalUnitService {
 
     private ResponseEntity<ApiResponse<?>> getRentalUnitsForStudent(SearchRentalUnitRequestDto requestDto,CustomUserDetails userDetails,int limit,String lastSeen, String requestId) {
         if(null  == requestDto.getCountry() || requestDto.getCountry().trim().isEmpty()) throw new MissingRequiredParamException("country");
+        if(false == Utility.isStrValuePresent(requestDto.getOrganizationId())) throw new MissingRequiredParamException("organizationId");
         List<RentalUnit> rentalUnits = rentalUnitRepo.getPaginatedRentalUnitsByEligibilityTrueAndDeletedFalseAndSearchFilters(
-                Utility.getRentalUnitFeatureList(requestDto.getFeatures()),requestDto.getCountry(),requestDto.getState(),requestDto.getCity(),requestDto.getMaxRent(),requestDto.getMinRent(),limit,lastSeen
+                Utility.getRentalUnitFeatureList(requestDto.getFeatures()),requestDto.getCountry(),requestDto.getState(),requestDto.getCity(),requestDto.getMaxRent(),requestDto.getMinRent(),requestDto.getOrganizationId(),limit,lastSeen
         );
         List<RentalUnitForStudentForListing> res = rentalUnits.stream().map(r -> {
             return responseMapper.mapRentalUnitToResponseDtoForStudent(userDetails.getId(),r);
@@ -91,6 +92,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         RentalUnit rentalUnit = RentalUnit.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(userDetails.getId())
+                .organizationName(requestDto.getOrganization().getName())
+                .sheerIdOrganizationId(requestDto.getOrganization().getIdExtended())
                 .rent(requestDto.getRent())
                 .deposit(requestDto.getDeposit())
                 .verificationStatus(VerificationStatus.pending)
@@ -139,6 +142,11 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         else{
             if(requestDto.getDeposit().getAmount() <= 0) missingProps.add("deposit.amount");
             if(null == requestDto.getDeposit().getCurrency()) missingProps.add("deposit.currency");
+        }
+        if(null == requestDto.getOrganization()) missingProps.add("organization");
+        else{
+            if(false == Utility.isStrValuePresent(requestDto.getOrganization().getName())) missingProps.add("organization.name");
+            if(false == Utility.isStrValuePresent(requestDto.getOrganization().getIdExtended())) missingProps.add("organization.id");
         }
         if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
     }

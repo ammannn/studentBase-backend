@@ -13,12 +13,15 @@ import com.university.mcmaster.models.dtos.response.ApplicationForStudent;
 import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.ApplicationRepo;
 import com.university.mcmaster.services.ApplicationService;
+import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.services.UserService;
 import com.university.mcmaster.utils.ResponseMapper;
 import com.university.mcmaster.utils.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +37,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ResponseMapper responseMapper;
     private final UserService userService;
     private final RentalUnitService rentalUnitService;
+    @Lazy
+    @Autowired
+    private final FileService fileService;
 
     @Override
     public ResponseEntity<?> getApplications(ApplicationStatus status,String rentalUnitId,String lastSeen,int limit,String requestId, HttpServletRequest request) {
@@ -165,7 +171,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ResponseEntity<?> updateApplicationStatus(String applicationId, ApplicationStatus status, String requestId, HttpServletRequest request) {
+    public ResponseEntity<?> updateApplicationStatus(String applicationId, ApplicationStatus status, String fileId,String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
         if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
@@ -178,12 +184,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             return updateApplicationStatusForStudent(userDetails.getId(),application,status,requestId);
         }
         if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
-            return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,requestId);
+            return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
         }
         throw new UnAuthenticatedUserException();
     }
 
-    private ResponseEntity<?> updateApplicationStatusForRentalUnitOwner(String userId, Application application, ApplicationStatus status, String requestId) {
+    private ResponseEntity<?> updateApplicationStatusForRentalUnitOwner(String userId, Application application, ApplicationStatus status, String fileId,String requestId) {
         if(false == ApplicationService.getAllowedRentalUnitStatusForOwner().contains(status)) throw new InvalidParamValueException("status",ApplicationService.getAllowedRentalUnitStatusForOwner().toString());
         Map<String,Object> updateMap = new HashMap<>();
         updateMap.put("applicationStatus",status);
@@ -194,6 +200,21 @@ public class ApplicationServiceImpl implements ApplicationService {
 //          todo: take further action like sending notification
         }else if(ApplicationStatus.rejected == status){
 //          todo: take further action like sending notification with some reason
+        }else if(ApplicationStatus.lease_offered == status){
+            if(null == fileId || fileId.trim().isEmpty()) throw new MissingRequiredParamException("fileId");
+            File file = fileService.getFileById(fileId);
+            if(null == file || false == file.isUploadedOnGcp()) throw new EntityNotFoundException();
+            applicationRepo.update(file.getApplicationId(),new HashMap<String,Object>(){{
+                put("applicationStatus",ApplicationStatus.lease_offered);
+                put("offeredLeaseDetails", OfferedLeaseDetails.builder()
+                        .offeredOn(Instant.now().toEpochMilli())
+                        .fileId(fileId)
+                        .filePath(file.getFilePath())
+                        .build());
+            }});
+            rentalUnitService.updateRentalUnit(file.getRentalUnitId(),new HashMap<String, Object>(){{
+                put("RentalUnitStage", RentalUnitStage.lease_offered);
+            }});
         }
         if(false == updateMap.isEmpty()){
             updateMap.put("lastUpdatedOn",Instant.now().toEpochMilli());
@@ -319,7 +340,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ResponseEntity<?> updateApplicationStatusV2(List<String> applicationIds, ApplicationStatus status, String requestId, HttpServletRequest request) {
+    public ResponseEntity<?> updateApplicationStatusV2(List<String> applicationIds, ApplicationStatus status,String fileId, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
         if(null == status) throw new MissingRequiredParamException();
@@ -337,7 +358,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 return updateApplicationStatusForStudent(userDetails.getId(),application,status,requestId);
             }
             if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
-                return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,requestId);
+                return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
             }
         }
         throw new UnAuthenticatedUserException();

@@ -16,7 +16,7 @@ public enum FilePurpose {
     student_id(true,true),
     national_id(true,true),
     user_profile_image(true,true),
-    offered_lease_doc(true,true),
+    lease_doc(true,true),
     signed_lease_doc(true,true);
     private FilePurpose(boolean deleteOld,boolean profileFile){
         this.deleteOld = deleteOld;
@@ -36,7 +36,7 @@ public enum FilePurpose {
                 rental_unit_image,
                 rental_unit_poster_image,
                 user_profile_image,
-                offered_lease_doc
+                lease_doc
         );
     }
 

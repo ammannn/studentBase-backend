@@ -46,6 +46,8 @@ public class RentalUnit implements FirebaseCommonProps {
     private StripeProduct stripeProduct;
     private boolean eligibleForListing; // payment_status = successfull and verification_status = verified
     private PaymentStatus paymentStatus;
+    private String organizationName;
+    private String sheerIdOrganizationId;
 
     @Override
     public String getCollection() {

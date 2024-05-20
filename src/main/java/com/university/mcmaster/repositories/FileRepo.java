@@ -20,4 +20,6 @@ public interface FileRepo {
     List<File> getFilesByRentalUnitIdAndRentalUnitElementDeletedFalseAndUploadedOnGcpTrue(String rentalUnitId, RentalUnitElement element);
 
     List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
+
+    List<File> getFilesByUserIdAndPurposeLeaseDocAndDeletedFalse(String userId);
 }

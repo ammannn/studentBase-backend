@@ -1,5 +1,6 @@
 package com.university.mcmaster.models.dtos.request;
 
+import com.university.mcmaster.integrations.sheerid.model.SheerIdUniversity;
 import com.university.mcmaster.models.entities.Address;
 import com.university.mcmaster.models.entities.Amount;
 import com.university.mcmaster.models.entities.Contact;
@@ -22,4 +23,5 @@ public class AddUpdateRentalUnitRequestDto {
     private String description;
     private String leaseTerm;
     private long leaseStartDate;
+    private SheerIdUniversity organization;
 }

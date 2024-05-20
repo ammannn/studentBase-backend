@@ -16,4 +16,5 @@ public interface FileService {
     File getFileById(String posterImageId);
     List<File> getFilesByRentalUnitIdAndUploadedOnGcpTrueAndDeletedFalse(String id);
     ResponseEntity<?> replaceFile(String fileId, GetUploadUrlForFileRequestDto requestDto, String requestId, HttpServletRequest request);
+    ResponseEntity<?> getLeaseDocuments(String requestId, HttpServletRequest request);
 }

@@ -51,4 +51,12 @@ public class FileController {
     ){
         return fileService.replaceFile(fileId,requestDto,requestId,request);
     }
+
+    @GetMapping("/lease-docs")
+    public ResponseEntity<?> getLeaseDocuments(
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+    ){
+        return fileService.getLeaseDocuments(requestId,request);
+    }
 }

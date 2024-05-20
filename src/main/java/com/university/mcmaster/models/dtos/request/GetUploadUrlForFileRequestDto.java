@@ -5,6 +5,8 @@ import com.university.mcmaster.enums.FileType;
 import com.university.mcmaster.enums.RentalUnitElement;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
