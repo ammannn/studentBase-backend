@@ -153,16 +153,26 @@ public class AuthServiceImpl implements AuthService {
         }
         responseDto.setRegistered(true);
         if(user.getRole().contains(UserRole.student)){
-            Map<String,HashMap<String,Object>> docs = responseMapper.getStudentDocs(user).getResult_1();
             responseDto.setStudent(StudentLogInResponse.builder()
                     .email(user.getEmail())
-                    .nationality(user.getNationality())
+                    .userId(user.getId())
+                    .organizationName(user.getOrganizationName())
+                    .organizationId(user.getSheerIdOrganizationId())
                     .phoneNumber(user.getPhoneNumber())
                     .verificationStatus(user.getVerificationStatus())
                     .name(user.getName())
+                    .nationality(user.getNationality())
                     .userRole(UserRole.student)
+                    .profileImageUrl((null != user.getProfileImage() && null != user.getProfileImage().getPath() && false == user.getProfileImage().getPath().trim().isEmpty()) ? GcpStorageUtil.createGetUrl(user.getProfileImage().getPath()).toString() : "")
                     .admin(user.getRole().contains(UserRole.admin))
-                    .documents(docs)
+                    .documents(responseMapper.getStudentDocs(user).getResult_1())
+                    .verifiedOn(user.getVerifiedOn())
+                    .dob(user.getDob())
+                    .nationality(user.getNationality())
+                    .emergencyContact(user.getEmergencyContact())
+                    .additionalEmail(user.getAdditionalEmail())
+                    .addresses(user.getAddresses())
+                    .reason(user.getReason())
                     .build());
         }else if(user.getRole().contains(UserRole.rental_unit_owner)){
             responseDto.setRentalUnitOwner(RentalUnitOwnerLogInResponse.builder()
