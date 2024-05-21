@@ -279,6 +279,12 @@ public class ResponseMapper {
     public ApplicationForStudent getApplicationForStudent(Application application, String userId, Map<String, StudentForStudent> userMap,
                                                           Map<String, RentalUnitForStudentForListing> rentalUnitMap) {
 
+        return getApplicationForStudent(application,userId,userMap,rentalUnitMap,true);
+    }
+
+    public ApplicationForStudent getApplicationForStudent(Application application, String userId,
+                                                          Map<String, StudentForStudent> userMap,
+                                                          Map<String, RentalUnitForStudentForListing> rentalUnitMap,boolean setRentalUnit) {
         if(null != application.getOfferedLeaseDetails()){
             if(null != application.getOfferedLeaseDetails().getFilePath()){
                 log.trace("setting offered lease doc for application : " + application.getId());
@@ -308,7 +314,7 @@ public class ResponseMapper {
         }
         return ApplicationForStudent.builder()
                 .applicationId(application.getId())
-                .rentalUnit(getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap))
+                .rentalUnit(setRentalUnit ? getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap) : null)
                 .applicationStatus(application.getApplicationStatus())
                 .lastUpdatedOn(application.getLastUpdatedOn())
                 .createdOn(application.getCreatedOn())
@@ -318,21 +324,6 @@ public class ResponseMapper {
                 .visitingSchedule(application.getVisitingSchedule())
                 .offeredLeaseDetails(application.getOfferedLeaseDetails())
                 .signedLeaseDetails(application.getSignedLeaseDetails())
-                .build();
-    }
-
-    public ApplicationForStudent getApplicationForStudent(Application application, String userId,
-                                                          Map<String, StudentForStudent> userMap,
-                                                          Map<String, RentalUnitForStudentForListing> rentalUnitMap,boolean setRentalUnit) {
-        return ApplicationForStudent.builder()
-                .applicationId(application.getId())
-                .rentalUnit(setRentalUnit ? getRentalUnitByIdForStudent(userId, application.getRentalUnitId(), rentalUnitMap) : null)
-                .applicationStatus(application.getApplicationStatus())
-                .lastUpdatedOn(application.getLastUpdatedOn())
-                .createdOn(application.getCreatedOn())
-                .students(application.getStudents().stream().map(s -> getStudentByIdForStudent(s, userMap)).collect(Collectors.toList()))
-                .createdBy(getStudentByIdForStudent(application.getCreatedBy(), userMap))
-                .visitingSchedule(application.getVisitingSchedule())
                 .build();
     }
 
