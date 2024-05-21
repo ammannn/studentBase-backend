@@ -204,7 +204,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             if(null == fileId || fileId.trim().isEmpty()) throw new MissingRequiredParamException("fileId");
             File file = fileService.getFileById(fileId);
             if(null == file || false == file.isUploadedOnGcp()) throw new EntityNotFoundException();
-            applicationRepo.update(file.getApplicationId(),new HashMap<String,Object>(){{
+            applicationRepo.update(application.getId(),new HashMap<String,Object>(){{
                 put("applicationStatus",ApplicationStatus.lease_offered);
                 put("offeredLeaseDetails", OfferedLeaseDetails.builder()
                         .offeredOn(Instant.now().toEpochMilli())
@@ -212,7 +212,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                         .filePath(file.getFilePath())
                         .build());
             }});
-            rentalUnitService.updateRentalUnit(file.getRentalUnitId(),new HashMap<String, Object>(){{
+            rentalUnitService.updateRentalUnit(application.getRentalUnitId(),new HashMap<String, Object>(){{
                 put("RentalUnitStage", RentalUnitStage.lease_offered);
             }});
         }
