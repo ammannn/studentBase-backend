@@ -10,6 +10,8 @@ import com.university.mcmaster.repositories.*;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.impl.LikeAndRatingServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Component
 public class ResponseMapper {
 
+    private static final Logger log = LoggerFactory.getLogger(ResponseMapper.class);
     @Autowired
     @Lazy
     private FileService fileService;
@@ -278,13 +281,23 @@ public class ResponseMapper {
 
         if(null != application.getOfferedLeaseDetails()){
             if(null != application.getOfferedLeaseDetails().getFilePath()){
+                log.trace("setting offered lease doc for application : " + application.getId());
                 application.getOfferedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getOfferedLeaseDetails().getFilePath()).toString());
+            }else{
+                log.trace("no lease doc path found for application : " + application.getId());
             }
+        }else{
+            log.trace("no lease doc found for application : " + application.getId());
         }
         if(null != application.getSignedLeaseDetails()){
             if(null != application.getSignedLeaseDetails().getFilePath()){
+                log.trace("setting signed lease doc for application : " + application.getId());
                 application.getSignedLeaseDetails().setFilePath(GcpStorageUtil.createGetUrl(application.getSignedLeaseDetails().getFilePath()).toString());
+            }else{
+                log.trace("no signed lease doc path found for application : " + application.getId());
             }
+        }else{
+            log.trace("no signed lease doc found for application : " + application.getId());
         }
         List<StudentForStudent> students = new ArrayList<>();
         boolean documentationCompleted = true;
