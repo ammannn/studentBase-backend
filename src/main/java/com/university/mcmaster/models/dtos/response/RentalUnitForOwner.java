@@ -38,4 +38,6 @@ public class RentalUnitForOwner {
     private int reviews;
     private RentalUnitStage stage;
     private boolean live;
+    private String organizationName;
+    private String sheerIdOrganizationId;
 }

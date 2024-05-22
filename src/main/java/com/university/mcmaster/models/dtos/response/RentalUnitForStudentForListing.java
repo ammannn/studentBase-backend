@@ -35,4 +35,5 @@ public class RentalUnitForStudentForListing {
     private Map<String,List<HashMap<String,Object>>> images;
     private VisitingScheduleOfRentalUnitOwner visitingSchedule;
     private ApplicationForStudent application;
+    private String organizationName;
 }
