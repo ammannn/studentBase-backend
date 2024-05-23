@@ -64,7 +64,6 @@ public class FileServiceImpl implements FileService {
                 rentalUnitId = null;
             }
             requestDto.setRentalUnitElement(null);
-
         }else if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
             if(false == FilePurpose.isValidFilePurpose(UserRole.rental_unit_owner,requestDto.getFilePurpose())) throw new InvalidParamValueException("filePurpose",FilePurpose.validForStudent().toString());
             applicationId = null;
@@ -122,7 +121,7 @@ public class FileServiceImpl implements FileService {
                         .name(file.getFileName())
                         .build());
             }});
-        } else if(file.getPurpose().isProfileFile()) {
+        } else if(file.getPurpose().isStudentProfileFile()) {
             userService.updateUser(userDetails.getId(),new HashMap<String,Object>(){{
                 put("documentPaths."+file.getPurpose().toString(), StudentDocFile.builder()
                         .path(file.getFilePath())

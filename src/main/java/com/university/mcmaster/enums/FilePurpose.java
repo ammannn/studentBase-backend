@@ -15,15 +15,15 @@ public enum FilePurpose {
     parents_bank_statement(true,true),
     student_id(true,true),
     national_id(true,true),
-    user_profile_image(true,true),
-    lease_doc(true,true),
-    signed_lease_doc(true,true);
-    private FilePurpose(boolean deleteOld,boolean profileFile){
+    user_profile_image(true,false),
+    lease_doc(true,false),
+    signed_lease_doc(true,false);
+    private FilePurpose(boolean deleteOld,boolean studentProfileFile){
         this.deleteOld = deleteOld;
-        this.profileFile = profileFile;
+        this.studentProfileFile = studentProfileFile;
     }
     private boolean deleteOld;
-    private boolean profileFile;
+    private boolean studentProfileFile;
 
     public static boolean isValidFilePurpose(UserRole role,FilePurpose purpose){
         if(UserRole.student == role) return validForStudent().contains(purpose);
