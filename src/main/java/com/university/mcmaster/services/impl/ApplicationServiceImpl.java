@@ -1,5 +1,6 @@
 package com.university.mcmaster.services.impl;
 
+import com.google.cloud.firestore.FieldValue;
 import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.UserRole;
@@ -180,11 +181,28 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == application) throw new EntityNotFoundException();
         if(status == application.getApplicationStatus()) throw new ActionNotAllowedException("update_application_status","old and requested status are same");
         if(false == ApplicationStatus.isValidTransition(application.getApplicationStatus(),status)) throw new ActionNotAllowedException("update_application_status","invalid status update request");
-        if(userDetails.getRoles().contains(UserRole.student)){
+        if(userDetails.getRoles().contains(UserRole.student)) {
             return updateApplicationStatusForStudent(userDetails.getId(),application,status,requestId);
         }
-        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
-            return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
+        if(userDetails.getRoles().contains(UserRole.rental_unit_owner)) {
+            int reqBeds = 0;
+            RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(application.getRentalUnitId());
+            if(ApplicationStatus.lease_offered == status) {
+                reqBeds = application.getStudents().size();
+                if(reqBeds > rentalUnit.getRemainingBeds()) throw new ActionNotAllowedException();
+            }
+            ResponseEntity<?> res = updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
+            if(res.getStatusCode().is2xxSuccessful()) {
+                if(ApplicationStatus.lease_offered == status) {
+                    if(reqBeds > 0){
+                        int temp = reqBeds;
+                        rentalUnitService.updateRentalUnit(application.getRentalUnitId(),new HashMap<String, Object>(){{
+                            put("remainingBeds", FieldValue.increment(-1 * (rentalUnit.getRemainingBeds() - temp)));
+                        }});
+                    }
+                }
+            }
+            return res;
         }
         throw new UnAuthenticatedUserException();
     }
@@ -212,9 +230,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                         .filePath(file.getFilePath())
                         .build());
             }});
-            rentalUnitService.updateRentalUnit(application.getRentalUnitId(),new HashMap<String, Object>(){{
-                put("RentalUnitStage", RentalUnitStage.lease_offered);
-            }});
         }
         if(false == updateMap.isEmpty()){
             updateMap.put("lastUpdatedOn",Instant.now().toEpochMilli());
@@ -223,16 +238,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                 new Thread(()->{
                     rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),status.toString(),1,"inc");
                     rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"dec");
-//                RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(application.getRentalUnitId());
-//                if(false == Arrays.asList(
-//                        RentalUnitStage.viewing_booked,
-//                        RentalUnitStage.paperwork_in_review,
-//                        RentalUnitStage.lease_offered
-//                ).contains(rentalUnit.getStage())){
-//                    rentalUnitService.updateRentalUnit(rentalUnit.getId(),new HashMap<String, Object>(){{
-//                        put("stage",RentalUnitStage.viewing_booked);
-//                    }});
-//                }
                 }).start();
             }
         }
@@ -245,9 +250,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(false == ApplicationService.getAllowedRentalUnitStatusForStudentToTakeAction().contains(status)) throw new InvalidParamValueException("status",ApplicationService.getAllowedRentalUnitStatusForOwner().toString());
         Map<String,Object> updateMap = new HashMap<>();
         updateMap.put("applicationStatus",status);
-        if(ApplicationStatus.pending_document_upload == status){
+        if(ApplicationStatus.pending_document_upload == status) {
 //          todo: take further action like sending notification
-        }else if(ApplicationStatus.review_in_process == status){
+        }else if(ApplicationStatus.review_in_process == status) {
 //            verifyApplicationForApprovalOrToSubmitApplication(application);
 //          todo: take further action like sending notification
         }
@@ -295,6 +300,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == application) throw new EntityNotFoundException();
         if(ApplicationStatus.pending_document_upload != application.getApplicationStatus()) throw new ActionNotAllowedException("add_remove_students_from_application","new students can be added only when the application is in status 'pending_document_upload'",400);
         if(false == userDetails.getId().equals(application.getCreatedBy())) throw new ActionNotAllowedException("add_remove_students_from_application","only students, who created application can add or remove students from application",400);
+        RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(application.getRentalUnitId());
         Set<String> filtredList = new HashSet<>();
         for (String studentId : requestDto.getStudents()) {
             User user = userService.findUserById(studentId);
@@ -302,6 +308,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             filtredList.add(studentId);
         }
         filtredList.add(userDetails.getId());
+        if(rentalUnit.getRemainingBeds() - filtredList.size() <= 0) throw new ActionNotAllowedException("add_remove_students_from_application","no more beds remaining in rental unit, remaining beds are : " + rentalUnit.getRemainingBeds(),400);
         applicationRepo.update(application.getId(),new HashMap<String, Object>(){{
             put("students",new ArrayList<String>(filtredList));
         }});
@@ -345,6 +352,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == userDetails || null == userDetails.getRoles()) throw new UnAuthenticatedUserException();
         if(null == status) throw new MissingRequiredParamException();
         List<Application> applications = new ArrayList<>();
+        Set<String> rentalUnitsIds = new HashSet<>();
+        String rentalUnitId = null;
         for (String applicationId : applicationIds) {
             if(null == applicationId || applicationId.trim().isEmpty()) throw new MissingRequiredParamException();
             Application application = applicationRepo.findById(applicationId);
@@ -352,15 +361,34 @@ public class ApplicationServiceImpl implements ApplicationService {
             if(status == application.getApplicationStatus()) throw new ActionNotAllowedException("update_application_status","old and requested status are same");
             if(false == ApplicationStatus.isValidTransition(application.getApplicationStatus(),status)) throw new ActionNotAllowedException("update_application_status","invalid status update request");
             applications.add(application);
-        }
-        for (Application application : applications) {
-            if(userDetails.getRoles().contains(UserRole.student)){
-                return updateApplicationStatusForStudent(userDetails.getId(),application,status,requestId);
+            rentalUnitsIds.add(application.getRentalUnitId());
+            rentalUnitId = application.getRentalUnitId();
+        }if(userDetails.getRoles().contains(UserRole.student)){
+            for (Application application : applications) {
+                updateApplicationStatusForStudent(userDetails.getId(),application,status,requestId);
             }
-            if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
-                return updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
+        }else if(userDetails.getRoles().contains(UserRole.rental_unit_owner)){
+            if(rentalUnitsIds.size() > 1) throw new ActionNotAllowedException();
+            RentalUnit rentalUnit = rentalUnitService.findRentalUnitById(rentalUnitId);
+            int reqBeds = 0;
+            if(ApplicationStatus.lease_offered == status) {
+                for (Application application : applications) {
+                    reqBeds += application.getStudents().size();
+                }
+                if(reqBeds > rentalUnit.getRemainingBeds()) throw new ActionNotAllowedException();
             }
+            for (Application application : applications) {
+                updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
+            }
+            if(reqBeds > 0){
+                int temp = reqBeds;
+                rentalUnitService.updateRentalUnit(rentalUnitId,new HashMap<String, Object>(){{
+                    put("remainingBeds", FieldValue.increment(-1 * (rentalUnit.getRemainingBeds() - temp)));
+                }});
+            }
+        }else{
+            throw new UnAuthenticatedUserException();
         }
-        throw new UnAuthenticatedUserException();
+        return ResponseEntity.ok("updated applications");
     }
 }

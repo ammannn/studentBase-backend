@@ -96,6 +96,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .sheerIdOrganizationId(requestDto.getOrganization().getIdExtended())
                 .rent(requestDto.getRent())
                 .deposit(requestDto.getDeposit())
+                .remainingBeds(responseMapper.getTotalBeds(requestDto.getFeatures()))
                 .verificationStatus(VerificationStatus.pending)
                 .address(requestDto.getAddress())
                 .features(requestDto.getFeatures())
@@ -335,8 +336,8 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
         Map<String,Boolean> amenities = Arrays.stream("Parking, Pool , On-site laundry , Dishwasher , Air conditioning, Gym , Pet friendly, balcony/deck, Furnished, partially furnished".split(","))
                 .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->false));
-        Map<String,Double> featuresNumbers = Arrays.stream("Room,hall,Beds, Baths, Kitchen,Yard".split(","))
-                .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->0.0));
+        Map<String,Integer> featuresNumbers = Arrays.stream("Beds, Baths, Kitchen".split(","))
+                .map(s->s.trim().toLowerCase()).collect(Collectors.toMap(s->s,s->0));
         return ResponseEntity.ok(ApiResponse.builder()
                         .data(RentalUnitFeatures.builder()
                                 .featuresUtilities(utilities)

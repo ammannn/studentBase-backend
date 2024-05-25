@@ -67,7 +67,9 @@ public class SecurityConfig {
                 "/api/health",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
-                "/wh/payment-update/**"
+                "/wh/**",
+                "/wh/payment-update/**",
+                "/wh/sheerid-verification/**",
         };
     }
 

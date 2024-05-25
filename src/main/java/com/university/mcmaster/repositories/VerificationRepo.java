@@ -1,8 +1,10 @@
 package com.university.mcmaster.repositories;
 
-import com.university.mcmaster.models.entities.SheerIdVerificationData;
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationData;
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationDetails;
 
 public interface VerificationRepo {
-    boolean save(SheerIdVerificationData verificationData);
-    SheerIdVerificationData getLatestSheerIdVerificationByEmailAndStatusSuccess(String email);
+    boolean save(SheerIdVerificationDetails verificationData);
+
+    SheerIdVerificationDetails getLatestSheerIdVerificationDetailsByEmail(String email);
 }

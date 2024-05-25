@@ -1,7 +1,5 @@
-package com.university.mcmaster.models.entities;
+package com.university.mcmaster.integrations.sheerid.model;
 
-import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationRequestDto;
-import com.university.mcmaster.integrations.sheerid.model.SheetIdVerificationResponseDto;
 import com.university.mcmaster.models.FirebaseCommonProps;
 import com.university.mcmaster.utils.FirestoreConstants;
 import lombok.*;
@@ -16,7 +14,7 @@ public class SheerIdVerificationData implements FirebaseCommonProps {
     private String id;
     private String email;
     private String status;
-    private SheetIdVerificationResponseDto verificationResponse;
+    private SheerIdVerificationResponseDto verificationResponse;
     private SheerIdVerificationRequestDto verificationRequest;
     private long createdOn;
     private String country;

@@ -14,6 +14,7 @@ public class EnvironmentVariables {
     public static final String STRIPE_ENDPOINT_SECRET = getEnvString("STRIPE_ENDPOINT_SECRET",false);
     public static final String PLATFORM_URL = getPlatformUrl();
     public static final String SHEERID_PROGRAM_ID = getEnvString("SHEERID_PROGRAM_ID",false);
+    public static final String SHEERID_API_TOKEN = getEnvString("SHEERID_API_TOKEN",false);
 
     private static String getPlatformUrl(){
         String url = getEnvUrlString("PLATFORM_URL");

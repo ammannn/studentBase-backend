@@ -8,8 +8,6 @@ import com.university.mcmaster.models.dtos.response.*;
 import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.*;
 import com.university.mcmaster.services.FileService;
-import com.university.mcmaster.services.impl.LikeAndRatingServiceImpl;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +72,7 @@ public class ResponseMapper {
                 .givenRating(givenRating)
                 .images(getRentalUnitImages(r.getId()))
                 .features(r.getFeatures())
+                .bedsRemaining(Math.max(r.getRemainingBeds(), 0))
                 .rentalUnitStatus(r.getRentalUnitStatus())
                 .title(r.getTitle())
                 .description(r.getDescription())
@@ -207,6 +206,7 @@ public class ResponseMapper {
                 .organizationName(rentalUnit.getOrganizationName())
                 .sheerIdOrganizationId(rentalUnit.getSheerIdOrganizationId())
                 .stage(getRentalUnitStage(rentalUnit))
+                .bedsRemaining(Math.max(rentalUnit.getRemainingBeds(),0))
                 .rentalUnitStatus(rentalUnit.getRentalUnitStatus())
                 .rentalUnitId(rentalUnit.getId())
                 .rent(rentalUnit.getRent())
@@ -370,5 +370,9 @@ public class ResponseMapper {
                     .review(lr.getReview())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    public int getTotalBeds(RentalUnitFeatures features) {
+        return null != features && null != features.getFeaturesNumbers() ?  features.getFeaturesNumbers().getOrDefault("beds",0) : 0;
     }
 }

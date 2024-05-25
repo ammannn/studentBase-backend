@@ -16,7 +16,7 @@ public class RentalUnitFeatures {
 
     private Map<String,Boolean> featuresUtilities;
     private Map<String,Boolean> featuresAmenities;
-    private Map<String,Double> featuresNumbers;
+    private Map<String,Integer> featuresNumbers;
 
     @Override
     public boolean equals(Object o) {

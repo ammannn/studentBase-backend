@@ -13,4 +13,7 @@ public class SheerIdUniversity {
     private String name;
     private String country;
     private String type;
+    private String state;
+    private String zip;
+    private String city;
 }

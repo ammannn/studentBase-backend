@@ -6,8 +6,7 @@ import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.exceptions.*;
 import com.university.mcmaster.integrations.sheerid.SheerIdService;
-import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationRequestDto;
-import com.university.mcmaster.integrations.sheerid.model.SheetIdVerificationResponseDto;
+import com.university.mcmaster.integrations.sheerid.model.*;
 import com.university.mcmaster.models.dtos.response.RentalUnitOwnerLogInResponse;
 import com.university.mcmaster.models.dtos.response.StudentLogInResponse;
 import com.university.mcmaster.models.entities.*;
@@ -24,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.naming.ServiceUnavailableException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,8 +92,8 @@ public class AuthServiceImpl implements AuthService {
         if(null == userDetails) throw new InvalidParamValueException("authToken");
         User student = userService.findUserById(userDetails.getId());
         if(null != student) throw new ActionNotAllowedException("register_user","user already exists",400);
-        SheerIdVerificationData verificationData = verificationRepo.getLatestSheerIdVerificationByEmailAndStatusSuccess(userDetails.getEmail());
-        if(null == verificationData || null == verificationData.getVerificationRequest() || null == verificationData.getVerificationRequest().getOrganization()) throw new ActionNotAllowedException("register_user","user is not verified on sheer id");
+        SheerIdVerificationDetails verificationData = verificationRepo.getLatestSheerIdVerificationDetailsByEmail(userDetails.getEmail());
+        if(null == verificationData || null == verificationData.getPersonInfo().getOrganization()) throw new ActionNotAllowedException("register_user","user is not verified on sheer id");
         List<UserRole> roles = new ArrayList<>(){{
             add(UserRole.student);
             add(UserRole.user);
@@ -103,14 +103,14 @@ public class AuthServiceImpl implements AuthService {
         }
         student = User.builder()
                 .id(userDetails.getId())
-                .nationality(verificationData.getCountry())
+                .nationality(verificationData.getPersonInfo().getOrganization().getCountry())
                 .email(userDetails.getEmail())
-                .name(verificationData.getVerificationRequest().getFirstName() + " " + verificationData.getVerificationRequest().getLastName())
-                .phoneNumber(verificationData.getVerificationRequest().getPhoneNumber())
+                .name(verificationData.getPersonInfo().getFirstName() + " " + verificationData.getPersonInfo().getLastName())
+                .phoneNumber(verificationData.getPersonInfo().getPhoneNumber())
                 .dashboard(Dashboard.builder().build())
-                .dob(verificationData.getVerificationRequest().getBirthDate())
-                .organizationName(verificationData.getVerificationRequest().getOrganization().getName())
-                .sheerIdOrganizationId(verificationData.getVerificationRequest().getOrganization().getIdExtended())
+                .dob(verificationData.getPersonInfo().getBirthDate())
+                .organizationName(verificationData.getPersonInfo().getOrganization().getName())
+                .sheerIdOrganizationId(verificationData.getPersonInfo().getOrganization().getIdExtended())
                 .role(roles)
                 .verificationStatus(VerificationStatus.pending)
                 .createdOn(Instant.now().toEpochMilli())
@@ -205,17 +205,40 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> verifyOnSheerId(SheerIdVerificationRequestDto requestDto,String country, String requestId) {
-        SheetIdVerificationResponseDto responseDto = SheerIdService.verifyStudent(requestDto);
-        SheerIdVerificationData verificationData = SheerIdVerificationData.builder()
-                .verificationResponse(responseDto)
-                .verificationRequest(requestDto)
-                .createdOn(Instant.now().toEpochMilli())
-                .email(requestDto.getEmail())
-                .country(country)
-                .id(UUID.randomUUID().toString())
-                .status(false == "success".equalsIgnoreCase(responseDto.getCurrentStep()) ? "failed" : "success")
-                .build();
-        boolean res = verificationRepo.save(verificationData);
-        return ResponseEntity.ok(responseDto);
+        if(false == Utility.isStrValuePresent(requestDto.getEmail()) || false == Utility.isValidEmail(requestDto.getEmail())) throw new MissingRequiredParamException("email");
+        SheerIdVerificationDetails details = verificationRepo.getLatestSheerIdVerificationDetailsByEmail(requestDto.getEmail());
+        if(null == details) throw new EntityNotFoundException();
+        return ResponseEntity.ok(ApiResponse.builder()
+                        .data(new HashMap<String,Object>(){{
+                            put("organization",details.getPersonInfo().getOrganization());
+                            put("name",details.getPersonInfo().getFirstName() + " " + details.getPersonInfo().getLastName());
+                        }})
+                .build());
+    }
+
+    @Override
+    public ResponseEntity<?> handleSheerIdVerification(Map<String,Object> requestDto, String sigHeader) {
+        String verificationId = getVerificationId(requestDto);
+        if(null != verificationId){
+            SheerIdVerificationDetails details = SheerIdService.getSheerIdVerificationDetailsById(verificationId);
+            if(null != details){
+                if(null != details.getPersonInfo() && null != details.getPersonInfo().getOrganization()){
+                    SheerIdUniversity sheerIdUniversity = SheerIdService.getSheerIdUniversityByVerificationId(verificationId);
+                    if(null != sheerIdUniversity){
+                        details.getPersonInfo().setOrganization(sheerIdUniversity);
+                    }
+                }
+                verificationRepo.save(details);
+            }
+        }
+        return ResponseEntity.ok("ok");
+    }
+
+    private String getVerificationId(Map<String,Object> requestDto) {
+        if(null !=  requestDto && requestDto.containsKey("verificationId")){
+            String temp = (String) requestDto.get("verificationId");
+            if(null != temp && false == temp.trim().isEmpty()) return temp.trim();
+        }
+        return null;
     }
 }

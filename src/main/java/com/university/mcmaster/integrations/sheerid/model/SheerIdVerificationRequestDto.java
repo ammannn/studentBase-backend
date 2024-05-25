@@ -10,9 +10,9 @@ import lombok.*;
 @Builder
 public class SheerIdVerificationRequestDto {
     private String email;
-    private String birthDate;
-    private String firstName;
-    private String lastName;
-    private SheerIdUniversityRequestDto organization;
-    private String phoneNumber;
+//    private String birthDate;
+//    private String firstName;
+//    private String lastName;
+//    private SheerIdUniversityRequestDto organization;
+//    private String phoneNumber;
 }

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.ServiceUnavailableException;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ public class AuthController {
             @RequestBody SheerIdVerificationRequestDto requestDto,
             @RequestParam("country") String country,
             @RequestHeader("requestId") String requestId
-    ){
+    ) {
         return authService.verifyOnSheerId(requestDto,country,requestId);
     }
 }

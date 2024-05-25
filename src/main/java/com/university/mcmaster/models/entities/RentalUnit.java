@@ -1,7 +1,6 @@
 package com.university.mcmaster.models.entities;
 
 import com.university.mcmaster.enums.PaymentStatus;
-import com.university.mcmaster.enums.RentalUnitStage;
 import com.university.mcmaster.enums.RentalUnitStatus;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.FirebaseCommonProps;
@@ -48,6 +47,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private PaymentStatus paymentStatus;
     private String organizationName;
     private String sheerIdOrganizationId;
+    private int remainingBeds;
 
     @Override
     public String getCollection() {

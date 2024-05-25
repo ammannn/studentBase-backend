@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SheetIdVerificationResponseDto {
+public class SheerIdVerificationResponseDto {
     private String verificationId;
     private String currentStep;
     private List<String> errorIds;

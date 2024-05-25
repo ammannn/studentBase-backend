@@ -36,4 +36,5 @@ public class RentalUnitForStudentForListing {
     private VisitingScheduleOfRentalUnitOwner visitingSchedule;
     private ApplicationForStudent application;
     private String organizationName;
+    private int bedsRemaining;
 }

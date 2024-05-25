@@ -40,4 +40,5 @@ public class RentalUnitForOwner {
     private boolean live;
     private String organizationName;
     private String sheerIdOrganizationId;
+    private int bedsRemaining;
 }
