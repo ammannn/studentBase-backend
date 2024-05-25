@@ -165,11 +165,11 @@ public class Utility {
         }
         StringBuilder builder = new StringBuilder();
         if(null != features.getFeaturesNumbers()){
-            if(null != features.getFeaturesNumbers().get("room") && features.getFeaturesNumbers().get("room") > 0){
-                builder.append(features.getFeaturesNumbers().get("room")).append("b");
+            if(null != features.getFeaturesNumbers().get("baths") && features.getFeaturesNumbers().get("baths") > 0){
+                builder.append(features.getFeaturesNumbers().get("baths")).append("b");
             }
-            if(null != features.getFeaturesNumbers().get("hall") && features.getFeaturesNumbers().get("hall") > 0){
-                builder.append(features.getFeaturesNumbers().get("hall")).append("h");
+            if(null != features.getFeaturesNumbers().get("beds") && features.getFeaturesNumbers().get("beds") > 0){
+                builder.append(features.getFeaturesNumbers().get("beds")).append("h");
             }
             if(null != features.getFeaturesNumbers().get("kitchen") && features.getFeaturesNumbers().get("kitchen") > 0){
                 builder.append(features.getFeaturesNumbers().get("kitchen")).append("k");
