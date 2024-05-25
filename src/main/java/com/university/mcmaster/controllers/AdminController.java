@@ -1,6 +1,7 @@
 package com.university.mcmaster.controllers;
 
 import com.university.mcmaster.enums.VerificationStatus;
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationDetails;
 import com.university.mcmaster.services.AdminService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +57,15 @@ public class AdminController {
             HttpServletRequest request
     ){
         return adminService.updateUserStatus(userId,verificationStatus,reason,requestId,request);
+    }
+
+    @PostMapping("/sheer-id-data")
+    public ResponseEntity<?> addStudentSheerIdData(
+            @RequestBody SheerIdVerificationDetails details,
+            @RequestHeader("requestId") String requestId,
+            HttpServletRequest request
+
+    ){
+        return adminService.addStudentSheerIdData(details,requestId,request);
     }
 }

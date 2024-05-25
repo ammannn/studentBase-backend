@@ -228,6 +228,7 @@ public class AuthServiceImpl implements AuthService {
                         details.getPersonInfo().setOrganization(sheerIdUniversity);
                     }
                 }
+                details.setId(UUID.randomUUID().toString());
                 verificationRepo.save(details);
             }
         }

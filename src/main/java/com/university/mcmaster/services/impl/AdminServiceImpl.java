@@ -3,14 +3,17 @@ package com.university.mcmaster.services.impl;
 import com.google.firebase.auth.UserRecord;
 import com.university.mcmaster.enums.*;
 import com.university.mcmaster.exceptions.EntityNotFoundException;
+import com.university.mcmaster.exceptions.InvalidParamValueException;
 import com.university.mcmaster.exceptions.MissingRequiredParamException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
+import com.university.mcmaster.integrations.sheerid.model.SheerIdVerificationDetails;
 import com.university.mcmaster.integrations.stripe.service.StripePaymentService;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.response.MethodResponse;
 import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.AdminRepo;
 import com.university.mcmaster.repositories.UserRepo;
+import com.university.mcmaster.repositories.VerificationRepo;
 import com.university.mcmaster.services.AdminService;
 import com.university.mcmaster.services.RentalUnitService;
 import com.university.mcmaster.services.UserService;
@@ -31,6 +34,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +46,7 @@ public class AdminServiceImpl implements AdminService {
     private final RentalUnitService rentalUnitService;
     private final UserRepo userRepo;
     private final AdminRepo adminRepo;
+    private final VerificationRepo verificationRepo;
 
     @EventListener
     public void createAdminUser(ApplicationStartedEvent event){
@@ -169,5 +174,27 @@ public class AdminServiceImpl implements AdminService {
                 .status(200)
                 .msg("updated status")
                 .build());
+    }
+
+    @Override
+    public ResponseEntity<?> addStudentSheerIdData(SheerIdVerificationDetails details, String requestId, HttpServletRequest request) {
+        if(
+                null == details ||
+                        null == details.getPersonInfo() ||
+                        false == Utility.isStrValuePresent(details.getPersonInfo().getEmail()) ||
+                        false == Utility.isStrValuePresent(details.getPersonInfo().getFirstName()) ||
+                        false == Utility.isStrValuePresent(details.getPersonInfo().getLastName()) ||
+                        false == Utility.isStrValuePresent(details.getPersonInfo().getBirthDate()) ||
+                        null == details.getPersonInfo().getOrganization() ||
+                        false == Utility.isStrValuePresent(details.getPersonInfo().getOrganization().getName()) ||
+                        false == Utility.isStrValuePresent(details.getPersonInfo().getOrganization().getCountry())
+        ){
+            throw new InvalidParamValueException();
+        }
+        details.setId(UUID.randomUUID().toString());
+        details.setCreated(Instant.now().toEpochMilli());
+        details.setUpdated(Instant.now().toEpochMilli());
+        verificationRepo.save(details);
+        return ResponseEntity.ok("saved details");
     }
 }
