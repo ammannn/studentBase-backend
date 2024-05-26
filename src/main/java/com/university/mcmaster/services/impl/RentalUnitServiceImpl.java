@@ -90,7 +90,10 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         validateCreateRentalPropertyRequest(requestDto);
-        VisitingSchedule schedule = calendarService.createVisitingScheduleObj(userDetails.getId(),requestDto.getVisitingSchedule(),requestId);
+        VisitingSchedule schedule = null;
+        if(null != requestDto.getVisitingSchedule()) {
+            schedule = calendarService.createVisitingScheduleObj(userDetails.getId(),requestDto.getVisitingSchedule(),requestId);
+        }
         List<String> featureSearchList = Utility.getRentalUnitFeatureList(requestDto.getFeatures());
         requestDto.getRent().setCurrencySymbol(requestDto.getRent().getCurrency().getSymbol());
         requestDto.getDeposit().setCurrencySymbol(requestDto.getDeposit().getCurrency().getSymbol());
@@ -209,6 +212,10 @@ public class RentalUnitServiceImpl implements RentalUnitService {
             validateAddress(requestDto,missingProps);
             if(false == missingProps.isEmpty()) throw new MissingRequiredParamException(missingProps.toString());
             updateMap.put("address",requestDto.getAddress());
+        }
+        if(null != requestDto.getVisitingSchedule()){
+            VisitingSchedule visitingSchedule = calendarService.createVisitingScheduleObj(userId,requestDto.getVisitingSchedule(),requestId);
+            updateMap.put("visitingSchedule", visitingSchedule);
         }
         if(null != requestDto.getRent() && requestDto.getRent().equals(rentalUnit.getRent())){
             requestDto.getRent().setCurrencySymbol(requestDto.getRent().getCurrencySymbol());
