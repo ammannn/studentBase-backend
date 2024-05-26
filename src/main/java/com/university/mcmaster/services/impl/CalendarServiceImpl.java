@@ -89,7 +89,7 @@ public class CalendarServiceImpl implements CalendarService {
         }
         if(null == requestDto.getDays() || requestDto.getDays().isEmpty()) throw new MissingRequiredParamException("days");
         for (RequestedDay day : requestDto.getDays()) {
-            if(null == day || false == Utility.isStrValuePresent(day.getDate()) || Utility.verifyDateFormat(day.getDate())) throw new MissingRequiredParamException("date");
+            if(null == day || false == Utility.isStrValuePresent(day.getDate()) || false == Utility.verifyDateFormat(day.getDate())) throw new MissingRequiredParamException("date");
             if(null == day.getTimeSlots() || day.getTimeSlots().isEmpty()) throw new MissingRequiredParamException("time_slot");
             for (RequestedTimeSlotForRentalUnit timeSlot : day.getTimeSlots()) {
                 if(null == timeSlot.getEnd() || null == timeSlot.getEnd().getDayPeriod() || timeSlot.getEnd().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");
