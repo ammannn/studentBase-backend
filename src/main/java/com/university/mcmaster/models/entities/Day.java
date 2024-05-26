@@ -14,6 +14,7 @@ import java.util.Objects;
 @Builder
 public class Day {
     private DayOfWeek dayOfWeek;
+    private String date;
     private List<TimeSlot> timeSlots;
 
     @Override

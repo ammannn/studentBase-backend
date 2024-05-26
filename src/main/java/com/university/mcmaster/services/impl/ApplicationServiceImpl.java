@@ -98,9 +98,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .createdOn(Instant.now().toEpochMilli())
                 .visitingSchedule(RequestedVisitingSchedule.builder()
                         .timeZone(requestDto.getTimeZone())
+                        .timeSlot(requestDto.getTimeSlot())
                         .date(requestDto.getDate())
-//                        .startTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitStartTime(),requestDto.getTimeZone()))
-//                        .endTime(Utility.getTimeStamp(requestDto.getDate(),requestDto.getVisitEndTime(),requestDto.getTimeZone()))
                         .build())
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .build();
@@ -119,8 +118,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         if(null == requestDto.getTimeZone() || requestDto.getTimeZone().trim().isEmpty()) throw new MissingRequiredParamException("timeZone");
         if(null == requestDto.getDate() || requestDto.getDate().trim().isEmpty()) throw new MissingRequiredParamException("date");
         if(false == Utility.verifyDateFormat(requestDto.getDate())) throw new InvalidParamValueException("date","yyyy-MM-dd");
-//        if(null == requestDto.getVisitStartTime() || null == requestDto.getVisitStartTime().getDayPeriod() || requestDto.getVisitStartTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
-//        if(null == requestDto.getVisitEndTime() || null == requestDto.getVisitEndTime().getDayPeriod() || requestDto.getVisitEndTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
+        if(null == requestDto.getTimeSlot()) throw new MissingRequiredParamException("time_slot");
+        if(null == requestDto.getTimeSlot().getEnd() || null == requestDto.getTimeSlot().getEnd().getDayPeriod() || requestDto.getTimeSlot().getEnd().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");
+        if(null == requestDto.getTimeSlot().getStart() || null == requestDto.getTimeSlot().getStart().getDayPeriod() || requestDto.getTimeSlot().getStart().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");//        if(null == requestDto.getVisitStartTime() || null == requestDto.getVisitStartTime().getDayPeriod() || requestDto.getVisitStartTime().getHour() == 0) throw new InvalidParamValueException("visitStartTime");
     }
 
     @Override

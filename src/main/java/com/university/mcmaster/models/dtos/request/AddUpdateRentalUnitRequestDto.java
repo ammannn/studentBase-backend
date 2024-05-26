@@ -24,4 +24,5 @@ public class AddUpdateRentalUnitRequestDto {
     private String leaseTerm;
     private long leaseStartDate;
     private SheerIdUniversity organization;
+    private CreateUpdateVisitingScheduleRequestDto visitingSchedule;
 }

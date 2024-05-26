@@ -30,8 +30,9 @@ public class CalendarServiceImpl implements CalendarService {
     private final CalendarRepo calendarRepo;
     private final ApplicationService applicationService;
 
+    @Deprecated
     @Override
-    public ResponseEntity<ApiResponse> createVisitingSchedule(CreateUpdateVisitingScheduleRequestDto requestDto, String requestId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> createVisitingScheduleObj(CreateUpdateVisitingScheduleRequestDto requestDto, String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         verifyVisitingSchedule(requestDto);
@@ -48,6 +49,18 @@ public class CalendarServiceImpl implements CalendarService {
                 .build());
     }
 
+    @Override
+    public VisitingSchedule createVisitingScheduleObj(String userId, CreateUpdateVisitingScheduleRequestDto requestDto, String requestId) {
+        verifyVisitingSchedule(requestDto);
+        return VisitingSchedule.builder()
+                .id(UUID.randomUUID().toString())
+                .userId(userId)
+                .createdOn(Instant.now().toEpochMilli())
+                .days(requestDto.getDays())
+                .timeZone(requestDto.getTimeZone())
+                .build();
+    }
+
     private void verifyVisitingSchedule(CreateUpdateVisitingScheduleRequestDto requestDto) {
         if(null == requestDto.getTimeZone() || requestDto.getTimeZone().trim().isEmpty()) throw new MissingRequiredParamException("timeZone");
         try {
@@ -56,6 +69,15 @@ public class CalendarServiceImpl implements CalendarService {
             throw new InvalidParamValueException("timeZone");
         }
         if(null == requestDto.getDays() || requestDto.getDays().isEmpty()) throw new MissingRequiredParamException("days");
+        for (Day day : requestDto.getDays()) {
+            if(null == day || false == Utility.isStrValuePresent(day.getDate()) || Utility.verifyDateFormat(day.getDate())) throw new MissingRequiredParamException("date");
+            if(null == day.getTimeSlots() || day.getTimeSlots().isEmpty()) throw new MissingRequiredParamException("time_slot");
+            for (TimeSlot timeSlot : day.getTimeSlots()) {
+                if(null == timeSlot.getEnd() || null == timeSlot.getEnd().getDayPeriod() || timeSlot.getEnd().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");
+                if(null == timeSlot.getStart() || null == timeSlot.getStart().getDayPeriod() || timeSlot.getStart().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");
+                if(timeSlot.getAttendees() <= 0) throw new MissingRequiredParamException("attendees");
+            }
+        }
     }
 
     @Override

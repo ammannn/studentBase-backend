@@ -13,4 +13,5 @@ public class RequestedVisitingSchedule {
     private String timeZone;
     private int durationInMin;
     private String date;
+    private RequestedTimeSlot timeSlot;
 }

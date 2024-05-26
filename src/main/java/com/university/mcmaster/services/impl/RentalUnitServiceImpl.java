@@ -13,6 +13,7 @@ import com.university.mcmaster.models.dtos.response.RentalUnitForOwner;
 import com.university.mcmaster.models.dtos.response.RentalUnitForStudentForListing;
 import com.university.mcmaster.models.entities.*;
 import com.university.mcmaster.repositories.RentalUnitRepo;
+import com.university.mcmaster.services.CalendarService;
 import com.university.mcmaster.services.FileService;
 import com.university.mcmaster.services.LikeAndRatingService;
 import com.university.mcmaster.services.RentalUnitService;
@@ -42,6 +43,9 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     private LikeAndRatingService likeAndRatingService;
     @Autowired
     private ResponseMapper responseMapper;
+    @Lazy
+    @Autowired
+    private CalendarService calendarService;
 
     @Override
     public ResponseEntity<ApiResponse<?>> getRentalUnits(boolean fetchLiveOnly,int limit,String lastSeen,String requestId, HttpServletRequest request) {
@@ -86,6 +90,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || false == userDetails.getRoles().contains(UserRole.rental_unit_owner)) throw new UnAuthenticatedUserException();
         validateCreateRentalPropertyRequest(requestDto);
+        VisitingSchedule schedule = calendarService.createVisitingScheduleObj(userDetails.getId(),requestDto.getVisitingSchedule(),requestId);
         List<String> featureSearchList = Utility.getRentalUnitFeatureList(requestDto.getFeatures());
         requestDto.getRent().setCurrencySymbol(requestDto.getRent().getCurrency().getSymbol());
         requestDto.getDeposit().setCurrencySymbol(requestDto.getDeposit().getCurrency().getSymbol());
@@ -96,6 +101,7 @@ public class RentalUnitServiceImpl implements RentalUnitService {
                 .sheerIdOrganizationId(requestDto.getOrganization().getIdExtended())
                 .rent(requestDto.getRent())
                 .deposit(requestDto.getDeposit())
+                .visitingSchedule(schedule)
                 .remainingBeds(responseMapper.getTotalBeds(requestDto.getFeatures()))
                 .verificationStatus(VerificationStatus.pending)
                 .address(requestDto.getAddress())

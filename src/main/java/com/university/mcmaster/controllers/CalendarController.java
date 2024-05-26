@@ -21,7 +21,7 @@ public class CalendarController {
             @RequestBody CreateUpdateVisitingScheduleRequestDto requestDto,
             @RequestHeader("requestId") String requestId,
             HttpServletRequest request){
-        return calendarService.createVisitingSchedule(requestDto,requestId,request);
+        return calendarService.createVisitingScheduleObj(requestDto,requestId,request);
     }
 
     @GetMapping("/schedule")

@@ -48,6 +48,7 @@ public class RentalUnit implements FirebaseCommonProps {
     private String organizationName;
     private String sheerIdOrganizationId;
     private int remainingBeds;
+    private VisitingSchedule visitingSchedule;
 
     @Override
     public String getCollection() {
