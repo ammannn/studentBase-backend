@@ -1,11 +1,11 @@
 package com.university.mcmaster.utils;
 
+import com.google.protobuf.RpcUtil;
 import com.university.mcmaster.enums.DayPeriod;
 import com.university.mcmaster.enums.PaymentRequestType;
 import com.university.mcmaster.enums.PaymentStatus;
-import com.university.mcmaster.models.entities.CustomUserDetails;
-import com.university.mcmaster.models.entities.RentalUnitFeatures;
-import com.university.mcmaster.models.entities.Time;
+import com.university.mcmaster.models.dtos.request.CreateUpdateVisitingScheduleRequestDto;
+import com.university.mcmaster.models.entities.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -203,6 +203,27 @@ public class Utility {
 
     public static boolean isStrValuePresent(String val) {
         return null != val && false == val.trim().isEmpty();
+    }
+
+    public static Map<String, Integer> getVisitingScheduleBookedSlotMap(CreateUpdateVisitingScheduleRequestDto visitingSchedule) {
+        Map<String,Integer> res = new HashMap<>();
+        for (Day day : visitingSchedule.getDays()) {
+            for (TimeSlot timeSlot : day.getTimeSlots()) {
+                String key = getTimeSlotKey(day.getDate(),timeSlot);
+                res.put(key,0);
+            }
+        }
+        return res;
+    }
+
+    private static String getTimeSlotKey(String date,TimeSlot timeSlot) {
+        return date+"#"
+                +timeSlot.getStart().getHour()+"#"
+                +timeSlot.getStart().getMinute()+"#"
+                +timeSlot.getStart().getDayPeriod().toString()+"#"
+                +timeSlot.getEnd().getHour()+"#"
+                +timeSlot.getEnd().getMinute()+"#"
+                +timeSlot.getEnd().getDayPeriod().toString();
     }
 }
 

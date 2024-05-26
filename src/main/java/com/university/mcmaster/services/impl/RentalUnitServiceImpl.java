@@ -216,6 +216,16 @@ public class RentalUnitServiceImpl implements RentalUnitService {
         if(null != requestDto.getVisitingSchedule()){
             VisitingSchedule visitingSchedule = calendarService.createVisitingScheduleObj(userId,requestDto.getVisitingSchedule(),requestId);
             updateMap.put("visitingSchedule", visitingSchedule);
+            Map<String,Integer> bookedSlotsMap = Utility.getVisitingScheduleBookedSlotMap(requestDto.getVisitingSchedule());
+            if(null == rentalUnit.getBookedSlotsCounts()){
+                updateMap.put("bookedSlotsCounts", bookedSlotsMap);
+            }else{
+                for (String key : bookedSlotsMap.keySet()) {
+                    if(false == rentalUnit.getBookedSlotsCounts().containsKey(key)){
+                        updateMap.put("bookedSlotsCounts."+key, 0);
+                    }
+                }
+            }
         }
         if(null != requestDto.getRent() && requestDto.getRent().equals(rentalUnit.getRent())){
             requestDto.getRent().setCurrencySymbol(requestDto.getRent().getCurrencySymbol());

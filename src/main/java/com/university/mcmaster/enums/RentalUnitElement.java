@@ -4,14 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum RentalUnitElement {
-    living_room(2)
-    ,bed_room(2)
-    ,beds(2)
-    ,dining_room(2)
-    ,bath_room(2)
-    ,baths(2)
-    ,kitchen(2)
-    ,others(5);
+    living_room(10)
+    ,bed_room(10)
+    ,beds(10)
+    ,dining_room(10)
+    ,bath_room(10)
+    ,baths(10)
+    ,kitchen(10)
+    ,others(10);
 
     private int allowedFiles;
 
