@@ -88,6 +88,14 @@ public class ApplicationServiceImpl implements ApplicationService {
                 ApplicationStatus.review_in_process,
                 ApplicationStatus.lease_offered
         ).contains(application.getApplicationStatus())) throw new ActionNotAllowedException("create_application","an application already exists");
+        RequestedVisitingSchedule requestedVisitingSchedule = RequestedVisitingSchedule.builder()
+                .timeZone(requestDto.getTimeZone())
+                .timeSlot(requestDto.getTimeSlot())
+                .date(requestDto.getDate())
+                .build();
+        if(
+                false == rentalUnit.getBookedSlotsCounts().containsKey(Utility.getTimeSlotKey(requestDto.getDate(),requestDto.getTimeSlot()))
+        ) throw new ActionNotAllowedException("create_application","requested time slot is not available");
         application = Application.builder()
                 .id(UUID.randomUUID().toString())
                 .rentalUnitId(requestDto.getRentalUnitId())
@@ -96,17 +104,14 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .rentalUnitOwnerId(rentalUnit.getUserId())
                 .applicationStatus(ApplicationStatus.visit_requested)
                 .createdOn(Instant.now().toEpochMilli())
-                .visitingSchedule(RequestedVisitingSchedule.builder()
-                        .timeZone(requestDto.getTimeZone())
-                        .timeSlot(requestDto.getTimeSlot())
-                        .date(requestDto.getDate())
-                        .build())
+                .visitingSchedule(requestedVisitingSchedule)
                 .lastUpdatedOn(Instant.now().toEpochMilli())
                 .build();
         applicationRepo.save(application);
         new Thread(() -> {
             rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(rentalUnit.getId(),ApplicationStatus.visit_requested.toString(),1,"inc");
             rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(rentalUnit.getId(),"totalApplications",1,"inc");
+            rentalUnitService.decrementOrIncrementBookedSlotsCountForRentalUnit(rentalUnit.getId(),requestedVisitingSchedule,1,"inc");
         }).start();
         return ResponseEntity.status(200).body(ApiResponse.builder()
                         .msg("added applications")

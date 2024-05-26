@@ -33,8 +33,8 @@ public class RentalUnitForStudentForListing {
     private int givenRating;
     private Contact contact;
     private Map<String,List<HashMap<String,Object>>> images;
-    private VisitingScheduleOfRentalUnitOwner visitingSchedule;
     private ApplicationForStudent application;
     private String organizationName;
     private int bedsRemaining;
+    private VisitingSchedule visitingSchedule;
 }

@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class CreateUpdateVisitingScheduleRequestDto {
-    private List<Day> days;
+    private List<RequestedDay> days;
     private String timeZone;
 }

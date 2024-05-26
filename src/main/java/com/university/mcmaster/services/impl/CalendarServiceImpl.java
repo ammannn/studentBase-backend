@@ -8,6 +8,8 @@ import com.university.mcmaster.exceptions.MissingRequiredParamException;
 import com.university.mcmaster.exceptions.UnAuthenticatedUserException;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.CreateUpdateVisitingScheduleRequestDto;
+import com.university.mcmaster.models.dtos.request.RequestedDay;
+import com.university.mcmaster.models.dtos.request.RequestedTimeSlotForRentalUnit;
 import com.university.mcmaster.models.dtos.response.DayResponse;
 import com.university.mcmaster.models.dtos.response.TimeSlotResponse;
 import com.university.mcmaster.models.entities.*;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +43,15 @@ public class CalendarServiceImpl implements CalendarService {
                 .id(UUID.randomUUID().toString())
                 .userId(userDetails.getId())
                 .createdOn(Instant.now().toEpochMilli())
-                .days(requestDto.getDays())
+                .days(requestDto.getDays().stream().map(d->Day.builder()
+                        .dayOfWeek(d.getDayOfWeek())
+                        .date(d.getDate())
+                        .timeSlots(d.getTimeSlots().stream().map(t->TimeSlot.builder()
+                                .allowedAttendees(t.getAllowedAttendees())
+                                .start(t.getStart())
+                                .end(t.getEnd())
+                                .build()).collect(Collectors.toList()))
+                        .build()).collect(Collectors.toList()))
                 .timeZone(requestDto.getTimeZone())
                 .build();
         boolean isSaved = calendarRepo.save(schedule);
@@ -56,7 +67,15 @@ public class CalendarServiceImpl implements CalendarService {
                 .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .createdOn(Instant.now().toEpochMilli())
-                .days(requestDto.getDays())
+                .days(requestDto.getDays().stream().map(d->Day.builder()
+                        .dayOfWeek(d.getDayOfWeek())
+                        .date(d.getDate())
+                        .timeSlots(d.getTimeSlots().stream().map(t->TimeSlot.builder()
+                                .allowedAttendees(t.getAllowedAttendees())
+                                .start(t.getStart())
+                                .end(t.getEnd())
+                                .build()).collect(Collectors.toList()))
+                        .build()).collect(Collectors.toList()))
                 .timeZone(requestDto.getTimeZone())
                 .build();
     }
@@ -69,13 +88,13 @@ public class CalendarServiceImpl implements CalendarService {
             throw new InvalidParamValueException("timeZone");
         }
         if(null == requestDto.getDays() || requestDto.getDays().isEmpty()) throw new MissingRequiredParamException("days");
-        for (Day day : requestDto.getDays()) {
+        for (RequestedDay day : requestDto.getDays()) {
             if(null == day || false == Utility.isStrValuePresent(day.getDate()) || Utility.verifyDateFormat(day.getDate())) throw new MissingRequiredParamException("date");
             if(null == day.getTimeSlots() || day.getTimeSlots().isEmpty()) throw new MissingRequiredParamException("time_slot");
-            for (TimeSlot timeSlot : day.getTimeSlots()) {
+            for (RequestedTimeSlotForRentalUnit timeSlot : day.getTimeSlots()) {
                 if(null == timeSlot.getEnd() || null == timeSlot.getEnd().getDayPeriod() || timeSlot.getEnd().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");
                 if(null == timeSlot.getStart() || null == timeSlot.getStart().getDayPeriod() || timeSlot.getStart().getHour() <= 0) throw new InvalidParamValueException("time_slot_hour");
-                if(timeSlot.getAttendees() <= 0) throw new MissingRequiredParamException("attendees");
+                if(timeSlot.getAllowedAttendees() <= 0) throw new MissingRequiredParamException("attendees");
             }
         }
     }
@@ -119,9 +138,9 @@ public class CalendarServiceImpl implements CalendarService {
         if(null != requestDto.getTimeZone() && false == requestDto.getTimeZone().trim().isEmpty() && false == requestDto.getTimeZone().equals(schedule.getTimeZone())){
             updateMap.put("timeZone",requestDto.getTimeZone());
         }
-        if(null != requestDto.getDays() && false == Utility.areListsEqual(requestDto.getDays(),schedule.getDays())){
-            updateMap.put("days",requestDto.getDays());
-        }
+//        if(null != requestDto.getDays() && false == Utility.areListsEqual(requestDto.getDays(),schedule.getDays())){
+//            updateMap.put("days",requestDto.getDays());
+//        }
         if(false == updateMap.isEmpty()){
             calendarRepo.update(schedule.getId(),updateMap);
         }

@@ -78,10 +78,7 @@ public class ResponseMapper {
                 .description(r.getDescription())
                 .leaseTerm(r.getLeaseTerm())
                 .leaseStartDate(r.getLeaseStartDate())
-                .visitingSchedule(null  != schedule ? VisitingScheduleOfRentalUnitOwner.builder()
-                        .days(schedule.getDays())
-                        .timeZone(schedule.getTimeZone())
-                        .build(): null)
+                .visitingSchedule(setBookedSlotsCounts(r.getBookedSlotsCounts(),r.getVisitingSchedule()))
                 .posterImageUrl(null != r.getPosterImagePath() ? GcpStorageUtil.createGetUrl(r.getPosterImagePath()).toString() : null)
                 .application(applicationForStudent)
                 .build();
@@ -203,6 +200,7 @@ public class ResponseMapper {
                 .avgRating(Utility.getAverageRating(rentalUnit.getRating()))
                 .likes(likes)
                 .reviews(reviews)
+                .visitingSchedule(setBookedSlotsCounts(rentalUnit.getBookedSlotsCounts(),rentalUnit.getVisitingSchedule()))
                 .organizationName(rentalUnit.getOrganizationName())
                 .sheerIdOrganizationId(rentalUnit.getSheerIdOrganizationId())
                 .stage(getRentalUnitStage(rentalUnit))
@@ -226,6 +224,19 @@ public class ResponseMapper {
                 .description(rentalUnit.getDescription())
                 .live(rentalUnit.isEligibleForListing())
                 .build();
+    }
+
+    private VisitingSchedule setBookedSlotsCounts(Map<String, Integer> bookedSlotsCounts, VisitingSchedule visitingSchedule) {
+        if(null != bookedSlotsCounts && null != visitingSchedule && null != visitingSchedule.getDays()){
+            for (Day day : visitingSchedule.getDays()) {
+                if(null != day.getTimeSlots()){
+                    for (TimeSlot timeSlot : day.getTimeSlots()) {
+                        timeSlot.setBooked(bookedSlotsCounts.getOrDefault(Utility.getTimeSlotKey(day.getDate(),timeSlot),0));
+                    }
+                }
+            }
+        }
+        return visitingSchedule;
     }
 
     private RentalUnitStage getRentalUnitStage(RentalUnit rentalUnit) {

@@ -5,6 +5,8 @@ import com.university.mcmaster.models.dtos.request.AddUpdateRentalUnitRequestDto
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.SearchRentalUnitRequestDto;
 import com.university.mcmaster.models.entities.RentalUnit;
+import com.university.mcmaster.models.entities.RequestedVisitingSchedule;
+import com.university.mcmaster.models.entities.TimeSlotCommonProps;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -36,6 +38,12 @@ public interface RentalUnitService {
     void decrementOrIncrementRatingCountForRentalUnit(String rentalUnitId, int rating, String op);
 
     void decrementOrIncrementGeneralCountForRentalUnit(String rentalUnitId, String count, int vale, String op);
+
+    void decrementOrIncrementBookedSlotsCountForRentalUnit(String rentalUnitId, String key, int vale, String op);
+
+    void decrementOrIncrementBookedSlotsCountForRentalUnit(String rentalUnitId, RequestedVisitingSchedule requestedVisitingSchedule, int vale, String op);
+
+    void decrementOrIncrementBookedSlotsCountForRentalUnit(String rentalUnitId, String date, TimeSlotCommonProps timeSlot, int vale, String op);
 
     ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request);
 

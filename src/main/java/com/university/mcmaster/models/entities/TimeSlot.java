@@ -1,6 +1,5 @@
 package com.university.mcmaster.models.entities;
 
-import com.university.mcmaster.enums.DayPeriod;
 import lombok.*;
 
 import java.util.Objects;
@@ -10,10 +9,11 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TimeSlot {
+public class TimeSlot implements TimeSlotCommonProps{
     private Time start;
     private Time end;
-    private int attendees;
+    private int allowedAttendees;
+    private int booked;
 
     @Override
     public boolean equals(Object o) {

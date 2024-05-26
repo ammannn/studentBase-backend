@@ -9,7 +9,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RequestedTimeSlot {
+public class RequestedTimeSlot implements TimeSlotCommonProps{
     private Time start;
     private Time end;
 

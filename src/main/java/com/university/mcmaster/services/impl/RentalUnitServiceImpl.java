@@ -351,6 +351,25 @@ public class RentalUnitServiceImpl implements RentalUnitService {
     }
 
     @Override
+    public void decrementOrIncrementBookedSlotsCountForRentalUnit(String rentalUnitId,String key,int vale,String op) {
+        rentalUnitRepo.update(rentalUnitId,new HashMap<String,Object>(){{
+            put("bookedSlotsCounts."+key, FieldValue.increment("inc".equals(op) ? 1 : -1));
+        }});
+    }
+
+    @Override
+    public void decrementOrIncrementBookedSlotsCountForRentalUnit(String rentalUnitId,RequestedVisitingSchedule requestedVisitingSchedule,int vale,String op) {
+        String key = Utility.getTimeSlotKey(requestedVisitingSchedule.getDate(),requestedVisitingSchedule.getTimeSlot());
+        decrementOrIncrementBookedSlotsCountForRentalUnit(rentalUnitId,key,vale,op);
+    }
+
+    @Override
+    public void decrementOrIncrementBookedSlotsCountForRentalUnit(String rentalUnitId,String date,TimeSlotCommonProps timeSlot,int vale,String op) {
+        String key = Utility.getTimeSlotKey(date,timeSlot);
+        decrementOrIncrementBookedSlotsCountForRentalUnit(rentalUnitId,key,vale,op);
+    }
+
+    @Override
     public ResponseEntity<ApiResponse<?>> getRentalUnitFeaturesStaticData(String requestId, HttpServletRequest request) {
         CustomUserDetails userDetails = Utility.customUserDetails(request);
         if(null == userDetails || null == userDetails.getRoles() || (false == userDetails.getRoles().contains(UserRole.rental_unit_owner) && false == userDetails.getRoles().contains(UserRole.user) )) throw new UnAuthenticatedUserException();
