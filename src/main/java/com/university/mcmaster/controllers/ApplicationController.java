@@ -56,7 +56,7 @@ public class ApplicationController {
         return applicationService.createApplication(requestDto,requestId,request);
     }
 
-    @PutMapping("/applications/{applicationId}")
+    @GetMapping("/applications/{applicationId}")
     @Operation(summary = "getApplicationById")
     public ResponseEntity<?> getApplicationById(
             @PathVariable("applicationId") String applicationId,
