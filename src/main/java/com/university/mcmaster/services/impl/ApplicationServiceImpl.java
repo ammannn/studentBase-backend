@@ -200,9 +200,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             if(res.getStatusCode().is2xxSuccessful()) {
                 if(ApplicationStatus.lease_offered == status) {
                     if(reqBeds > 0){
-                        int temp = reqBeds;
+                        int res_1 = rentalUnit.getRemainingBeds() - reqBeds;
                         rentalUnitService.updateRentalUnit(application.getRentalUnitId(),new HashMap<String, Object>(){{
-                            put("remainingBeds", FieldValue.increment(-1 * (rentalUnit.getRemainingBeds() - temp)));
+                            put("remainingBeds", res_1 > 0 ? FieldValue.increment(-1 * (res_1)) : 0);
                         }});
                     }
                 }
@@ -386,9 +386,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                 updateApplicationStatusForRentalUnitOwner(userDetails.getId(),application,status,fileId,requestId);
             }
             if(reqBeds > 0){
-                int temp = reqBeds;
+                int res = rentalUnit.getRemainingBeds() - reqBeds;
                 rentalUnitService.updateRentalUnit(rentalUnitId,new HashMap<String, Object>(){{
-                    put("remainingBeds", FieldValue.increment(-1 * (rentalUnit.getRemainingBeds() - temp)));
+                    put("remainingBeds", res > 0 ? FieldValue.increment(-1 * (res)) : 0);
                 }});
             }
         }else{
