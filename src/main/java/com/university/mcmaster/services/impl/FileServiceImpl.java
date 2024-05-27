@@ -131,6 +131,7 @@ public class FileServiceImpl implements FileService {
         }else if(FilePurpose.rental_unit_poster_image == file.getPurpose() && null != file.getRentalUnitId()){
             rentalUnitService.updateRentalUnitPosterImage(file.getRentalUnitId(),file.getId(),file.getFilePath());
         }else if(FilePurpose.signed_lease_doc == file.getPurpose()){
+            Application application = applicationService.getApplicationById(file.getApplicationId());
             applicationService.updateApplication(file.getApplicationId(),new HashMap<String,Object>(){{
                 put("applicationStatus",ApplicationStatus.lease_signed);
                 put("signedLeaseDetails", SignedLeaseDetails.builder()
@@ -139,6 +140,8 @@ public class FileServiceImpl implements FileService {
                         .filePath(file.getFilePath())
                         .build());
             }});
+            rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),ApplicationStatus.lease_signed.toString(),1,"inc");
+            rentalUnitService.decrementOrIncrementGeneralCountForRentalUnit(application.getRentalUnitId(),application.getApplicationStatus().toString(),1,"dec");
         }
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
