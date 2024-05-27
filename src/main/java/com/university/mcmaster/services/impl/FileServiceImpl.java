@@ -139,9 +139,6 @@ public class FileServiceImpl implements FileService {
                         .filePath(file.getFilePath())
                         .build());
             }});
-            rentalUnitService.updateRentalUnit(file.getRentalUnitId(),new HashMap<String, Object>(){{
-                put("RentalUnitStage", RentalUnitStage.lease_signed);
-            }});
         }
         return ResponseEntity.ok(ApiResponse.builder()
                         .status(200)
