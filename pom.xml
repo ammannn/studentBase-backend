@@ -14,7 +14,7 @@
 	<name>mcmaster</name>
 	<description>off campus housing portal</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
