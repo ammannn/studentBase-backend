@@ -50,6 +50,12 @@ public class AdminServiceImpl implements AdminService {
 
     @EventListener
     public void createAdminUser(ApplicationStartedEvent event){
+        log.trace("****************   env vars  ******************");
+        log.trace("GOOGLE_APPLICATION_CREDENTIALS : "  +EnvironmentVariables.GOOGLE_APPLICATION_CREDENTIALS);
+        log.trace("BUCKET_NAME : "  +EnvironmentVariables.BUCKET_NAME);
+        log.trace("PROJECT_ID : "  +EnvironmentVariables.PROJECT_ID);
+        log.trace("ADMIN_EMAIL : "  +EnvironmentVariables.ADMIN_EMAIL);
+        log.trace("******************************************");
         String email = EnvironmentVariables.ADMIN_EMAIL;
         if(null != email && false == email.isEmpty()){
             log.trace("checking for admin account for email : " + email);
