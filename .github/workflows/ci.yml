@@ -28,6 +28,9 @@ jobs:
           cat /home/runner/gcloud-key.json
         shell: /usr/bin/bash -e {0}
 
+      - name: docker login
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
       - name: auth
         run: gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=/home/runner/gcloud-key.json --project=studentbase-v1
 
