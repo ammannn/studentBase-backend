@@ -37,7 +37,8 @@ jobs:
 
       - name: Get GKE Credentials
         run: |
-          gcloud container clusters get-credentials student-base-cluster  # Replace with your GKE cluster name
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud container clusters get-credentials student-base-cluster --region us-central1-c 
         shell: /usr/bin/bash -e {0}
 
       - name: docker login
