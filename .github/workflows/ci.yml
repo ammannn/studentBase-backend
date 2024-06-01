@@ -13,6 +13,7 @@ jobs:
 
     env:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      USE_GKE_GCLOUD_AUTH_PLUGIN: True
 
     steps:
       - name: Check out repository
@@ -37,12 +38,9 @@ jobs:
         run: |
            sudo apt-get update && sudo apt-get install -y kubectl
 
-      - name: Download and Install gke-gcloud-auth-plugin
-        run: |
-          curl -LO https://dl.google.com/dl/kubernetes/plugin/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl-gke-gcloud-auth-plugin
-          chmod +x kubectl-gke-gcloud-auth-plugin
-          sudo mv kubectl-gke-gcloud-auth-plugin /usr/local/bin/gke-gcloud-auth-plugin
-
+      - name: Install Google Auth Plugin
+        run: |-
+             gcloud components install gke-gcloud-auth-plugin
 
       - name: Authenticate gcloud
         run: |
