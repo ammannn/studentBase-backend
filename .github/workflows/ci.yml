@@ -1,17 +1,35 @@
-name: CI
+name: Maven Deploy
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - pipeline # Trigger the workflow on pushes to the main branch
 
 jobs:
-  build:
-
+  deploy:
+    name: Deploy to Maven Repository
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: build
+        run: docker build -t us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest .
+
+      - name: Write GCP service account key to file
+        run: echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" | base64 --decode > $HOME/gcloud-key.json
+
+      - name: Deploy to Google Cloud
+        run: |
+          gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
+          gcloud config set project studentbase-v1
+
+      - name: auth
+        run: gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=$HOME/gcloud-key.json --project=studentbase-v1
+      - name: push
+        run: docker push us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest
+
+      - name: deploy
+        run: kubectl apply -f ./scripts/deploy.yml
