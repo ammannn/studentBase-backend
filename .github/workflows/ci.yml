@@ -35,4 +35,4 @@ jobs:
         run: docker push us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest
 
       - name: deploy
-        run: kubectl apply -f ./scripts/deploy.yml
+        run: kubectl apply -f /home/scripts/deploy.yml
