@@ -36,6 +36,7 @@ jobs:
       - name: Install kubectl
         run: |
            sudo apt-get update && sudo apt-get install -y kubectl
+           gcloud components install gke-gcloud-auth-plugin
 
       - name: Authenticate gcloud
         run: |
