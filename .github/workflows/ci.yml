@@ -35,17 +35,19 @@ jobs:
           gcloud config set compute/zone us-central1-c  # Set your compute zone
         shell: /usr/bin/bash -e {0}
 
-      - name: Get GKE Credentials
-        run: |
-          gcloud components install gke-gcloud-auth-plugin
-          gcloud container clusters get-credentials student-base-cluster --region us-central1-c 
-        shell: /usr/bin/bash -e {0}
-
       - name: docker login
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: push
         run: docker push us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest
+
+
+      - name: Get GKE Credentials
+        run: |
+          apt-get install google-cloud-cli-gke-gcloud-auth-plugin
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud container clusters get-credentials student-base-cluster --region us-central1-c
+        shell: /usr/bin/bash -e {0}
 
       - name: deploy
         run: |
