@@ -3,7 +3,7 @@ name: Maven Deploy
 on:
   push:
     branches:
-      - main 
+      - master
       - pipeline # Trigger the workflow on pushes to the main branch
 
 jobs:
