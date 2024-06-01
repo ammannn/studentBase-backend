@@ -40,7 +40,9 @@ jobs:
 
       - name: Install Google Auth Plugin
         run: |-
-             gcloud components install gke-gcloud-auth-plugin
+             curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-478.0.0-linux-x86_64.tar.gz
+             tar -xf google-cloud-cli-478.0.0-linux-x86_64.tar.gz
+             ./google-cloud-sdk/install.sh
 
       - name: Authenticate gcloud
         run: |
