@@ -22,13 +22,14 @@ jobs:
         env:
           GCP_SERVICE_ACCOUNT_KEY: ${{ env.GCP_SERVICE_ACCOUNT_KEY }}
         run: echo "$GCP_SERVICE_ACCOUNT_KEY"  > $HOME/gcloud-key.json
- 
+
+      - name: auth 
         run: |
           cat $HOME/gcloud-key.json
           gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
           gcloud config set project studentbase-v1
 
-      - name: auth
+      - name: auth-2
         run: gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=$HOME/gcloud-key.json --project=studentbase-v1
 
       - name: push
