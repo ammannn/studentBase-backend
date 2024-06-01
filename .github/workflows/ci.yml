@@ -39,4 +39,4 @@ jobs:
       - name: deploy
         run: |
           ls   # Verify if the directory contains the deploy.yml file
-          kubectl apply -f ./home/scripts/deploy.yml
+          kubectl apply -f scripts/deploy.yml
