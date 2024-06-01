@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - new2 # Trigger the workflow on pushes to the main branch
+      - pipeline # Trigger the workflow on pushes to the main branch
 
 jobs:
   deploy:
