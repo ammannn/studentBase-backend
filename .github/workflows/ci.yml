@@ -67,6 +67,5 @@ jobs:
       - name: deploy
         run: |
           ls
-          kubectl get pods
           kubectl apply -f scripts/deploy.yml --validate=false
-
+          kubectl rollout restart deployment/studbase-backend
