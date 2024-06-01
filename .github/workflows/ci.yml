@@ -1,0 +1,71 @@
+name: Maven Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - pipeline
+
+jobs:
+  deploy:
+    name: Deploy to Maven Repository
+    runs-on: ubuntu-22.04
+
+    env:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      USE_GKE_GCLOUD_AUTH_PLUGIN: True
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: build
+        run: docker build -t us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest .
+
+      - name: Decode and write GCP service account key to file
+        run: |
+          echo "$GCP_SERVICE_ACCOUNT_KEY" > /home/runner/gcloud-key.json
+          echo "$GCP_SERVICE_ACCOUNT_KEY"
+          cat /home/runner/gcloud-key.json
+
+      - name: Install gcloud SDK
+        run: |
+          curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
+          tar xzf google-cloud-sdk.tar.gz
+          ./google-cloud-sdk/install.sh
+
+      - name: Install kubectl
+        run: |
+           sudo apt-get update && sudo apt-get install -y kubectl
+
+      - name: Install Google Auth Plugin
+        run: |-
+            echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+            sudo apt update
+            sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin kubectl
+            export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+
+
+
+      - name: Authenticate gcloud
+        run: |
+          gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=/home/runner/gcloud-key.json --project=studentbase-v1
+          gcloud config set project studentbase-v1
+          gcloud config set compute/zone us-central1-a
+
+      - name: Get GKE Credentials
+        run: gcloud container clusters get-credentials student-base-cluster --region us-central1-c
+
+      - name: docker login
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: push
+        run: docker push us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest
+
+      - name: deploy
+        run: |
+          ls
+          kubectl apply -f scripts/deploy.yml --validate=false
+          kubectl rollout restart deployment/studbase-backend
