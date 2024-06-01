@@ -28,15 +28,32 @@ jobs:
           cat /home/runner/gcloud-key.json
         shell: /usr/bin/bash -e {0}
 
+      - name: Install gcloud SDK
+        run: |
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+        shell: /usr/bin/bash -e {0}
+
+      - name: Authenticate gcloud
+        run: |
+          gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=/home/runner/gcloud-key.json --project=studentbase-v1
+          gcloud config set project studentbase-v1
+          gcloud config set compute/zone us-central1-c  # Set your compute zone
+        shell: /usr/bin/bash -e {0}
+
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials student-base-cluster  # Replace with your GKE cluster name
+        shell: /usr/bin/bash -e {0}
+
       - name: docker login
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
-      - name: auth
-        run: gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=/home/runner/gcloud-key.json --project=studentbase-v1
-
       - name: push
         run: docker push us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest
+
       - name: deploy
         run: |
-          ls   # Verify if the directory contains the deploy.yml file
-          kubectl apply -f scripts/deploy.yml  --validate=false
+          ls  # Verify if the directory contains the deploy.yml file
+          kubectl apply -f scripts/deploy.yml --validate=false
+        shell: /usr/bin/bash -e {0}
+
