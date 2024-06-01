@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     name: Deploy to Maven Repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
@@ -40,9 +40,14 @@ jobs:
 
       - name: Install Google Auth Plugin
         run: |-
-             curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-478.0.0-linux-x86_64.tar.gz
-             tar -xf google-cloud-cli-478.0.0-linux-x86_64.tar.gz
-             ./google-cloud-sdk/install.sh
+            echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+            sudo apt update
+            sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin kubectl
+            export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+
+
 
       - name: Authenticate gcloud
         run: |
@@ -62,5 +67,6 @@ jobs:
       - name: deploy
         run: |
           ls
+          kubectl get pods
           kubectl apply -f scripts/deploy.yml --validate=false
 
