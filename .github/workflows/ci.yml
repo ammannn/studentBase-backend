@@ -27,11 +27,15 @@ jobs:
           echo "$GCP_SERVICE_ACCOUNT_KEY"
           cat /home/runner/gcloud-key.json
 
-      - name: Install gcloud SDK and GKE Auth Plugin
+      - name: Install gcloud SDK
         run: |
-          sudo apt-get update
-          sudo apt-get install -y google-cloud-cli 
-          gcloud components install gke-gcloud-auth-plugin
+          curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
+          tar xzf google-cloud-sdk.tar.gz
+          ./google-cloud-sdk/install.sh
+
+      - name: Install kubectl
+        run: |
+          gcloud components install kubectl
 
       - name: Authenticate gcloud
         run: |
