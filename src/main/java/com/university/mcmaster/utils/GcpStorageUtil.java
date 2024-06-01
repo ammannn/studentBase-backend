@@ -18,6 +18,12 @@ public class GcpStorageUtil {
                 Storage.SignUrlOption.withV4Signature());
     }
 
+    public static String getCountries() {
+        Storage storage = StorageOptions.newBuilder().setProjectId(EnvironmentVariables.PROJECT_ID).build().getService();
+        Blob blob = storage.get(BlobId.of(EnvironmentVariables.BUCKET_NAME, "/static/countries"));
+        return new String(blob.getContent());
+    }
+
     public static URL createPostUrl(String filePath, String contentType) {
         Storage storage = StorageOptions.newBuilder().setProjectId(EnvironmentVariables.PROJECT_ID).build().getService();
         BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(EnvironmentVariables.BUCKET_NAME, filePath)).build();

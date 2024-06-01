@@ -1,13 +1,19 @@
 package com.university.mcmaster.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.university.mcmaster.integrations.sheerid.SheerIdService;
 import com.university.mcmaster.integrations.sheerid.model.SheerIdUniversity;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
 import com.university.mcmaster.models.dtos.request.SheerIdOrgSearchRequestDto;
+import com.university.mcmaster.utils.GcpStorageUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -20,6 +26,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class MainController {
+
+    private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
     @GetMapping("/version")
     public ResponseEntity<?> version() {
@@ -34,14 +42,16 @@ public class MainController {
     @GetMapping("/countries")
     public ResponseEntity<?> getCountries() {
         ObjectMapper mapper = new ObjectMapper();
-        HashMap<String, Object> jsonMap = null;
         try {
-            jsonMap = mapper.readValue(new File(Paths.get("src","main","resources","static","countries.json").toString()), HashMap.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            JsonNode node = mapper.readTree(GcpStorageUtil.getCountries());
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .data(node)
+                    .build());
+        } catch (JsonProcessingException e) {
+            log.trace(e.getMessage());
         }
         return ResponseEntity.ok(ApiResponse.builder()
-                .data(jsonMap)
+                .data(new HashMap<>())
                 .build());
     }
 
