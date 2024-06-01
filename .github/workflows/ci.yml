@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - pipeline # Trigger the workflow on pushes to the main branch
+      - pipeline
 
 jobs:
   deploy:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }} # Define the environment variable using secrets
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
     steps:
       - name: Check out repository
@@ -26,14 +26,20 @@ jobs:
           echo "$GCP_SERVICE_ACCOUNT_KEY" > /home/runner/gcloud-key.json
           echo "$GCP_SERVICE_ACCOUNT_KEY"
           cat /home/runner/gcloud-key.json
-        shell: /usr/bin/bash -e {0}
+
+      - name: Install gcloud SDK and GKE Auth Plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-cloud-sdk google-cloud-cli-gke-gcloud-auth-plugin
 
       - name: Authenticate gcloud
         run: |
           gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=/home/runner/gcloud-key.json --project=studentbase-v1
           gcloud config set project studentbase-v1
-          gcloud config set compute/zone us-central1-c  # Set your compute zone
-        shell: /usr/bin/bash -e {0}
+          gcloud config set compute/zone us-central1-a
+
+      - name: Get GKE Credentials
+        run: gcloud container clusters get-credentials student-base-cluster --region us-central1-c
 
       - name: docker login
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
@@ -41,17 +47,8 @@ jobs:
       - name: push
         run: docker push us-central1-docker.pkg.dev/studentbase-v1/studentbase/backend:latest
 
-
-      - name: Get GKE Credentials
-        run: |
-          sudo apt-get update && apt-get install google-cloud-cli-gke-gcloud-auth-plugin
-          gcloud components install gke-gcloud-auth-plugin
-          gcloud container clusters get-credentials student-base-cluster --region us-central1-c
-        shell: /usr/bin/bash -e {0}
-
       - name: deploy
         run: |
-          ls  # Verify if the directory contains the deploy.yml file
+          ls
           kubectl apply -f scripts/deploy.yml --validate=false
-        shell: /usr/bin/bash -e {0}
 
