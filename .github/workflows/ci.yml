@@ -28,11 +28,6 @@ jobs:
           cat /home/runner/gcloud-key.json
         shell: /usr/bin/bash -e {0}
 
-      - name: Install gcloud SDK
-        run: |
-          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
-        shell: /usr/bin/bash -e {0}
-
       - name: Authenticate gcloud
         run: |
           gcloud auth activate-service-account runners@studentbase-v1.iam.gserviceaccount.com --key-file=/home/runner/gcloud-key.json --project=studentbase-v1
