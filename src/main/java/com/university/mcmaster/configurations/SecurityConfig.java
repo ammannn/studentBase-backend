@@ -63,6 +63,7 @@ public class SecurityConfig {
                 "/api/login/**",
                 "/api/sheerId/verify/**",
                 "/api/sheerId/orgs/**",
+                "/api/countries/**",
                 "/api/version",
                 "/api/health",
                 "/swagger-ui/**",
