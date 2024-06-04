@@ -17,9 +17,9 @@ public class EnvironmentVariables {
     public static final String SHEERID_API_TOKEN = getEnvString("SHEERID_API_TOKEN",false);
 
     private static String getPlatformUrl(){
-        String url = getEnvUrlString("PLATFORM_URL");
-        if (null == url) return "http://localhost:4200";
-        return url;
+        String env = getEnvironment();
+        if(null == env || env.trim().isEmpty() || env.contains("prod")) return "https://studentbase.co";
+        return "http://localhost:4200";
     }
     private static String getEnvUrlString(String env) {
         String url = getEnvString(env,false);
