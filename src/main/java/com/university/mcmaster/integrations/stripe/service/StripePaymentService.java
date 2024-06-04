@@ -14,7 +14,6 @@ import com.university.mcmaster.models.dtos.response.MethodResponse;
 import com.university.mcmaster.models.entities.StripeProduct;
 import com.university.mcmaster.utils.EnvironmentVariables;
 import com.university.mcmaster.utils.Utility;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
