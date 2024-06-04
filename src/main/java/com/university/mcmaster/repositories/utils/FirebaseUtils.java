@@ -1,5 +1,6 @@
 package com.university.mcmaster.repositories.utils;
 
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.WriteResult;
@@ -38,7 +39,15 @@ public class FirebaseUtils<T extends FirebaseCommonProps>{
 
     public Query addLastSeen(Query query,String collection,String lastSeen){
         if(null != collection && null != lastSeen && false == lastSeen.trim().isEmpty()){
-            query = query.startAfter(FirestoreClient.getFirestore().collection(collection).document(lastSeen));
+            try {
+                DocumentSnapshot snapshot = FirestoreClient.getFirestore().collection(collection).document(lastSeen).get().get();
+                if(null != snapshot){
+                    System.out.println("snapshot is available");
+                    query = query.startAfter(snapshot);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return query;
     }

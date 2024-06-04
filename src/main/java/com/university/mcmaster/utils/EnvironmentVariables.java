@@ -10,11 +10,11 @@ public class EnvironmentVariables {
     public static final String BUCKET_NAME = getEnvString("BUCKET_NAME",false);
     public static final String GOOGLE_APPLICATION_CREDENTIALS = getGoogleCreds();
     public static final String ADMIN_EMAIL = getEnvString("ADMIN_EMAIL",false);
-    public static final String STRIPE_API_KEY = getEnvString("STRIPE_API_KEY",false);
-    public static final String STRIPE_ENDPOINT_SECRET = getEnvString("STRIPE_ENDPOINT_SECRET",false);
+    public static final String STRIPE_API_KEY = getEnvString("STRIPE_API_KEY",true);
+    public static final String STRIPE_ENDPOINT_SECRET = getEnvString("STRIPE_ENDPOINT_SECRET",true);
     public static final String PLATFORM_URL = getPlatformUrl();
-    public static final String SHEERID_PROGRAM_ID = getEnvString("SHEERID_PROGRAM_ID",false);
-    public static final String SHEERID_API_TOKEN = getEnvString("SHEERID_API_TOKEN",false);
+    public static final String SHEERID_PROGRAM_ID = getEnvString("SHEERID_PROGRAM_ID",true);
+    public static final String SHEERID_API_TOKEN = getEnvString("SHEERID_API_TOKEN",true);
 
     private static String getPlatformUrl(){
         String env = getEnvironment();
@@ -57,6 +57,9 @@ public class EnvironmentVariables {
     private static String getEnvString(String varName, boolean isSecret) {
         try {
             String tempVar = System.getenv(varName);
+            if(null == tempVar && isSecret){
+                tempVar = SecretManager.getSecret(varName);
+            }
             return sanitiseString(tempVar);
         } catch (Exception e) {
             log.error(e.getMessage());

@@ -130,8 +130,7 @@ public class MigrationController {
     }
 
     @GetMapping("/index-check")
-    @EventListener
-    public ResponseEntity<?> indexApi(ApplicationStartedEvent event){
+    public ResponseEntity<?> indexApi(){
         userRepo.findUserByEmail("test");
         userRepo.getAllUsersByRole(UserRole.admin);
         userRepo.getPaginatedUsersByVerificationStatusForAdmin(VerificationStatus.failed,10,"test");

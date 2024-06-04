@@ -52,8 +52,8 @@ public class ApplicationRepoImpl extends FirebaseUtils<Application> implements A
                 .whereEqualTo("deleted",false);
         if(null != rentalUnitId && false == rentalUnitId.isEmpty()) query = query.whereEqualTo("rentalUnitId",rentalUnitId);
         if(null != status) query = query.whereEqualTo("applicationStatus",status);
-        query = addLastSeen(query,FirestoreConstants.FS_APPLICATIONS,lastSeen);
         query = query.orderBy("lastUpdatedOn", Query.Direction.DESCENDING);
+        query = addLastSeen(query,FirestoreConstants.FS_APPLICATIONS,lastSeen);
         if(limit > 0) query = query.limit(limit);
         return processQueryForEntityList(query,Application.class);
     }
