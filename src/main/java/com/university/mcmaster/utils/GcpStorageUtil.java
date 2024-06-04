@@ -19,9 +19,8 @@ public class GcpStorageUtil {
     }
 
     public static String getCountries() {
-        Storage storage = StorageOptions.newBuilder().setProjectId(EnvironmentVariables.PROJECT_ID).build().getService();
-        Blob blob = storage.get(BlobId.of(EnvironmentVariables.BUCKET_NAME, "static/countries.json"));
-        return new String(blob.getContent());
+        URL url = createGetUrl("static/countries.json");
+        return new String(Utility.getData(url).toByteArray());
     }
 
     public static URL createPostUrl(String filePath, String contentType) {

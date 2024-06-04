@@ -11,6 +11,12 @@ import com.university.mcmaster.models.entities.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -226,6 +232,34 @@ public class Utility {
                 +timeSlot.getEnd().getHour()+"#"
                 +timeSlot.getEnd().getMinute()+"#"
                 +timeSlot.getEnd().getDayPeriod().toString();
+    }
+
+    public static ByteArrayOutputStream getData(URL url) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        InputStream inputStream = null;
+        boolean errorInDownloadingVideo = false;
+        try {
+            URLConnection urlConnection = url.openConnection();
+            urlConnection.setConnectTimeout(3000);
+            urlConnection.connect();
+            inputStream = urlConnection.getInputStream();
+            byte[] byteChunk = new byte[1024];
+            int n;
+            while ((n = inputStream.read(byteChunk)) > 0) {
+                byteArrayOutputStream.write(byteChunk, 0, n);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+
+                }
+            }
+        }
+        return byteArrayOutputStream;
     }
 }
 

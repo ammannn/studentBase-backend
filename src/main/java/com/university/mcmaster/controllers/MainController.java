@@ -3,6 +3,7 @@ package com.university.mcmaster.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.university.mcmaster.enums.ApplicationStatus;
 import com.university.mcmaster.integrations.sheerid.SheerIdService;
 import com.university.mcmaster.integrations.sheerid.model.SheerIdUniversity;
 import com.university.mcmaster.models.dtos.request.ApiResponse;
@@ -10,6 +11,8 @@ import com.university.mcmaster.models.dtos.request.SheerIdOrgSearchRequestDto;
 import com.university.mcmaster.utils.GcpStorageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +47,7 @@ public class MainController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode node = mapper.readTree(GcpStorageUtil.getCountries());
+            System.out.println(node);
             return ResponseEntity.ok(ApiResponse.builder()
                     .data(node)
                     .build());
