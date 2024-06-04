@@ -16,7 +16,6 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("running sec filter before request : " + request.getRequestURI());
         String authHeader = request.getHeader("Authorization");
         if(null != authHeader && authHeader.startsWith("Bearer ")){
             String tokenStr = authHeader.substring(7);
@@ -26,13 +25,8 @@ public class SecurityFilter extends OncePerRequestFilter {
                 token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(token);
                 request.setAttribute("user",userDetails);
-            }else{
-                logger.trace("user user found for give token on firebase auth");
             }
-        }else{
-            logger.trace("no auth token provided");
         }
         filterChain.doFilter(request, response);
-        System.out.println("running sec filter after request : "  + response.getStatus());
     }
 }
