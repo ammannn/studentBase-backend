@@ -151,11 +151,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public ResponseEntity<?> processPaymentWebhook(String payload,String sigHeader) {
+        System.out.println("**************************************************");
+        log.trace("request is received to process payment webhook");
         Event event = null;
         try {
             event = Webhook.constructEvent(payload, sigHeader, EnvironmentVariables.STRIPE_ENDPOINT_SECRET);
             EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
             StripeObject stripeObject  = dataObjectDeserializer.deserializeUnsafe();
+            System.out.println(event.getType());
             if("payment_intent.succeeded".equals(event.getType())){
                 PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
                 processPaymentSuccess(paymentIntent);
@@ -170,8 +173,10 @@ public class PaymentServiceImpl implements PaymentService {
                 processExpiredCheckoutSession(session);
             }
         } catch (JsonSyntaxException | SignatureVerificationException | EventDataObjectDeserializationException e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("");
         }
+        System.out.println("**************************************************");
         return ResponseEntity.ok("ok");
     }
 
@@ -193,6 +198,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processPaymentFailed(PaymentIntent paymentIntent) {
+        log.trace("processing stripe webhook for failed payment");
         Map<String,String> paymentIntentData =  paymentIntent.getMetadata();
         String requestId = paymentIntentData.get("requestId");
         String paymentId = paymentIntentData.get("paymentId");
@@ -217,6 +223,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processPaymentSuccess(PaymentIntent paymentIntent) {
+        log.trace("processing stripe webhook for successfull payment");
         Map<String,String> paymentIntentData =  paymentIntent.getMetadata();
         String requestId = paymentIntentData.get("requestId");
         String paymentId = paymentIntentData.get("paymentId");
