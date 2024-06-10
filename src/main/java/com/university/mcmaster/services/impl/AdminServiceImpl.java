@@ -55,6 +55,10 @@ public class AdminServiceImpl implements AdminService {
         log.trace("BUCKET_NAME : "  +EnvironmentVariables.BUCKET_NAME);
         log.trace("PROJECT_ID : "  +EnvironmentVariables.PROJECT_ID);
         log.trace("ADMIN_EMAIL : "  +EnvironmentVariables.ADMIN_EMAIL);
+        log.trace("SHEERID_API_TOKEN : "  +EnvironmentVariables.SHEERID_API_TOKEN);
+        log.trace("SHEERID_PROGRAM_ID : "  +EnvironmentVariables.SHEERID_PROGRAM_ID);
+        log.trace("STRIPE_API_KEY : "  +EnvironmentVariables.STRIPE_API_KEY);
+        log.trace("STRIPE_ENDPOINT_SECRET : "  +EnvironmentVariables.STRIPE_ENDPOINT_SECRET);
         log.trace("******************************************");
         String email = EnvironmentVariables.ADMIN_EMAIL;
         if(null != email && false == email.isEmpty()){

@@ -19,6 +19,7 @@ import com.university.mcmaster.services.UserService;
 import com.university.mcmaster.utils.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
@@ -218,17 +220,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> handleSheerIdVerification(Map<String,Object> requestDto, String sigHeader) {
+        log.trace("[handleSheerIdVerification] request is received to process sheer id verification data");
         String verificationId = getVerificationId(requestDto);
         if(null != verificationId){
+            log.trace("[handleSheerIdVerification] obtained verification id : " + verificationId + ", fetching verification details");
             SheerIdVerificationDetails details = SheerIdService.getSheerIdVerificationDetailsById(verificationId);
             if(null != details){
+                log.trace("[handleSheerIdVerification] obtained details data, checking for required details");
                 if(null != details.getPersonInfo() && null != details.getPersonInfo().getOrganization()){
+                    log.trace("[handleSheerIdVerification] fetching university from sheerid");
                     SheerIdUniversity sheerIdUniversity = SheerIdService.getSheerIdUniversityByVerificationId(verificationId);
                     if(null != sheerIdUniversity){
                         details.getPersonInfo().setOrganization(sheerIdUniversity);
                     }
                 }
                 details.setId(UUID.randomUUID().toString());
+                log.trace("[handleSheerIdVerification] saving sheer id details");
                 verificationRepo.save(details);
             }
         }
