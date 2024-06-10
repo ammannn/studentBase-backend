@@ -1,5 +1,6 @@
 package com.university.mcmaster.models.entities;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.university.mcmaster.enums.FilePurpose;
 import com.university.mcmaster.enums.RentalUnitElement;
 import com.university.mcmaster.models.FirebaseCommonProps;
@@ -8,6 +9,7 @@ import lombok.*;
 
 @Getter@Setter@AllArgsConstructor
 @NoArgsConstructor@Builder
+@IgnoreExtraProperties
 public class File implements FirebaseCommonProps {
     public static String collection = FirestoreConstants.FS_FILES;
     private String id;

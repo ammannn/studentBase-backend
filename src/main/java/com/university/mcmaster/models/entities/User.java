@@ -1,5 +1,6 @@
 package com.university.mcmaster.models.entities;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.university.mcmaster.enums.UserRole;
 import com.university.mcmaster.enums.VerificationStatus;
 import com.university.mcmaster.models.FirebaseCommonProps;
@@ -14,6 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@IgnoreExtraProperties
 public class User implements FirebaseCommonProps {
         private static String collection = FirestoreConstants.FS_USERS;
         private String id;
