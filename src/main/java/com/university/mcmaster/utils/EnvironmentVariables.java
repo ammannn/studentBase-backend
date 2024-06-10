@@ -56,9 +56,11 @@ public class EnvironmentVariables {
 
     private static String getEnvString(String varName, boolean isSecret) {
         try {
-            String tempVar = System.getenv(varName);
-            if(null == tempVar && isSecret){
+            String tempVar = null;
+            if(isSecret){
                 tempVar = SecretManager.getSecret(varName);
+            }else{
+                tempVar = System.getenv(varName);
             }
             return sanitiseString(tempVar);
         } catch (Exception e) {
