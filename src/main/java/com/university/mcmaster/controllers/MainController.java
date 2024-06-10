@@ -34,7 +34,7 @@ public class MainController {
 
     @GetMapping("/version")
     public ResponseEntity<?> version() {
-        return ResponseEntity.ok("v0.0.2");
+        return ResponseEntity.ok("v0.0.3");
     }
 
     @GetMapping("/health")
