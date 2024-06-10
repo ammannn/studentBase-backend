@@ -18,7 +18,7 @@ public class EnvironmentVariables {
 
     private static String getPlatformUrl(){
         String env = getEnvironment();
-        if(null == env || env.trim().isEmpty() || env.contains("prod")) return "https://studentbase.co";
+        if(null == env || env.trim().isEmpty() || env.contains("prod")) return "https://studentbase-v1.web.app";
         return "http://localhost:4200";
     }
     private static String getEnvUrlString(String env) {
