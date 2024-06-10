@@ -51,7 +51,7 @@ public class EnvironmentVariables {
     }
     private static String getGoogleCreds() {
         String name = "GOOGLE_APPLICATION_CREDENTIALS";
-        return getEnvString(name,true);
+        return getEnvString(name,false);
     }
 
     private static String getEnvString(String varName, boolean isSecret) {
