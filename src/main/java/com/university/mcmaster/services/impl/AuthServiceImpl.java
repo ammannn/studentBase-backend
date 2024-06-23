@@ -220,7 +220,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> handleSheerIdVerification(Map<String,Object> requestDto, String sigHeader) {
+
         log.trace("[handleSheerIdVerification] request is received to process sheer id verification data");
+        System.out.println("[handleSheerIdVerification] request is received to process sheer id verification data");
         String verificationId = getVerificationId(requestDto);
         if(null != verificationId){
             log.trace("[handleSheerIdVerification] obtained verification id : " + verificationId + ", fetching verification details");
